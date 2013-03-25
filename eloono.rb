@@ -25,7 +25,7 @@ get '/' do
   "Just Checking it Out"
 end
 
-post '/submit' do
+get '/submit' do
   @sysword = SystemIgnoreWords.create!(:word => "the")
   if @sysword.save
     redirect '/'
