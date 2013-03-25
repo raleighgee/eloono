@@ -67,3 +67,24 @@ end
 get '/' do
   "Just Checking it Out"
 end
+
+get '/tweets' do
+  
+  user = User.find_by_id(session[:user_id])
+  
+  Twitter.configure do |config|
+		config.consumer_key = "DHBxwGvab2sJGw3XhsEmA"
+		config.consumer_secret = "530TCO6YMRuB23R7wse91rTcIKFPKQaxFQNVhfnk"
+		config.oauth_token = user.token
+		config.oauth_token_secret = user.secret
+	end
+	
+	@tweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true)
+	
+	@tweets.each do |p|
+	  code = code.to_s+p.full_text.to_s=%{<br /><br />}
+	end
+	
+	code
+	  
+end
