@@ -82,7 +82,7 @@ get '/tweets' do
 	@tweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true)
 	
 	@tweets.each do |p|
-	  code = code.to_s+p.full_text.to_s=%{<br /><br />}
+	  code = code.to_s+p.full_text.to_s+%{<br /><br />}
 	end
 	
 	code
