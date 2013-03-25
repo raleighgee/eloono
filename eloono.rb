@@ -79,6 +79,8 @@ get '/tweets' do
 		config.oauth_token_secret = user.secret
 	end
 	
+	code = ""
+	
 	@tweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true)
 	
 	@tweets.each do |p|
