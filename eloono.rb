@@ -1,8 +1,8 @@
 require 'rubygems'
 require 'sinatra'
 require 'sinatra/activerecord'
-require 'config/environments.rb'
-require 'models/connection.rb'
+require 'environments'
+require 'connection'
 
 get '/' do
   "Just Checking it Out"
