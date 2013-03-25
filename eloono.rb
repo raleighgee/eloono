@@ -49,6 +49,7 @@ get '/auth/:name/callback' do
     :secret => auth["credentials"]["secret"],
     :name => auth["info"]["name"]})
   #session[:user_id] = user.id
+  user.save
   redirect '/'
 end
 
