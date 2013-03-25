@@ -4,6 +4,7 @@ require 'sinatra'
 require 'sinatra/activerecord'
 require 'active_record'
 require 'uri'
+require 'twitter'
 
 require_relative "./models/connection"
 require_relative "./models/itweets"
