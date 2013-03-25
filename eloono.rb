@@ -38,6 +38,8 @@ ActiveRecord::Base.establish_connection(
 
 use OmniAuth::Strategies::Twitter, 'DHBxwGvab2sJGw3XhsEmA', '530TCO6YMRuB23R7wse91rTcIKFPKQaxFQNVhfnk'
 
+enable :sessions
+
 get '/auth/:name/callback' do
   auth = request.env["omniauth.auth"]
   user = User.first_or_create({ :uid => auth["uid"]}, {
