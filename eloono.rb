@@ -4,6 +4,7 @@ require 'sinatra'
 require 'sinatra/activerecord'
 require 'active_record'
 require 'uri'
+require 'omniauth-twitter'
 require 'twitter'
 
 require_relative "./models/connection"
@@ -31,6 +32,29 @@ ActiveRecord::Base.establish_connection(
   :database => db.path[1..-1],
   :encoding => 'utf8'
 )
+
+
+########## TWITTER AUTHENTICATION ########## 
+
+use OmniAuth::Strategies::Twitter, 'DHBxwGvab2sJGw3XhsEmA', '530TCO6YMRuB23R7wse91rTcIKFPKQaxFQNVhfnk'
+
+get '/auth/:name/callback' do
+  auth = request.env["omniauth.auth"]
+  user = User.first_or_create({ :uid => auth["uid"]}, {
+    :uid => auth["uid"],
+    :provider => auth["provider"],
+    :token => auth["credentials"]["token"],
+    :secret => auth["credentials"]["secret"],
+    :name => auth["info"]["name"]})
+  #session[:user_id] = user.id
+  redirect '/'
+end
+
+["/sign_in/?", "/signin/?", "/log_in/?", "/login/?", "/sign_up/?", "/signup/?"].each do |path|
+  get path do
+    redirect '/auth/twitter'
+  end
+end
 
 
 ########## MVC CODE ########## 
