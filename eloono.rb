@@ -6,6 +6,7 @@ require 'active_record'
 require 'uri'
 
 require_relative "./models/system_ignore_word"
+require_relative "./models/link"
 
 
 ########## DB SETUP ########## 
@@ -28,8 +29,8 @@ get '/' do
 end
 
 get '/submit' do
-  @sysword = SystemIgnoreWords.create!(:word => "the")
-  if @sysword.save
+  @link = Link.create!(:tweet_id => 316846121321, :expanded_url => "yahoo.com", :source_id => 1, :user_id => 1)
+  if @link.save
     redirect '/'
   else
     "Sorry, there was an error!"
