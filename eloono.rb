@@ -29,7 +29,7 @@ get '/' do
 end
 
 get '/submit' do
-  @link = Link.create!(:tweet_id => 316846121321, :expanded_url => "yahoo.com", :source_id => 1, :user_id => 1)
+  @link = Link.create!(:tweet_id => 123, :expanded_url => "yahoo.com", :source_id => 1, :user_id => 1)
   if @link.save
     redirect '/'
   else
