@@ -48,7 +48,16 @@ get '/auth/:name/callback' do
     :token => auth["credentials"]["token"],
     :secret => auth["credentials"]["secret"],
     :name => auth["info"]["name"])
-  #session[:user_id] = user.id
+  session[:user_id] = user.id
+  user.save
+  redirect '/setsecrets'
+end
+
+get 'setsecrets' do
+  user = User.find_by_id(session[:user_id])
+  auth = request.env["omniauth.auth"]
+  user.token = auth["credentials"]["token"]
+  user.secret = auth["credentials"]["secret"]
   user.save
   redirect '/'
 end
