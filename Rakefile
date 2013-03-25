@@ -1,2 +1,2 @@
-require './app'
+require './eloono'
 require 'sinatra/activerecord/rake'
