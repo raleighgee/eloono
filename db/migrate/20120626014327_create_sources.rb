@@ -1,0 +1,35 @@
+class CreateSources < ActiveRecord::Migration
+	def change
+		create_table :sources do |t|
+			t.integer :user_id
+			t.string :twitter_id
+			t.integer :score, :default => 1
+			t.integer :statuses_count
+			t.integer :favorites_count
+			t.string :profile_image_url
+			t.string :user_name, :default => "not seen"
+			t.integer :listed_count
+			t.string :following_flag
+			t.text :user_description
+			t.string :location
+			t.integer :followers_count
+			t.string :user_url
+			t.string :user_screen_name
+			t.integer :friends_count
+			t.string :user_language
+			t.string :user_time_zone
+			t.datetime :twitter_created_at
+			t.integer :number_links_followed, :default => 0
+			t.integer :number_of_interactions, :default => 0
+			t.integer :number_retweets, :default => 0
+			t.float :tweets_per_hour, :default => 0
+			t.integer :ignores, :default => 0
+			t.float :net_interaction_score, :default => 0
+			t.float :average_word_score, :default => 0
+			t.integer :word_score_rank, :default => 1
+			t.integer :interaction_score_rank, :default => 1
+			t.integer :ignore_order, :default => 21
+			t.timestamps
+		end
+	end
+end
