@@ -36,17 +36,18 @@ ActiveRecord::Base.establish_connection(
 
 ########## TWITTER AUTHENTICATION ########## 
 
+use OmniAuth::Strategies::Twitter, 'DHBxwGvab2sJGw3XhsEmA', '530TCO6YMRuB23R7wse91rTcIKFPKQaxFQNVhfnk'
+
 enable :sessions
 
 get '/auth/:name/callback' do
-  use OmniAuth::Strategies::Twitter, 'DHBxwGvab2sJGw3XhsEmA', '530TCO6YMRuB23R7wse91rTcIKFPKQaxFQNVhfnk'
   auth = request.env["omniauth.auth"]
   user = User.find_or_create_by_uid(
     :uid => auth["uid"],
     :provider => auth["provider"],
     :token => auth["credentials"]["token"],
     :secret => auth["credentials"]["secret"],
-    :name => auth["info"]["name"]})
+    :name => auth["info"]["name"])
   #session[:user_id] = user.id
   user.save
   redirect '/'
