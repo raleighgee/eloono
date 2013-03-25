@@ -5,6 +5,8 @@ require 'sinatra/activerecord'
 require 'active_record'
 require 'uri'
 
+require_relative "./models/system_ignore_word"
+
 
 ########## DB SETUP ########## 
 db = URI.parse(ENV['DATABASE_URL'] || 'postgres://localhost/mydb')
