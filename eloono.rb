@@ -53,7 +53,7 @@ get '/auth/:name/callback' do
   redirect '/setsecrets'
 end
 
-get 'setsecrets' do
+get '/setsecrets' do
   user = User.find_by_id(session[:user_id])
   auth = request.env["omniauth.auth"]
   user.token = auth["credentials"]["token"]
