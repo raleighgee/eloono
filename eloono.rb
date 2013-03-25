@@ -1,9 +1,12 @@
+########## REQUIRES ########## 
 require 'rubygems'
 require 'sinatra'
 require 'sinatra/activerecord'
 require 'active_record'
 require 'uri'
 
+
+########## DB SETUP ########## 
 db = URI.parse(ENV['DATABASE_URL'] || 'postgres://localhost/mydb')
 
 ActiveRecord::Base.establish_connection(
@@ -17,7 +20,7 @@ ActiveRecord::Base.establish_connection(
 )
 
 
-
+########## MVC CODE ########## 
 get '/' do
   "Just Checking it Out"
 end
