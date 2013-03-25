@@ -1,6 +1,6 @@
 class LoadSysIgnoreWords < ActiveRecord::Migration
   def up
-    Sysign.create(:word=>"the")
+    Sysigword.create(:word=>"the")
     Sysigword.create(:word=>"to")
     Sysigword.create(:word=>"a")
     Sysigword.create(:word=>"of")
