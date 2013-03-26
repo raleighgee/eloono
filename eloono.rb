@@ -6,6 +6,7 @@ require 'active_record'
 require 'uri'
 require 'omniauth-twitter'
 require 'twitter'
+require 'pony'
 
 require_relative "./models/connection"
 require_relative "./models/itweets"
@@ -89,4 +90,25 @@ get '/tweets' do
 	
 	code
 	  
+end
+
+get '/sendmail' do
+	Pony.mail(
+		:from => 'raleigh.gresham@gmail.com',
+		:to => 'riff42@yahoo.com',
+		:subject => 'The Tweets You Should Be Reading',
+		:body => 'This is where the tweets will go',
+		:port => '587',
+		:via => :smtp,
+		:via_options => { 
+			:address => 'smtp.sendgrid.net', 
+			:port => '587', 
+			:enable_starttls_auto => true, 
+			:user_name => ENV['SENDGRID_USERNAME'], 
+			:password => ENV['SENDGRID_PASSWORD'], 
+			:authentication => :plain, 
+			:domain => ENV['SENDGRID_DOMAIN']
+		}
+	 )
+    redirect '/' 
 end
