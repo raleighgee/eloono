@@ -197,7 +197,7 @@ get '/first_score' do
 								# look to see if word already exists, if not, create a new one using cleanword above
 								word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
 								# check if word is on the System ignore list
-								sysignore = SystemIgnoreWord.find_by_word(cleanword)
+								sysignore = Sysigword.find_by_word(cleanword)
 								if sysignore
 									word.sys_ignore_flag = "yes"
 								end
