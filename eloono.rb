@@ -348,7 +348,7 @@ get '/first_score' do
   		# Loop through words in split up tweet
   		@words.each do |w|
 			# check if word is on the System ignore list
-  			sysignore = SystemIgnoreWord.find_by_word(w)
+  			sysignore = Sysigword.find_by_word(w)
   			unless sysignore
 				# see if word is a Top 1,000 word
   				ntopword = Tword.find(:first, :conditions => ["word = ? and user_id = ?", w, user.id])
