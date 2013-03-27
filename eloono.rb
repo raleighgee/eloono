@@ -86,7 +86,7 @@ get '/first_score' do
 	user.handle = u.screen_name
 	user.profile_image_url = u.profile_image_url
 	user.language = u.lang.to_s
-	user.calls_left = Twitter.rate_limit_status.remaining_hits.to_i
+	#user.calls_left = Twitter.rate_limit_status.remaining_hits.to_i
 	user.save
 	friends = Twitter.friend_ids
 	friends.ids.each do |friend|
@@ -364,7 +364,7 @@ get '/first_score' do
   	end # End loop through "new" Tweets to score
 	
 	# Update user after scoring
-	user.calls_left = Twitter.rate_limit_status.remaining_hits.to_i
+	#user.calls_left = Twitter.rate_limit_status.remaining_hits.to_i
 	user.num_score_rounds = 1
 	user.save
 	
