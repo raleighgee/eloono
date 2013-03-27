@@ -386,7 +386,7 @@ get '/calc_scores' do
 						end # end check if word is a top word
 					end # end check if word is on the system ignore list
 				end # End loop through words in split up tweet    
-				tweet.word_quality_score = (scoreofwords.to_f/@words.size.theroko_f)
+				tweet.word_quality_score = (scoreofwords.to_f/@words.size.to_f)
 				tweet.score = tweet.word_quality_score
 				tweet.save
 			end # End loop through "new" Tweets to score
