@@ -248,8 +248,8 @@ get '/first_score' do
 								nohandle = nohandle.gsub("?", '')
 								nohandle = nohandle.gsub("&", '')
 								nohandle = nohandle.gsub("|", '')
-								nohandle = nohandle.gsub("—", '')
-								nohandle = nohandle.gsub('"','')
+								nohandle = nohandle.gsub("-", '')
+								#nohandle = nohandle.gsub('"','')
 								cleantweet = cleantweet.to_s+%{<a href="http://twitter.com/}+nohandle.to_s+%{" target="_blank" class="embed_handle">}+w.to_s+%{</a> }
 							else
 								cleantweet = cleantweet.to_s+w.to_s+" "
@@ -368,7 +368,7 @@ get '/first_score' do
 	user.num_score_rounds = 1
 	user.save
 	
-	 redirect '/tweets' 
+	redirect '/tweets' 
 	
 end
 
