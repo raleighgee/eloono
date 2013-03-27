@@ -321,13 +321,13 @@ get '/first_score' do
 	# Rebuild user's top words
 	@userwords = Word.find(:all, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"], :order => "seen_count DESC")
   	for userword in @userwords
-		ntopword = TopWord.create!(:word => userword.word, :user_id => user.id, :score => userword.seen_count)
+		ntopword = Tword.create!(:word => userword.word, :user_id => user.id, :score => userword.seen_count)
   	end
 		
   	# Rank top words for use in scoring
   	ranker = 1
   	lastscore = 0
-  	@ranks = TopWord.find(:all, :conditions => ["user_id = ?", user.id], :order => "score ASC")
+  	@ranks = Tword.find(:all, :conditions => ["user_id = ?", user.id], :order => "score ASC")
   	for rank in @ranks
   		if rank.score != lastscore
 			ranker = ranker+1
@@ -351,7 +351,7 @@ get '/first_score' do
   			sysignore = SystemIgnoreWord.find_by_word(w)
   			unless sysignore
 				# see if word is a Top 1,000 word
-  				ntopword = TopWord.find(:first, :conditions => ["word = ? and user_id = ?", w, user.id])
+  				ntopword = Tword.find(:first, :conditions => ["word = ? and user_id = ?", w, user.id])
 				# if word is a top 1,000 word, boost tweet score
   				if ntopword
 					scoreofwords = scoreofwords+ntopword.rank.to_f
