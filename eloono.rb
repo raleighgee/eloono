@@ -199,7 +199,7 @@ end
 
 get '/build_tweets' do
 	@users = User.find(:all)
-	for user in users
+	for user in @users
 	
   		# Select all tweets that have only been loaded (e.g. last action = pulled)
   		@tweets = Tweet.find(:all, :conditions => ["user_id = ? and last_action = ?", user.id, "pulled"], :order => "twitter_created_at DESC")
