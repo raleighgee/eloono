@@ -240,7 +240,7 @@ get '/build_tweets' do
 				
 				# if the number of words in the tweet is less than 3, set the tweet content to exactly what the tweet says - no clean required
 				if @words.size < 3
-					cleantweet = t.tweet_content
+					cleantweet = tweet.tweet_content
 				else
 					# build clean version of tweet
 					if w.include? %{http}
@@ -318,7 +318,7 @@ get '/build_tweets' do
 						@reallinks = flink.split(" ")
 						boom = %{http}+@reallinks[0].to_s
 						boom = boom.gsub('"','')
-						l = Link.find_or_create_by_expanded_url_and_tweet_id_and_user_id(:tweet_id => tweet.id, :expanded_url => boom, :user_id => user.id, :source_id => t.source_id)
+						l = Link.find_or_create_by_expanded_url_and_tweet_id_and_user_id(:tweet_id => tweet.id, :expanded_url => boom, :user_id => user.id, :source_id => tweet.source_id)
 						l.save
 					end
 				end
@@ -327,7 +327,7 @@ get '/build_tweets' do
 			# Set the tweet type based on whether the tweet has a link or not
 			haslink = Link.find_by_tweet_id(tweet.id)
 			if haslink
-				flinks = Link.count(:all, :conditions => ["tweet_id = ?", t.id])
+				flinks = Link.count(:all, :conditions => ["tweet_id = ?", tweet.id])
 				tweet.tweet_type = "link"
 				tweet.url_count = flinks
 			else
