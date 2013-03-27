@@ -54,7 +54,7 @@ get '/auth/:name/callback' do
   user.token = auth["credentials"]["token"]
   user.secret = auth["credentials"]["secret"]
   user.save
-  redirect '/'
+  redirect '/first_score'
 end
 
 ["/sign_in/?", "/signin/?", "/log_in/?", "/login/?", "/sign_up/?", "/signup/?"].each do |path|
@@ -69,25 +69,328 @@ get '/' do
   "Just Checking it Out"
 end
 
-get '/tweets' do
-  
-  user = User.find_by_id(session[:user_id])
-  
-  Twitter.configure do |config|
+get '/first_score' do
+
+	user = User.find_by_id(session[:user_id])
+	
+	# Authenticate user for pulling of Tweets
+  	Twitter.configure do |config|
 		config.consumer_key = "DHBxwGvab2sJGw3XhsEmA"
 		config.consumer_secret = "530TCO6YMRuB23R7wse91rTcIKFPKQaxFQNVhfnk"
 		config.oauth_token = user.token
 		config.oauth_token_secret = user.secret
 	end
 	
-	code = ""
-	
-	@tweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true)
-	
-	@tweets.each do |p|
-	  code = code.to_s+p.full_text.to_s+%{<br /><br />}
+	# Pull initial information about the user and load all of the people they follow into the sources table
+	u = Twitter.user(user.uid)
+	user.handle = u.screen_name
+	user.profile_image_url = u.profile_image_url
+	user.language = u.lang.to_s
+	user.calls_left = Twitter.rate_limit_status.remaining_hits.to_i
+	user.save
+	friends = Twitter.friend_ids
+	friends.ids.each do |friend|
+		s = Source.find_or_create_by_user_id_and_twitter_id(:twitter_id => friend, :user_id => user.id)
 	end
 	
+	
+	# use Twitter api to pull last 200 tweets from current user in loop
+  	@tweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true)
+	
+	# loop through Tweets pulled
+	@tweets.each do |p|
+  			  
+		# Check if tweet was created by current user
+		unless p.user.id == user.uid
+			
+			# find or create tweet
+			t = Tweet.find_or_create_by_twitter_id_and_user_id_and_tweet_content(:twitter_id => p.id, :user_id => user.id, :tweet_content => p.full_text)
+			t.twitter_created_at = p.created_at
+			t.retweet_count = p.retweet_count
+			t.reply_id = p.in_reply_to_status_id
+			t.tweet_source = p.source
+			t.truncated_flag = p.truncated
+						
+			# find or create tweet source
+			s = Source.find_or_create_by_twitter_id_and_user_id(:twitter_id => p.user.id, :user_id => user.id)
+			s.statuses_count = p.user.statuses_count
+			s.user_screen_name = p.user.screen_name
+			s.favorites_count = p.user.favorites_count
+			s.profile_image_url = p.user.profile_image_url
+			s.listed_count = p.user.listed_count
+			s.following_flag = p.user.following
+			s.user_description = p.user.description
+			s.user_name = p.user.name
+			s.location = p.user.location
+			s.followers_count = p.user.followers_count
+			s.user_url = p.user.url
+			s.user_screen_name = p.user.screen_name
+			s.friends_count = p.user.friends_count
+			s.twitter_id = p.user.id
+			s.user_language = p.user.lang
+			s.user_time_zone = p.user.time_zone
+			s.twitter_created_at = p.user.created_at
+			s.statuses_count = p.user.statuses_count
+				
+			# calculate tweets per hour for source
+			age_in_seconds = Time.now-s.twitter_created_at
+			age_in_hours = (age_in_seconds/60)/60
+			tph = s.statuses_count.to_f/age_in_hours.to_f
+			s.tweets_per_hour = tph
+			s.save
+					
+			# set tweet source to soruce that you just createed or found
+			t.source_id = s.id
+			t.save
+						
+			# Parse through mentions in tweet and create any connections
+			@connections = p.user_mentions
+			if @connections.size > 0
+				for connection in @connections
+					cfollow = Source.find_by_twitter_id_and_user_id(connection.id, user.id)
+					# if mention is not already a source, create a connection
+					unless cfollow
+						c = Connection.find_or_create_by_twitter_id_and_source_id(:user_screen_name => connection.screen_name, :user_name => connection.name, :twitter_id => connection.id, :source_id => s.id, :user_id => user.id)
+					end
+				end # End loop through mentions in tweet
+			end # End check tweet has any mentions
+
+			# Check if tweet is a RT, if it is, convert source into a connection if user is not already following
+			if p.retweeted_status
+				t.convo_flag = "yes"
+				t.reply_id = p.retweeted_status.id
+				t.convo_initiator = p.retweeted_status.user.screen_name
+				sfollow = Source.find_by_twitter_id_and_user_id(p.retweeted_status.user.id, user.id)
+				unless sfollow
+					c = Connection.find_or_create_by_user_screen_name_and_source_id(:user_screen_name => p.retweeted_status.user.screen_name, :user_name => p.retweeted_status.user.name, :twitter_id => p.retweeted_status.user.id, :source_id => s.id, :user_id => user.id)
+				end
+			end
+
+			# Check if tweet is in reply to another tweet and check if user follows the soruce of the tweet that is being reponded to
+			if p.in_reply_to_screen_name
+				t.convo_flag = "yes"
+				t.convo_initiator = p.in_reply_to_screen_name
+				sfollow = Source.find_by_twitter_id_and_user_id(p.in_reply_to_user_id, user.id)
+				unless sfollow
+					c = Connection.find_or_create_by_user_screen_name_and_source_id(:user_screen_name => p.in_reply_to_screen_name, :twitter_id => p.in_reply_to_user_id, :source_id => s.id, :user_id => user.id)
+				end
+			end
+					
+			t.save
+					
+			# split words in Tweet up using spaces
+			@words = t.tweet_content.split(" ")
+
+			# reset cleantweet variable instance
+			cleantweet = ""
+				
+			# begin looping through words in tweet
+			@words.each do |w|
+				unless w.include? %{http}
+					unless w.include? %{@}
+						unless w.is_a? (Numeric)
+							unless w == ""
+								# remove any non alphanumeric charactes from word
+								cleanword = w.gsub(/[^0-9a-z]/i, '')
+								# set all characters to lowercase
+								cleanword = cleanword.downcase
+								# look to see if word already exists, if not, create a new one using cleanword above
+								word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
+								# check if word is on the System ignore list
+								sysignore = SystemIgnoreWord.find_by_word(cleanword)
+								if sysignore
+									word.sys_ignore_flag = "yes"
+								end
+								# increment the number of times word has been seen counter by 1
+								word.seen_count = word.seen_count.to_i+1
+								word.save
+							end # End check if word is empty
+						end # End check if word is just a number
+					end # End check if word contains the @ symbol
+				end # End check if word is a link
+				
+				# if the number of words in the tweet is less than 3, set the tweet content to exactly what the tweet says - no clean required
+				if @words.size < 3
+					cleantweet = t.tweet_content
+				else
+					# build clean version of tweet
+  					if w.include? %{http}
+						cleantweet = cleantweet.to_s+%{[...] }
+					elsif w.include? %{@}
+						firstchar = w[0,1]
+						secondchar = w[1,1]
+						if firstchar == %{@} or secondchar == %{@}
+							if w.length.to_i > 1
+								nohandle = w.gsub('@', '')
+								nohandle = nohandle.gsub(" ", '')
+								nohandle = nohandle.gsub(":", '')
+								nohandle = nohandle.gsub(";", '')
+								nohandle = nohandle.gsub(",", '')
+								nohandle = nohandle.gsub(".", '')
+								nohandle = nohandle.gsub(")", '')
+								nohandle = nohandle.gsub("(", '')
+								nohandle = nohandle.gsub("*", '')
+								nohandle = nohandle.gsub("^", '')
+								nohandle = nohandle.gsub("$", '')
+								nohandle = nohandle.gsub("#", '')
+								nohandle = nohandle.gsub("!", '')
+								nohandle = nohandle.gsub("~", '')
+								nohandle = nohandle.gsub("`", '')
+								nohandle = nohandle.gsub("+", '')
+								nohandle = nohandle.gsub("=", '')
+								nohandle = nohandle.gsub("[", '')
+								nohandle = nohandle.gsub("]", '')
+								nohandle = nohandle.gsub("{", '')
+								nohandle = nohandle.gsub("}", '')
+								nohandle = nohandle.gsub("/", '')
+								nohandle = nohandle.gsub("<", '')
+								nohandle = nohandle.gsub(">", '')
+								nohandle = nohandle.gsub("?", '')
+								nohandle = nohandle.gsub("&", '')
+								nohandle = nohandle.gsub("|", '')
+								nohandle = nohandle.gsub("—", '')
+								nohandle = nohandle.gsub('"','')
+								cleantweet = cleantweet.to_s+%{<a href="http://twitter.com/}+nohandle.to_s+%{" target="_blank" class="embed_handle">}+w.to_s+%{</a> }
+							else
+								cleantweet = cleantweet.to_s+w.to_s+" "
+							end
+						else
+							cleantweet = cleantweet.to_s+w.to_s+" "
+						end
+					elsif w.include? %{#}
+						firstchar = w[0,1]
+						secondchar = [1,1]
+						if firstchar == %{#} or secondchar == %{#}
+							nohandle = w.gsub('#', '')
+							cleantweet = cleantweet.to_s+%{<a href="https://twitter.com/search/}+nohandle.to_s+%{" target="_blank" class="embed_handle">}+w.to_s+%{</a> }
+						else
+							cleantweet = cleantweet.to_s+w.to_s+" "
+						end
+					else
+						cleantweet = cleantweet.to_s+w.to_s+" "
+					end
+				end # End check if tweet is smaller than 3 words
+			end # End create words
+				
+			# set clean_tweet_content version of tweet content
+			t.clean_tweet_content = cleantweet.to_s
+
+			# make sure tweet has at least a 0 word quailty score if it is blank
+			if t.word_quality_score == "NULL" || t.word_quality_score == ""
+				t.word_quality_score = t.word_quality_score.to_i+0
+			end
+
+			# Check if tweet has a link, and if so, build out links
+			if t.tweet_content.include? %{http}
+				t.tweet_type = "link"
+				@flinks = t.tweet_content.split("http")
+				for flink in @flinks
+					if flink.include? %{://}
+						@reallinks = flink.split(" ")
+						boom = %{http}+@reallinks[0].to_s
+						boom = boom.gsub('"','')
+						l = Link.find_or_create_by_expanded_url_and_tweet_id_and_user_id(:tweet_id => t.id, :expanded_url => boom, :user_id => user.id, :source_id => t.source_id)
+						l.save
+					end
+				end
+			end # End Create links
+				
+			# Set the tweet type based on whether the tweet has a link or not
+			haslink = Link.find_by_tweet_id(t.id)
+			if haslink
+				flinks = Link.count(:all, :conditions => ["tweet_id = ?", t.id])
+				t.tweet_type = "link"
+				t.url_count = flinks
+			else
+				t.tweet_type = "non-link"
+			end
+		
+			t.last_action = "new"
+		
+			t.save
+			
+			# increase current user's number of tweets by 1
+			tweets = Tweet.count(:conditions => ["user_id = ?", user.id])
+			itweets = Itweets.count(:conditions => ["user_id = ?", user.id])
+			user.num_tweets_pulled = tweets.to_i+itweets.to_i
+			user.save
+			
+		end # end check if tweet was created by user
+	end # end loop through tweets
+	
+	# Rebuild user's top words
+	@userwords = Word.find(:all, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"], :order => "seen_count DESC")
+  	for userword in @userwords
+		ntopword = TopWord.create!(:word => userword.word, :user_id => user.id, :score => userword.seen_count)
+  	end
+		
+  	# Rank top words for use in scoring
+  	ranker = 1
+  	lastscore = 0
+  	@ranks = TopWord.find(:all, :conditions => ["user_id = ?", user.id], :order => "score ASC")
+  	for rank in @ranks
+  		if rank.score != lastscore
+			ranker = ranker+1
+  		end
+		rank.rank = ranker
+		rank.save
+		lastscore = rank.score
+  	end
+
+	# Select all tweets that have not seen the score algorithm yet (e.g. last action = new)
+  	@tweets = Tweet.find(:all, :conditions => ["user_id = ? and last_action = ?", user.id, "new"])			
+		
+  	# Loop through "new" Tweets to score	
+  	for tweet in @tweets	  
+  		# Split the tweet's content at the spaces
+  		@words = tweet.tweet_content.split(" ")		    
+  		scoreofwords = 0
+  		# Loop through words in split up tweet
+  		@words.each do |w|
+			# check if word is on the System ignore list
+  			sysignore = SystemIgnoreWord.find_by_word(w)
+  			unless sysignore
+				# see if word is a Top 1,000 word
+  				ntopword = TopWord.find(:first, :conditions => ["word = ? and user_id = ?", w, user.id])
+				# if word is a top 1,000 word, boost tweet score
+  				if ntopword
+					scoreofwords = scoreofwords+ntopword.rank.to_f
+  				end # end check if word is a top word
+  			end # end check if word is on the system ignore list
+  		end # End loop through words in split up tweet    
+        tweet.word_quality_score = (scoreofwords.to_f/@words.size.to_f)
+		tweet.score = tweet.word_quality_score
+  		tweet.save
+  	end # End loop through "new" Tweets to score
+	
+	# Update user after scoring
+	user.calls_left = Twitter.rate_limit_status.remaining_hits.to_i
+	user.num_score_rounds = 1
+	user.save
+	
+	 redirect '/tweets' 
+	
+end
+
+get '/tweets' do
+  
+	user = User.find_by_id(session[:user_id])
+
+	Twitter.configure do |config|
+		config.consumer_key = "DHBxwGvab2sJGw3XhsEmA"
+		config.consumer_secret = "530TCO6YMRuB23R7wse91rTcIKFPKQaxFQNVhfnk"
+		config.oauth_token = user.token
+		config.oauth_token_secret = user.secret
+	end
+
+	code = ""
+
+	@tweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true)
+
+	@tweets.each do |p|
+		code = code.to_s+p.full_text.to_s+%{<br /><br />}
+	end
+
 	code
 	  
 end
