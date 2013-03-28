@@ -616,7 +616,6 @@ get '/follow/:t' do
 	
 end
 
-
 get '/interact/:t' do
 
 	tweet = Tweet.find_by_id(params[:t])
@@ -672,7 +671,7 @@ get '/interact/:t' do
 			tweet.destroy
 		end # end check if tweet has already been followed
 	else # if tweet is not found then...
-		itweet = Itweet.find_by_old_id(params[:t])
+		itweet = Itweets.find_by_old_id(params[:t])
 		linkcode = %{https://twitter.com/intent/tweet?in_reply_to=}+itweet.twitter_id.to_s+%{&via=}+itweet.source.user_screen_name.to_s
 	end # end check if a tweet is found
 	
