@@ -57,7 +57,7 @@ get '/auth/:name/callback' do
   redirect '/thanks'
 end
 
-@users = User.find(:all, :conditions => ["active_scoring <> ?", "no"])
+@users = User.find(:all, :conditions => ["active_scoring <> ?", "yes"])
 for user in @users
 	
 	# Set user's active scoring indicator
