@@ -60,11 +60,9 @@ end
 @users = User.find(:all, :conditions => ["active_scoring <> ?", "yes"])
 for user in @users
 	
-	# Set user's active scoring indicator
-	user.active_scoring = "yes"
-	user.save
+
 	
-		# Select all tweets that have only been loaded (e.g. last action = pulled)
+	# Select all tweets that have only been loaded (e.g. last action = pulled)
 	@tweets = Tweet.find(:all, :conditions => ["user_id = ? and last_action = ?", user.id, "pulled"], :order => "twitter_created_at DESC")
 	
 	# Loop through tweets to process words, create clean tweet version and extract links
@@ -377,6 +375,7 @@ for user in @users
 	# Update user after scoring
 	# user.calls_left = Twitter.rate_limit_status.remaining_hits.to_i
 	user.num_score_rounds = user.num_score_rounds+1
+	user.active_scoring = "no"
 	user.save
 	
 end # end loop through users
