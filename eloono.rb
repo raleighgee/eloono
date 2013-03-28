@@ -608,7 +608,7 @@ get '/follow/:t' do
 	end # end check if a tweet is found
 	
 	@links = Link.find(:all, :conditions => ["tweet_id = ?", params[:t]], :order => "created_at DESC")
-	if tweet.url_count.to_i > 1
+	if @links.size.to_i > 1
 		redirect %{http://twitter.com/}+tweet.source.user_screen_name.to_s+%{/status/}+tweet.twitter_id.to_s
 	else
 		redirect @links[0].expanded_url
