@@ -57,12 +57,6 @@ get '/auth/:name/callback' do
   redirect '/thanks'
 end
 
-
-
-				s.save
-						
-				# set tweet source to soruce that you just createed or found
-				t.source_id = s.id
 @users = User.find(:all, :conditions => ["active_scoring <> ?", "yes"])
 
 for user in @users
