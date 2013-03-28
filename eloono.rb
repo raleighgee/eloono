@@ -605,9 +605,9 @@ get '/follow/:t' do
 	end # End check if tweet followed flag does not = "yes"
 	@links = Link.find(:all, :conditions => ["tweet_id = ?", tweet.id], :order => "created_at DESC")
 	if tweet.url_count.to_i > 1
-		redirect_to %{http://twitter.com/}+tweet.source.user_screen_name.to_s+%{/status/}+tweet.twitter_id.to_s
+		redirect %{http://twitter.com/}+tweet.source.user_screen_name.to_s+%{/status/}+tweet.twitter_id.to_s
 	else
-		redirect_to @links[0].expanded_url
+		redirect @links[0].expanded_url
 	end
 end
 
