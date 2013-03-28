@@ -617,7 +617,8 @@ get '/follow/:t' do
 end
 
 
-get '/interact/:t/' do
+get '/interact/:t' do
+
 	tweet = Tweet.find_by_id(params[:t])
 	
 	if tweet
