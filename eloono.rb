@@ -193,7 +193,8 @@ get '/get_tweets' do
 			end # end check if tweet was created by user
 		end # end loop through tweets
 	end # end loop through users
-	redirect '/tweets' 
+	
+	render :nothing => true, :status => 200, :content_type => 'text/html'
 	
 end
 
@@ -341,7 +342,7 @@ get '/build_tweets' do
 		end # end loop though tweets
 	end # end loop through users
 	
-	Building Tweets compelted succesfully
+	render :nothing => true, :status => 200, :content_type => 'text/html'
 	
 end
 
@@ -528,7 +529,7 @@ get '/calc_scores' do
 		
 	end # end loop through users
 	
-	%{Scoring has been compelted successfully!}
+	render :nothing => true, :status => 200, :content_type => 'text/html'
 	
 end
 
@@ -573,5 +574,4 @@ get '/sendmail' do
 			:domain => ENV['SENDGRID_DOMAIN']
 		}
 	 )
-    redirect '/' 
 end
