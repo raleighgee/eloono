@@ -541,7 +541,13 @@ get '/tweets' do
 	
 	@links = ""
 	for linktweet in @linktweets
-		@links = @links.to_s+linktweet.clean_tweet_content.to_s+%{ | <a href="}+linktweet.link.expanded_url.to_s+%{" target="_blank">Follow</a><br />}
+		@truelinks - Link.find(:all, :conditions => ["tweet_id = ?", linktweet.id])
+		if truelinks.size > 1
+			@links = @links.to_s+linktweet.clean_tweet_content.to_s+%{ | <a href="twitter.com" target="_blank">Follow</a><br />}
+		else
+			tlink = @truelinks[0]
+			@links = @links.to_s+linktweet.clean_tweet_content.to_s+%{ | <a href="}+tlink.expanded_url.to_s+%{" target="_blank">Follow</a><br />}
+		end		
 	end
 	
 	@nonlinks = ""
