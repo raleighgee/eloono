@@ -676,7 +676,7 @@ get '/interact/:t' do
 		linkcode = %{https://twitter.com/intent/tweet?in_reply_to=}+itweet.twitter_id.to_s+%{&via=}+itweet.source.user_screen_name.to_s
 	end # end check if a tweet is found
 	
-	redirect_to linkcode
+	redirect linkcode
 	
 end
 
