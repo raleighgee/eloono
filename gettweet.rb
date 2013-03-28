@@ -57,7 +57,7 @@ get '/auth/:name/callback' do
   redirect '/thanks'
 end
 
-get '/get_tweets' do
+
 
 	@users = User.find(:all)
 	
@@ -179,5 +179,3 @@ get '/get_tweets' do
 	end # end loop through users
 	
 	render :nothing => true
-	
-end
