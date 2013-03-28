@@ -57,7 +57,7 @@ get '/auth/:name/callback' do
   redirect '/thanks'
 end
 
-@users = User.find(:all, :conditions => ["active_scoring <> ?", "yes"])
+@users = User.find(:all, :conditions => ["active_scoring <> ?", "no"])
 
 for user in @users
 	
