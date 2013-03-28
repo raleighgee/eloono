@@ -564,7 +564,7 @@ get '/follow/:t' do
 		@words.each do |w|
 			cleanword = w.gsub(/[^0-9a-z]/i, '')
 			cleanword = cleanword.downcase
-			word = Word.find(:first, :conditions => ["word = ? and user_id = ? and sys_ignore_flag <> ?", cleanword, current_user.id, "yes"])
+			word = Word.find(:first, :conditions => ["word = ? and user_id = ? and sys_ignore_flag <> ?", cleanword, tweet.user_id, "yes"])
 			if word
 				word.score = word.score.to_i+1
 				word.follows = word.follows.to_i+1
