@@ -12,7 +12,7 @@ class CreateUsers < ActiveRecord::Migration
 			t.integer :level, :default => 0
 			t.string :language, :default => "en"
 			t.integer :calls_left, :default => 350
-			t.integer :number_sign_ins, :default => 0
+			t.integer :number_eloonos_sent, :default => 0
 			t.integer :num_tweets_pulled, :default => 0
 			t.string :active_scoring, :default => "no"
 			t.string :pay_key, :default => "0"
