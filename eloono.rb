@@ -541,7 +541,7 @@ get '/tweets' do
 	
 	@links = ""
 	for linktweet in @linktweets
-		@links = @links.to_s+linktweet.clean_tweet_content.to_s+%{<br />}
+		@links = @links.to_s+linktweet.clean_tweet_content.to_s+%{ | <a href="}+linktweet.link.expanded_url.to_s+%{" target="_blank">Follow</a><br />}
 	end
 	
 	@nonlinks = ""
