@@ -546,7 +546,7 @@ get '/tweets' do
 	
 	@nonlinks = ""
 	for nonlinktweet in @nonlinktweets
-		@nonlinks = @nonlinks.to_s+nonlinktweet.clean_tweet_content.to_s+%{ | <a href="http://eloono.com/interact/}+linktweet.id.to_s+%{" target="_blank">Join Conversation</a><br />}
+		@nonlinks = @nonlinks.to_s+nonlinktweet.clean_tweet_content.to_s+%{ | <a href="http://eloono.com/interact/}+nonlinktweet.id.to_s+%{" target="_blank">Join Conversation</a><br />}
 	end
 	
 	%{<h1>Top 25 Link Tweets</h1>}+@links.to_s+%{<br /><br /><h1>Top 25 Non-Link Tweets</h1>}+@nonlinks.to_s
