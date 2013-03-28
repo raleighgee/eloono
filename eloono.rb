@@ -536,8 +536,8 @@ end
 
 get '/tweets' do
 
-	@linktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type = ? and last_action = ?", 1, "link", "scored"], :order => "score DESC, updated_at DESC", :limit => 25)
-	@nonlinktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type <> ? and last_action = ?", 1, "link", "scored"], :order => "score DESC, updated_at DESC", :limit => 25)
+	@linktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type = ? and last_action = ?", 1, "link", "new"], :order => "score DESC, updated_at DESC", :limit => 25)
+	@nonlinktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type <> ? and last_action = ?", 1, "link", "new"], :order => "score DESC, updated_at DESC", :limit => 25)
 	
 	@links = ""
 	for linktweet in @linktweets
