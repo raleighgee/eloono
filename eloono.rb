@@ -194,7 +194,7 @@ get '/get_tweets' do
 		end # end loop through tweets
 	end # end loop through users
 	
-	render :nothing => true, :status => 200, :content_type => 'text/html'
+	render :nothing => true
 	
 end
 
@@ -342,7 +342,7 @@ get '/build_tweets' do
 		end # end loop though tweets
 	end # end loop through users
 	
-	render :nothing => true, :status => 200, :content_type => 'text/html'
+	render :nothing => true
 	
 end
 
@@ -517,6 +517,7 @@ get '/calc_scores' do
 				wordindex = (tweet.word_quality_score.to_f/maxwordscore.to_f)*100
 				sourceindex = (tweet.source_score_score.to_f/maxsourcescore.to_f)*100
 				tweet.score = (wordindex.to_f+sourceindex.to_f)/2
+				tweet.last_action = "scored"
 				tweet.save
 			end
 			
@@ -529,31 +530,27 @@ get '/calc_scores' do
 		
 	end # end loop through users
 	
-	render :nothing => true, :status => 200, :content_type => 'text/html'
+	render :nothing => true
 	
 end
 
 get '/tweets' do
-  
-	user = User.find_by_id(session[:user_id])
 
-	Twitter.configure do |config|
-		config.consumer_key = "DHBxwGvab2sJGw3XhsEmA"
-		config.consumer_secret = "530TCO6YMRuB23R7wse91rTcIKFPKQaxFQNVhfnk"
-		config.oauth_token = user.token
-		config.oauth_token_secret = user.secret
+	@linktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type = ? and last_action = ?", 1, "link", "scored"], :order => "score DESC, updated_at DESC", :limit => 25)
+	@nonlinktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type <> ? and last_action = ?", 1, "link", "scored"], :order => "score DESC, updated_at DESC", :limit => 25)
+	
+	@links = ""
+	for linktweet in @linktweets
+		@links = @links.to_s+linktweet.clean_tweet_content.to_s+%{<br />}
 	end
-
-	code = ""
-
-	@tweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true)
-
-	@tweets.each do |p|
-		code = code.to_s+p.full_text.to_s+%{<br /><br />}
+	
+	@nonlinks = ""
+	for nonlinktweet in @nonlinktweets
+		@nonlinks = @nonlinks.to_s+nonlinktweet.clean_tweet_content.to_s+%{<br />}
 	end
+	
+	%{<h1>Top 25 Link Tweets</h1>}+@links.to_s+%{<br /><br /><h1>Top 25 Non-Link Tweets</h1>}+@nonlinks.to_s
 
-	code
-	  
 end
 
 get '/sendmail' do
