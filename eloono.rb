@@ -553,7 +553,7 @@ get '/tweets' do
 
 end
 
-get 'follow/:t' do
+get '/follow/:t' do
 	tweet = Tweet.find_by_id(params[:t])
 	if tweet.followed_flag != "yes"
 		source = Source.find_by_id(tweet.source_id)
