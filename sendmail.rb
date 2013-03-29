@@ -38,6 +38,7 @@ ActiveRecord::Base.establish_connection(
 for user in @users
   fourago = Time.now-(4*60*60)
   if user.last_interaction <= fourago
+    
     @linktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type = ? and last_action = ?", user.id, "link", "new"], :order => "score DESC, updated_at DESC", :limit => 25)
     @nonlinktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type <> ? and last_action = ?", user.id, "link", "new"], :order => "score DESC, updated_at DESC", :limit => 25)   
     
@@ -121,14 +122,13 @@ for user in @users
       end # end check if tweet is four hours old or older
     end # end loop through old tweets
     
-    
   end # end check if user hasn't receved an email in the last four hours
   
   ## Delete words that have not been followed ##
-  twentyforhours = (Time.now-86400)
-	@oldwords = Word.find(:all, :conditions => ["follows < ? and user_id = ?", 1, user.id])
+  averageseen = Word.Average(:seen_count, :conditions => ["user_id = ?", user.id])
+	@oldwords = Word.find(:all, :conditions => ["user_id = ?", user.id])
 	for oldword in @oldwords
-	  if oldword.created_at <= twentyforhours
+	  if oldword.seen_count < averageseen and oldword.follows < 1
 		  oldword.destroy
 		end
 	end

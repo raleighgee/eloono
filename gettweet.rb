@@ -197,20 +197,20 @@ for user in @users
 				unless w.include? %{@}
 					unless w.is_a? (Numeric)
 						unless w == ""
+						  
 							# remove any non alphanumeric charactes from word
 							cleanword = w.gsub(/[^0-9a-z]/i, '')
-							# set all characters to lowercase
-							cleanword = cleanword.downcase
-							# look to see if word already exists, if not, create a new one using cleanword above
-							word = Word.create!(:word => cleanword, :user_id => user.id)
 							# check if word is on the System ignore list
 							sysignore = Sysigword.find_by_word(cleanword)
-							if sysignore
-								word.sys_ignore_flag = "yes"
-							end
-							# increment the number of times word has been seen counter by 1
-							word.seen_count = word.seen_count.to_i+1
-							word.save
+							unless sysignore
+							  # set all characters to lowercase
+							  cleanword = cleanword.downcase
+							  # look to see if word already exists, if not, create a new one using cleanword above
+							  word = Word.create!(:word => cleanword, :user_id => user.id)
+							  # increment the number of times word has been seen counter by 1
+							  word.seen_count = word.seen_count.to_i+1
+							  word.save
+							end # end check if word is on the system ignore list
 						end # End check if word is empty
 					end # End check if word is just a number
 				end # End check if word contains the @ symbol
