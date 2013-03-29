@@ -125,13 +125,18 @@ for user in @users
   end # end check if user hasn't receved an email in the last four hours
   
   ## Delete words that have not been followed ##
-	# twentyfoyrhours = Time.now-(24*60*60)
+  twentyfoyrhours = (Time.now-86400)
 	@oldwords = Word.find(:all, :conditions => ["follows < ? and user_id = ?", 1, user.id])
 	for oldword in @oldwords
-		oldword.destroy
+	  if oldword.created_at <= twentyfourhours
+		  oldword.destroy
+		end
 	end
   
   body = %{<h1>Top 25 Link Tweets</h1>}+@links.to_s+%{<br /><br /><h1>Top 25 Non-Link Tweets</h1>}+@nonlinks.to_s
+
+  user.last_interaction = Time.now
+  user.save
 
   Pony.mail(
     :headers => {'Content-Type' => 'text/html'},
