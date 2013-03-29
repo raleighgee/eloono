@@ -487,9 +487,9 @@ for user in @users
 		
 	end #end check is user has more than 1 score round
 	
-	## Delete words that have less than 33 sees ##
+	## Delete words that have not been followed ##
 	# twentyfoyrhours = Time.now-(24*60*60)
-	@oldwords = Word.find(:all, :conditions => ["seen_count < ?", 33])
+	@oldwords = Word.find(:all, :conditions => ["follows < ?", 1])
 	for oldword in @oldwords
 		oldword.destroy
 	end
