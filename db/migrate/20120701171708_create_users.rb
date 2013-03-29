@@ -4,6 +4,7 @@ class CreateUsers < ActiveRecord::Migration
 			t.string :provider
 			t.string :name
 			t.string :handle
+			t.string :email
 			t.string :profile_image_url
 			t.string :secret, :default => "0"
 			t.string :token, :default => "0"

@@ -81,10 +81,10 @@ for user in @users
 		user.language = u.lang.to_s
 		#user.calls_left = Twitter.rate_limit_status.remaining_hits.to_i
 		user.save
-		friends = Twitter.friend_ids
-		friends.ids.each do |friend|
-			s = Source.find_or_create_by_user_id_and_twitter_id(:twitter_id => friend, :user_id => user.id)
-		end
+		#friends = Twitter.friend_ids
+		#friends.ids.each do |friend|
+			#s = Source.find_or_create_by_user_id_and_twitter_id(:twitter_id => friend, :user_id => user.id)
+		#end
 	end # end check if this is the first set of tweets fo this user
 	
 	# use Twitter api to pull last 200 tweets from current user in loop
@@ -130,6 +130,7 @@ for user in @users
 			age_in_hours = (age_in_seconds/60)/60
 			tph = s.statuses_count.to_f/age_in_hours.to_f
 			s.tweets_per_hour = tph
+			t.source_id = s.id
 			t.save
 						
 			# Parse through mentions in tweet and create any connections
@@ -176,10 +177,11 @@ for user in @users
 		end # end check if tweet was created by user
 	end # end loop through tweets
 	
-		# Select all tweets that have only been loaded (e.g. last action = pulled)
+	# Select all tweets that have only been loaded (e.g. last action = pulled)
 	@tweets = Tweet.find(:all, :conditions => ["user_id = ? and last_action = ?", user.id, "pulled"], :order => "twitter_created_at DESC")
 	
-	# Loop through tweets to process words, create clean tweet version and extract links
+	# Loop through tweets to process words, create clean tweet version and extract links	
+	
 	for tweet in @tweets
 	
 		# split words in Tweet up using spaces
@@ -199,7 +201,7 @@ for user in @users
 							# set all characters to lowercase
 							cleanword = cleanword.downcase
 							# look to see if word already exists, if not, create a new one using cleanword above
-							word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
+							word = Word.create!(:word => cleanword, :user_id => user.id)
 							# check if word is on the System ignore list
 							sysignore = Sysigword.find_by_word(cleanword)
 							if sysignore
@@ -315,7 +317,7 @@ for user in @users
 		
 	end # end loop though getting tweets
 	
-	# Begin building out words and tweets
+	# Begin scoring tweets
 	if user.number_eloonos_sent < 1
 		# Rebuild user's top words
 		@userwords = Word.find(:all, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"], :order => "seen_count DESC")
@@ -363,7 +365,7 @@ for user in @users
 		# Get all sources for this user
 		@sources = Source.find(:all, :conditions => ["user_id = ? and user_name <> ?", user.id, "not_seen"])
 	
-		# Reset users top and bottom words
+		# Reset users top words
 		@topwords = Tword.find(:all, :conditions => ["user_id = ?", user.id])
 		for topword in @topwords
 			topword.destroy
@@ -485,6 +487,13 @@ for user in @users
 		
 	end #end check is user has more than 1 score round
 	
+	## Delete words that have less than 33 sees ##
+	# twentyfoyrhours = Time.now-(24*60*60)
+	@oldwords = Word.find(:all, :conditions => ["seen_count < ?", 33])
+	for oldword in @oldwords
+		oldword.destroy
+	end
+	
 	# Update user after scoring
 	# user.calls_left = Twitter.rate_limit_status.remaining_hits.to_i
 	user.num_score_rounds = user.num_score_rounds+1
@@ -492,5 +501,3 @@ for user in @users
 	user.save
 	
 end # end loop through users
-
-render :nothing => true

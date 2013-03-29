@@ -70,7 +70,7 @@ end
 
 ########## MVC CODE ########## 
 get '/' do
-  "Just Checking it Out"
+  %{<a href="http://eloono.com/signin">Click Here to Sign In<a/>}
 end
 
 
@@ -94,7 +94,7 @@ get '/tweets' do
 end
 
 get '/follow/:t' do
-	tweet = Tweet.find_by_id(params[:t])
+	tweet = Itweets.find_by_old_id(params[:t])
 	
 	if tweet
 		if tweet.followed_flag != "yes"
@@ -119,31 +119,7 @@ get '/follow/:t' do
 			end # End loop through words
 			tweet.followed_flag = "yes"
 			tweet.last_action = "follow"
-			tweet.save
-				
-			i = Itweets.find_or_create_by_user_id_and_twitter_id(:user_id => tweet.user_id, :twitter_id => tweet.twitter_id)
-			i.old_id = tweet.id
-			i.source_id = tweet.source_id
-			i.score = tweet.score
-			i.tweet_type = tweet.tweet_type
-			i.url_count = tweet.url_count
-			i.followed_flag = tweet.followed_flag
-			i.last_action = tweet.last_action
-			i.twitter_created_at = tweet.twitter_created_at
-			i.retweet_count = tweet.retweet_count
-			i.tweet_source = tweet.tweet_source
-			i.tweet_content = tweet.tweet_content
-			i.clean_tweet_content = tweet.clean_tweet_content
-			i.truncated_flag = tweet.truncated_flag
-			i.reply_id = tweet.reply_id
-			i.convo_flag = tweet.convo_flag
-			i.convo_initiator = tweet.convo_initiator
-			i.word_quality_score = tweet.word_quality_score
-			i.source_score_score = tweet.source_score_score
-			i.old_created_at = tweet.created_at
-			i.save
-			tweet.destroy
-				
+			tweet.save				
 		end # End check if tweet followed flag does not = "yes"
 	end # end check if a tweet is found
 	
@@ -158,7 +134,7 @@ end
 
 get '/interact/:t' do
 
-	tweet = Tweet.find_by_id(params[:t])
+	tweet = Itweets.find_by_old_id(params[:t])
 	
 	if tweet
 		if tweet.followed_flag != "yes"
@@ -184,59 +160,8 @@ get '/interact/:t' do
 			tweet.followed_flag = "yes"
 			tweet.last_action = "tweeted"
 			tweet.save
-			
-			linkcode = %{https://twitter.com/intent/tweet?in_reply_to=}+tweet.twitter_id.to_s+%{&via=}+tweet.source.user_screen_name.to_s
-
-			i = Itweets.find_or_create_by_user_id_and_twitter_id(:user_id => tweet.user_id, :twitter_id => tweet.twitter_id)
-			i.old_id = tweet.id
-			i.source_id = tweet.source_id
-			i.score = tweet.score
-			i.tweet_type = tweet.tweet_type
-			i.url_count = tweet.url_count
-			i.followed_flag = tweet.followed_flag
-			i.last_action = tweet.last_action
-			i.twitter_created_at = tweet.twitter_created_at
-			i.retweet_count = tweet.retweet_count
-			i.tweet_source = tweet.tweet_source
-			i.tweet_content = tweet.tweet_content
-			i.clean_tweet_content = tweet.clean_tweet_content
-			i.truncated_flag = tweet.truncated_flag
-			i.reply_id = tweet.reply_id
-			i.convo_flag = tweet.convo_flag
-			i.convo_initiator = tweet.convo_initiator
-			i.word_quality_score = tweet.word_quality_score
-			i.source_score_score = tweet.source_score_score
-			i.old_created_at = tweet.created_at
-			i.save
-			tweet.destroy
 		end # end check if tweet has already been followed
-	else # if tweet is not found then...
-		itweet = Itweets.find_by_old_id(params[:t])
-		linkcode = %{https://twitter.com/intent/tweet?in_reply_to=}+itweet.twitter_id.to_s+%{&via=}+itweet.source.user_screen_name.to_s
 	end # end check if a tweet is found
-	
+	linkcode = %{https://twitter.com/intent/tweet?in_reply_to=}+tweet.twitter_id.to_s+%{&via=}+tweet.source.user_screen_name.to_s
 	redirect linkcode
-	
-end
-
-
-
-get '/sendmail' do
-	Pony.mail(
-		:from => 'raleigh.gresham@gmail.com',
-		:to => 'riff42@yahoo.com',
-		:subject => 'The Tweets You Should Be Reading',
-		:body => 'This is where the tweets will go',
-		:port => '587',
-		:via => :smtp,
-		:via_options => { 
-			:address => 'smtp.sendgrid.net', 
-			:port => '587', 
-			:enable_starttls_auto => true, 
-			:user_name => ENV['SENDGRID_USERNAME'], 
-			:password => ENV['SENDGRID_PASSWORD'], 
-			:authentication => :plain, 
-			:domain => ENV['SENDGRID_DOMAIN']
-		}
-	 )
 end
