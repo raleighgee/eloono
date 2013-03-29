@@ -487,13 +487,6 @@ for user in @users
 		
 	end #end check is user has more than 1 score round
 	
-	## Delete words that have not been followed ##
-	# twentyfoyrhours = Time.now-(24*60*60)
-	@oldwords = Word.find(:all, :conditions => ["follows < ?", 1])
-	for oldword in @oldwords
-		oldword.destroy
-	end
-	
 	# Update user after scoring
 	# user.calls_left = Twitter.rate_limit_status.remaining_hits.to_i
 	user.num_score_rounds = user.num_score_rounds+1

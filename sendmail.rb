@@ -124,6 +124,13 @@ for user in @users
     
   end # end check if user hasn't receved an email in the last four hours
   
+  ## Delete words that have not been followed ##
+	# twentyfoyrhours = Time.now-(24*60*60)
+	@oldwords = Word.find(:all, :conditions => ["follows < ? and user_id = ?", 1, user.id])
+	for oldword in @oldwords
+		oldword.destroy
+	end
+  
   body = %{<h1>Top 25 Link Tweets</h1>}+@links.to_s+%{<br /><br /><h1>Top 25 Non-Link Tweets</h1>}+@nonlinks.to_s
 
   Pony.mail(
