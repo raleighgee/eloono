@@ -77,32 +77,32 @@ for user in @users
     
     @nonlinks = ""
     for nonlinktweet in @nonlinktweets
-      i = Itweets.find_or_create_by_user_id_and_twitter_id(:user_id => user.id, :twitter_id => nonlinktweet.twitter_id)
-  		i.old_id = nonlinktweet.id
-  		i.source_id = nonlinktweet.source_id
-  		i.score = nonlinktweet.score
-  		i.tweet_type = nonlinktweet.tweet_type
-  		i.url_count = nonlinktweet.url_count
-  		i.followed_flag = nonlinktweet.followed_flag
-  		i.last_action = nonlinktweet.last_action
-  		i.twitter_created_at = nonlinktweet.twitter_created_at
-  		i.retweet_count = nonlinktweet.retweet_count
-  		i.tweet_source = nonlinktweet.tweet_source
-  		i.tweet_content = nonlinktweet.tweet_content
-  		i.clean_tweet_content = nonlinktweet.clean_tweet_content
-  		i.truncated_flag = nonlinktweet.truncated_flag
-  		i.reply_id = nonlinktweet.reply_id
-  		i.convo_flag = nonlinktweet.convo_flag
-  		i.convo_initiator = nonlinktweet.convo_initiator
-  		i.word_quality_score = nonlinktweet.word_quality_score
-  		i.source_score_score = nonlinktweet.source_score_score
-  		i.old_created_at = nonlinktweet.created_at
-  		i.save
-    	@nonlinks = @nonlinks.to_s+i.clean_tweet_content.to_s+%{ | <a href="http://eloono.com/interact/}+i.old_id.to_s+%{" target="_blank">Join Conversation</a><br />}
+      ni = Itweets.find_or_create_by_user_id_and_twitter_id(:user_id => user.id, :twitter_id => nonlinktweet.twitter_id)
+  		ni.old_id = nonlinktweet.id
+  		ni.source_id = nonlinktweet.source_id
+  		ni.score = nonlinktweet.score
+  		ni.tweet_type = nonlinktweet.tweet_type
+  		ni.url_count = nonlinktweet.url_count
+  		ni.followed_flag = nonlinktweet.followed_flag
+  		ni.last_action = nonlinktweet.last_action
+  		ni.twitter_created_at = nonlinktweet.twitter_created_at
+  		ni.retweet_count = nonlinktweet.retweet_count
+  		ni.tweet_source = nonlinktweet.tweet_source
+  		ni.tweet_content = nonlinktweet.tweet_content
+  		ni.clean_tweet_content = nonlinktweet.clean_tweet_content
+  		ni.truncated_flag = nonlinktweet.truncated_flag
+  		ni.reply_id = nonlinktweet.reply_id
+  		ni.convo_flag = nonlinktweet.convo_flag
+  		ni.convo_initiator = nonlinktweet.convo_initiator
+  		ni.word_quality_score = nonlinktweet.word_quality_score
+  		ni.source_score_score = nonlinktweet.source_score_score
+  		ni.old_created_at = nonlinktweet.created_at
+  		ni.save
+    	@nonlinks = @nonlinks.to_s+ni.clean_tweet_content.to_s+%{ | <a href="http://eloono.com/interact/}+ni.old_id.to_s+%{" target="_blank">Join Conversation</a><br />}
     	nonlinktweet.destroy
     	
     	# Clean out connections that are actualy sources
-			connection = Connection.find(:first, :conditions => ["user_id = ? and twitter_id = ?", i.user_id, i.source.twitter_id])
+			connection = Connection.find(:first, :conditions => ["user_id = ? and twitter_id = ?", ni.user_id, ni.source.twitter_id])
 			if connection
 			  connection.destroy
 			end
@@ -112,7 +112,7 @@ for user in @users
     # Delete tweets and links that are older than four hours and have not been served
     @oldtweets = Tweet.find(:all, :conditions => ["user_id = ?", user.id])
     for oldtweet in @oldtweets
-      if oldtweet.twitter_created_at <= fourago
+      if oldtweet.twitter_created_at <= (4*60*60)
         @oldlinks = Link.find(:all, :conditions => ["tweet_id = ?", oldtweet.id])
         for oldlink in @oldlinks
           oldlink.destroy
