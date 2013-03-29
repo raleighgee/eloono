@@ -98,7 +98,7 @@ for user in @users
   		ni.source_score_score = nonlinktweet.source_score_score
   		ni.old_created_at = nonlinktweet.created_at
   		ni.save
-    	@nonlinks = @nonlinks.to_s+ni.clean_tweet_content.to_s+%{ | <a href="http://eloono.com/interact/}+ni.old_id.to_s+%{" target="_blank">Join Conversation</a><br />}
+    	@nonlinks = @nonlinks.to_s+ni.clean_tweet_content.to_s+%{ | <a href="http://eloono.com/interact/}+ni.id.to_s+%{" target="_blank">Join Conversation</a><br />}
     	nonlinktweet.destroy
     	
     	# Clean out connections that are actualy sources

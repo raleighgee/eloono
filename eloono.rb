@@ -134,7 +134,7 @@ end
 
 get '/interact/:t' do
 
-	tweet = Itweets.find_by_old_id(params[:t])
+	tweet = Itweets.find(params[:t])
 	
 	if tweet
 		if tweet.followed_flag != "yes"
@@ -163,6 +163,6 @@ get '/interact/:t' do
 			tweet.save
 		end # end check if tweet has already been followed
 	end # end check if a tweet is found
-	linkcode = %{https://twitter.com/intent/tweet?in_reply_to=}+tweet.old_id.to_s+%{&via=}+tweet.source.user_screen_name.to_s
+	linkcode = %{https://twitter.com/intent/tweet?in_reply_to=}+tweet.twitter_id.to_s#+%{&via=}+tweet.source.user_screen_name.to_s
 	redirect linkcode
 end
