@@ -112,7 +112,7 @@ for user in @users
     # Delete tweets and links that are older than four hours and have not been served
     @oldtweets = Tweet.find(:all, :conditions => ["user_id = ?", user.id])
     for oldtweet in @oldtweets
-      if oldtweet.updated_at <= 14400
+      if oldtweet.updated_at <= (Time.now-14400)
         @oldlinks = Link.find(:all, :conditions => ["tweet_id = ?", oldtweet.id])
         for oldlink in @oldlinks
           oldlink.destroy
