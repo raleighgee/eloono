@@ -68,7 +68,7 @@ for user in @users
     	linktweet.destroy
     	
     	# Clean out connections that are actualy sources
-			connection = Connection.find_by_user_id_and_twitter_id(:user_id => i.user_id, :twitter_id => i.source.twitter_id)
+			connection = Connection.find(:first, :conditions => ["user_id = ? and twitter_id = ?", i.user_id, i.source.twitter_id])
 			if connection
 			  connection.destroy
 			end
@@ -102,7 +102,7 @@ for user in @users
     	nonlinktweet.destroy
     	
     	# Clean out connections that are actualy sources
-			connection = Connection.find_by_user_id_and_twitter_id(:user_id => i.user_id, :twitter_id => i.source.twitter_id)
+			connection = Connection.find(:first, :conditions => ["user_id = ? and twitter_id = ?", i.user_id, i.source.twitter_id])
 			if connection
 			  connection.destroy
 			end
