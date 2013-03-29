@@ -34,32 +34,9 @@ ActiveRecord::Base.establish_connection(
   :encoding => 'utf8'
 )
 
-
-########## TWITTER AUTHENTICATION ########## 
-
-use OmniAuth::Strategies::Twitter, 'DHBxwGvab2sJGw3XhsEmA', '530TCO6YMRuB23R7wse91rTcIKFPKQaxFQNVhfnk'
-
-enable :sessions
-
-get '/auth/:name/callback' do
-  auth = request.env["omniauth.auth"]
-  user = User.find_or_create_by_uid(
-    :uid => auth["uid"],
-    :provider => auth["provider"],
-    :token => auth["credentials"]["token"],
-    :secret => auth["credentials"]["secret"],
-    :name => auth["info"]["name"])
-  session[:user_id] = user.id
-  user.save
-  user.token = auth["credentials"]["token"]
-  user.secret = auth["credentials"]["secret"]
-  user.save
-  redirect '/thanks'
-end
-
 @users = User.find(:all, :conditions => ["active_scoring <> ?", "yes"])
 for user in @users
-  fourago = Time.now-(4*60*60)
+  fourago = Time.now #Time.now-(4*60*60)
   if user.last_interaction <= fourago
     @linktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type = ? and last_action = ?", user.id, "link", "new"], :order => "score DESC, updated_at DESC", :limit => 25)
     @nonlinktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type <> ? and last_action = ?", user.id, "link", "new"], :order => "score DESC, updated_at DESC", :limit => 25)   
