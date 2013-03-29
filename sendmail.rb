@@ -66,6 +66,13 @@ for user in @users
   		i.save
     	@links = @links.to_s+linktweet.clean_tweet_content.to_s+%{ | <a href="http://eloono.com/follow/}+i.old_id.to_s+%{" target="_blank">Follow</a><br />}
     	linktweet.destroy
+    	
+    	# Clean out connections that are actualy sources
+			connection = Connection.find_by_user_id_and_twitter_id(:user_id => i.user_id, :twitter_id => i.source.twitter_id)
+			if connection
+			  connection.destroy
+			end
+    	
     end
     
     @nonlinks = ""
@@ -93,13 +100,20 @@ for user in @users
   		i.save
     	@nonlinks = @nonlinks.to_s+i.clean_tweet_content.to_s+%{ | <a href="http://eloono.com/interact/}+i.old_id.to_s+%{" target="_blank">Join Conversation</a><br />}
     	nonlinktweet.destroy
+    	
+    	# Clean out connections that are actualy sources
+			connection = Connection.find_by_user_id_and_twitter_id(:user_id => i.user_id, :twitter_id => i.source.twitter_id)
+			if connection
+			  connection.destroy
+			end
+    	
     end
     
     # Delete tweets and links that are older than four hours and have not been served
     @oldtweets = Tweet.find(:all, :conditions => ["user_id = ?", user.id])
     for oldtweet in @oldtweets
       if oldtweet.twitter_created_at <= fourago
-        @oldlinks = Link.find(:all, :conditions => ["tweet_id = ?" oldtweet.id])
+        @oldlinks = Link.find(:all, :conditions => ["tweet_id = ?", oldtweet.id])
         for oldlink in @oldlinks
           oldlink.destroy
         end # end loop through old links to delete

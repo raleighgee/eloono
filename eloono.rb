@@ -142,6 +142,7 @@ get '/interact/:t' do
 			source.number_links_followed = source.number_links_followed.to_i+1
 			source.number_of_interactions = source.number_of_interactions.to_i+1
 			source.save
+			
 			@words = tweet.tweet_content.split(" ")
 			@words.each do |w|
 				cleanword = w.gsub(/[^0-9a-z]/i, '')
