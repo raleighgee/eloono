@@ -125,10 +125,10 @@ for user in @users
   end # end check if user hasn't receved an email in the last four hours
   
   ## Delete words that have not been followed ##
-  twentyfoyrhours = (Time.now-86400)
+  twentyforhours = (Time.now-86400)
 	@oldwords = Word.find(:all, :conditions => ["follows < ? and user_id = ?", 1, user.id])
 	for oldword in @oldwords
-	  if oldword.created_at <= twentyfourhours
+	  if oldword.created_at <= twentyforhours
 		  oldword.destroy
 		end
 	end
