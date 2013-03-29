@@ -36,7 +36,7 @@ ActiveRecord::Base.establish_connection(
 
 @users = User.find(:all, :conditions => ["active_scoring <> ?", "yes"])
 for user in @users
-  fourago = Time.now #Time.now-(4*60*60)
+  fourago = Time.now-(4*60*60)
   if user.last_interaction <= fourago
     @linktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type = ? and last_action = ?", user.id, "link", "new"], :order => "score DESC, updated_at DESC", :limit => 25)
     @nonlinktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type <> ? and last_action = ?", user.id, "link", "new"], :order => "score DESC, updated_at DESC", :limit => 25)   
@@ -64,7 +64,7 @@ for user in @users
   		i.source_score_score = linktweet.source_score_score
   		i.old_created_at = linktweet.created_at
   		i.save
-    	@links = @links.to_s+%{<img src="}+linktweet.source.profile_image_url.to_s+%{" /> }+linktweet.source.user_name.to_s+%{ | }+linktweet.clean_tweet_content.to_s+%{ | <a href="http://eloono.com/follow/}+i.old_id.to_s+%{" target="_blank">Read</a> | <a href="http://eloono.com/interact/}+i.id.to_s+%{" target="_blank">Interact</a><br />}
+    	@links = @links.to_s+%{<img src="}+linktweet.source.profile_image_url.to_s+%{" /> <b>}+linktweet.source.user_name.to_s+%{</b> | }+linktweet.clean_tweet_content.to_s+%{ | <a href="http://eloono.com/follow/}+i.old_id.to_s+%{" target="_blank">Read</a> | <a href="http://eloono.com/interact/}+i.id.to_s+%{" target="_blank">Interact</a><br />}
     	linktweet.destroy
     	
     	# Clean out connections that are actualy sources
@@ -98,7 +98,7 @@ for user in @users
   		ni.source_score_score = nonlinktweet.source_score_score
   		ni.old_created_at = nonlinktweet.created_at
   		ni.save
-    	@nonlinks = @nonlinks.to_s+%{<img src="}+ni.source.profile_image_url.to_s+%{" /> }+ni.source.user_name.to_s+%{ | }+ni.clean_tweet_content.to_s+%{ | <a href="http://eloono.com/interact/}+ni.id.to_s+%{" target="_blank">Interact</a><br />}
+    	@nonlinks = @nonlinks.to_s+%{<img src="}+ni.source.profile_image_url.to_s+%{" /> <b>}+ni.source.user_name.to_s+%{</b> | }+ni.clean_tweet_content.to_s+%{ | <a href="http://eloono.com/interact/}+ni.id.to_s+%{" target="_blank">Interact</a><br />}
     	nonlinktweet.destroy
     	
     	# Clean out connections that are actualy sources
@@ -133,7 +133,7 @@ for user in @users
 		end
 	end
   
-  body = %{<h1>Top 25 Link Tweets</h1>}+@links.to_s+%{<br /><br /><h1>Top 25 Non-Link Tweets</h1>}+@nonlinks.to_s
+  body = %{<h1>Top Link Tweets</h1>}+@links.to_s+%{<br /><br /><h1>Top Non-Link Tweets</h1>}+@nonlinks.to_s
 
   user.last_interaction = Time.now
   user.save
