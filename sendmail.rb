@@ -141,7 +141,7 @@ for user in @users
   Pony.mail(
     :headers => {'Content-Type' => 'text/html'},
   	:from => 'toptweets@eloono.com',
-  	:to => 'riff42@yahoo.com',
+  	:to => 'raleigh.gresham@gmail.com',
   	:subject => 'Your top Tweets from the Last Four Hours',
   	:body => body.to_s,
   	:port => '587',
