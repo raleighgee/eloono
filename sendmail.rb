@@ -64,7 +64,7 @@ for user in @users
   		i.source_score_score = linktweet.source_score_score
   		i.old_created_at = linktweet.created_at
   		i.save
-    	@links = @links.to_s+%{<img src=}+linktweet.source.profile_image_url.to_s+%{" /> }+linktweet.source.user_screen_name.to_s+%{ | }+linktweet.clean_tweet_content.to_s+%{ | <a href="http://eloono.com/follow/}+i.old_id.to_s+%{" target="_blank">Read</a> | <a href="http://eloono.com/interact/}+i.old_id.to_s+%{" target="_blank">Interact</a><br />}
+    	@links = @links.to_s+%{<img src="}+linktweet.source.profile_image_url.to_s+%{" /> }+linktweet.source.user_name.to_s+%{ | }+linktweet.clean_tweet_content.to_s+%{ | <a href="http://eloono.com/follow/}+i.old_id.to_s+%{" target="_blank">Read</a> | <a href="http://eloono.com/interact/}+i.old_id.to_s+%{" target="_blank">Interact</a><br />}
     	linktweet.destroy
     	
     	# Clean out connections that are actualy sources
@@ -98,7 +98,7 @@ for user in @users
   		ni.source_score_score = nonlinktweet.source_score_score
   		ni.old_created_at = nonlinktweet.created_at
   		ni.save
-    	@nonlinks = @nonlinks.to_s+%{<img src=}+ni.source.profile_image_url.to_s+%{" /> }+ni.source.user_screen_name.to_s+%{ | }+ni.clean_tweet_content.to_s+%{ | <a href="http://eloono.com/interact/}+ni.id.to_s+%{" target="_blank">Interact</a><br />}
+    	@nonlinks = @nonlinks.to_s+%{<img src="}+ni.source.profile_image_url.to_s+%{" /> }+ni.source.user_name.to_s+%{ | }+ni.clean_tweet_content.to_s+%{ | <a href="http://eloono.com/interact/}+ni.id.to_s+%{" target="_blank">Interact</a><br />}
     	nonlinktweet.destroy
     	
     	# Clean out connections that are actualy sources
