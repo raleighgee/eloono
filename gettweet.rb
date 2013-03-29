@@ -132,6 +132,7 @@ for user in @users
 			s.tweets_per_hour = tph
 			t.source_id = s.id
 			t.save
+			s.save
 						
 			# Parse through mentions in tweet and create any connections
 			@connections = p.user_mentions
