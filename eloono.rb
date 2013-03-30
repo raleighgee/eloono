@@ -164,3 +164,9 @@ get '/interact/:t' do
 	linkcode = %{https://twitter.com/intent/tweet?in_reply_to=}+tweet.twitter_id.to_s#+%{&via=}+tweet.source.user_screen_name.to_s
 	redirect linkcode
 end
+
+get '/ats/:word' do
+  siw = Sysigword.create!(:word => params[:word])
+  siw.save
+  params[:word].to_s+" has been added to the system ignore list."
+end
