@@ -113,7 +113,6 @@ get '/follow/:t' do
 					if word.word.include? %{#}
 						word.score = word.score.to_i+2
 					end
-					word.comp_average = (word.score.to_f+word.follows.to_f+word.seen_count.to_f)/3
 					word.save
 				end # End check if word is exists
 			end # End loop through words
@@ -154,7 +153,6 @@ get '/interact/:t' do
 					if word.word.include? %{#}
 						word.score = word.score.to_i+2
 					end
-					word.comp_average = (word.score.to_f+word.follows.to_f+word.seen_count.to_f)/3
 					word.save
 				end # End check if word is exists
 			end # End loop through words

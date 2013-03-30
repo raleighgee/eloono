@@ -335,11 +335,19 @@ for user in @users
 	
 	
 	####################### SCORE TWEETS ####################### 
+	
+	@uwords = Word.find(:all, :conditions => ["user_id = ?", user.id])
+	for uword in @uwords
+	  scoreupdate = uword.seen_count.to_f/@uwords.size.to_f
+	  uword.score = uword.score.to_f+scoreupdate.to_f
+	  uword.comp_average = (word.score.to_f+word.follows.to_f+word.seen_count.to_f)/3
+	  uword.save
+	end # end looop through user's words
 		
 	if user.number_eloonos_sent < 1
 	  
 		# Build user's top words
-		@userwords = Word.find(:all, :conditions => ["user_id = ?", user.id], :order => "seen_count DESC")
+		@userwords = Word.find(:all, :conditions => ["user_id = ?", user.id], :order => "comp_average DESC")
 		for userword in @userwords
 			ntopword = Tword.create!(:word => userword.word, :user_id => user.id, :score => userword.seen_count)
 		end
@@ -404,7 +412,7 @@ for user in @users
 		end
 	
 		# Rebuild user's top words
-		@userwords = Word.find(:all, :conditions => ["user_id = ? and follows > ?", user.id, 0], :order => "comp_average DESC", :limit => 1000)
+		@userwords = Word.find(:all, :conditions => ["user_id = ?", user.id], :order => "comp_average DESC", :limit => 1000)
 		for userword in @userwords
 			ntopword = Tword.create!(:word => userword.word, :user_id => user.id, :score => userword.comp_average)
 		end
