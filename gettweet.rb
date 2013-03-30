@@ -169,14 +169,26 @@ for user in @users
 					
 			t.save
 			
-			# increase current user's number of tweets by 1
-			tweets = Tweet.count(:conditions => ["user_id = ?", user.id])
-			itweets = Itweets.count(:conditions => ["user_id = ?", user.id])
-			user.num_tweets_pulled = tweets.to_i+itweets.to_i
-			user.save
+			# Check if tweet already existed in Itweets then boost user's tweet count
+			olditweet = Itweets.find_by_twitter_id(t.twitter_id)
+			if olditweet
+			  t.destroy
+			else
+  			# increase current user's number of tweets by 1
+  			tweets = Tweet.count(:conditions => ["user_id = ?", user.id])
+  			itweets = Itweets.count(:conditions => ["user_id = ?", user.id])
+  			user.num_tweets_pulled = tweets.to_i+itweets.to_i
+  			user.save
+  		end
 			
 		end # end check if tweet was created by user
 	end # end loop through tweets
+	
+
+	
+	
+	
+	
 	
 	# Select all tweets that have only been loaded (e.g. last action = pulled)
 	@tweets = Tweet.find(:all, :conditions => ["user_id = ? and last_action = ?", user.id, "pulled"], :order => "twitter_created_at DESC")

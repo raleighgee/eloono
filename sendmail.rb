@@ -125,7 +125,7 @@ for user in @users
   end # end check if user hasn't receved an email in the last four hours
   
   ## Delete words that have not been followed ##
-  averageseen = Word.average(:seen_count, :conditions => ["user_id = ?", user.id])
+  averageseen = Word.average (:seen_count, :conditions => ["user_id = ?", user.id])
 	@oldwords = Word.find(:all, :conditions => ["user_id = ?", user.id])
 	for oldword in @oldwords
 	  if oldword.seen_count < averageseen and oldword.follows < 1
