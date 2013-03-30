@@ -73,6 +73,10 @@ for user in @users
 		config.oauth_token_secret = user.secret
 	end
 	
+	
+	####################### PULL TWEETS AND CREATE SKELETONS ####################### 
+	
+	
 	# Pull initial information about the user and load all of the people they follow into the sources table if this is the first time we've hit this user
 	if user.num_score_rounds < 1
 		u = Twitter.user(user.uid)
@@ -184,6 +188,10 @@ for user in @users
 		end # end check if tweet was created by user
 	end # end loop through tweets
 	
+	
+	####################### BUILD OUT TWEETS, WORDS AND LINKS ####################### 
+	
+	
 	# Select all tweets that have only been loaded (e.g. last action = pulled)
 	@tweets = Tweet.find(:all, :conditions => ["user_id = ? and last_action = ?", user.id, "pulled"], :order => "twitter_created_at DESC")
 	
@@ -262,7 +270,6 @@ for user in @users
 							nohandle = nohandle.gsub("&", '')
 							nohandle = nohandle.gsub("|", '')
 							nohandle = nohandle.gsub("-", '')
-							#nohandle = nohandle.gsub('"','')
 							cleantweet = cleantweet.to_s+%{<a href="http://twitter.com/}+nohandle.to_s+%{" target="_blank" class="embed_handle">}+w.to_s+%{</a> }
 						else
 							cleantweet = cleantweet.to_s+w.to_s+" "
@@ -324,10 +331,15 @@ for user in @users
 		
 	end # end loop though getting tweets
 	
-	# Begin scoring tweets
+	
+	
+	
+	####################### SCORE TWEETS ####################### 
+		
 	if user.number_eloonos_sent < 1
-		# Rebuild user's top words
-		@userwords = Word.find(:all, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"], :order => "seen_count DESC")
+	  
+		# Build user's top words
+		@userwords = Word.find(:all, :conditions => ["user_id = ?", user.id], :order => "seen_count DESC")
 		for userword in @userwords
 			ntopword = Tword.create!(:word => userword.word, :user_id => user.id, :score => userword.seen_count)
 		end
@@ -365,13 +377,26 @@ for user in @users
 			end # End loop through words in split up tweet    
 			tweet.word_quality_score = (scoreofwords.to_f/@words.size.to_f)
 			tweet.score = tweet.word_quality_score
+			tweet.last_action = "scored"
 			tweet.save
 		end # End loop through "new" Tweets to score
+		
 	else # if this is not the user's first scoring round
-	
+	  
 		# Get all sources for this user
 		@sources = Source.find(:all, :conditions => ["user_id = ? and user_name <> ?", user.id, "not_seen"])
-	
+	  
+	  # Add ignores to sources
+	  for source in @sources
+	    @sitweets = Itweets.find(:all, :conditions => ["user_id = ? and source_id = ? and last_action = ?", user.id, source.id, "new"])
+	    for sitweets in @sitweets
+	      if sitweet.created_at <= (Time.now - (4*60*60))
+	        source.ignores = source.ignores.to_i+1
+	        source.save
+        end # check if itweet is older then 4 hours
+	    end # end loop th
+	  end # end loop through sources to give them number of ignores
+	  
 		# Reset users top words
 		@topwords = Tword.find(:all, :conditions => ["user_id = ?", user.id])
 		for topword in @topwords
@@ -379,7 +404,7 @@ for user in @users
 		end
 	
 		# Rebuild user's top words
-		@userwords = Word.find(:all, :conditions => ["user_id = ? and follows > ? and sys_ignore_flag = ?", user.id, 0, "no"], :order => "comp_average DESC", :limit => 1000)
+		@userwords = Word.find(:all, :conditions => ["user_id = ? and follows > ?", user.id, 0], :order => "comp_average DESC", :limit => 1000)
 		for userword in @userwords
 			ntopword = Tword.create!(:word => userword.word, :user_id => user.id, :score => userword.comp_average)
 		end

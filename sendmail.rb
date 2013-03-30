@@ -39,8 +39,8 @@ for user in @users
   fourago = Time.now-(2*60*60)
   if user.last_interaction <= fourago
     
-    @linktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type = ? and last_action = ?", user.id, "link", "new"], :order => "score DESC, updated_at DESC", :limit => 25)
-    @nonlinktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type <> ? and last_action = ?", user.id, "link", "new"], :order => "score DESC, updated_at DESC", :limit => 25)   
+    @linktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type = ? and last_action = ?", user.id, "link", "scored"], :order => "score DESC, updated_at DESC", :limit => 25)
+    @nonlinktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type <> ? and last_action = ?", user.id, "link", "scored"], :order => "score DESC, updated_at DESC", :limit => 25)   
     
     @links = ""
     for linktweet in @linktweets
@@ -132,7 +132,8 @@ for user in @users
   	end
 
     body = %{<h1>Top Link Tweets</h1>}+@links.to_s+%{<br /><br /><h1>Top Non-Link Tweets</h1>}+@nonlinks.to_s
-
+    
+    user.number_eloonos_sent = user.number_eloonos_sent.to_i+1
     user.last_interaction = Time.now
     user.save
 
