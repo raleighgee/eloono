@@ -184,12 +184,6 @@ for user in @users
 		end # end check if tweet was created by user
 	end # end loop through tweets
 	
-
-	
-	
-	
-	
-	
 	# Select all tweets that have only been loaded (e.g. last action = pulled)
 	@tweets = Tweet.find(:all, :conditions => ["user_id = ? and last_action = ?", user.id, "pulled"], :order => "twitter_created_at DESC")
 	
@@ -213,10 +207,10 @@ for user in @users
 							# remove any non alphanumeric charactes from word
 							cleanword = w.gsub(/[^0-9a-z]/i, '')
 							# check if word is on the System ignore list
+							# set all characters to lowercase
+						  cleanword = cleanword.downcase
 							sysignore = Sysigword.find_by_word(cleanword)
 							unless sysignore
-							  # set all characters to lowercase
-							  cleanword = cleanword.downcase
 							  # look to see if word already exists, if not, create a new one using cleanword above
 							  word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
 							  # increment the number of times word has been seen counter by 1
