@@ -36,7 +36,7 @@ ActiveRecord::Base.establish_connection(
 
 @users = User.find(:all, :conditions => ["active_scoring <> ?", "yes"])
 for user in @users
-  fourago = Time.now#-(4*60*60)
+  fourago = Time.now-(2*60*60)
   if user.last_interaction <= fourago
     
     @linktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type = ? and last_action = ?", user.id, "link", "new"], :order => "score DESC, updated_at DESC", :limit => 25)
@@ -122,39 +122,39 @@ for user in @users
       end # end check if tweet is four hours old or older
     end # end loop through old tweets
     
+    ## Delete words that have not been followed ##
+    averageseen = Word.average(:seen_count, :conditions => ["user_id = ?", user.id])
+  	@oldwords = Word.find(:all, :conditions => ["user_id = ?", user.id])
+  	for oldword in @oldwords
+  	  if oldword.seen_count < averageseen and oldword.follows < 1
+  		  oldword.destroy
+  		end
+  	end
+
+    body = %{<h1>Top Link Tweets</h1>}+@links.to_s+%{<br /><br /><h1>Top Non-Link Tweets</h1>}+@nonlinks.to_s
+
+    user.last_interaction = Time.now
+    user.save
+
+    Pony.mail(
+      :headers => {'Content-Type' => 'text/html'},
+    	:from => 'toptweets@eloono.com',
+    	:to => 'raleigh.gresham@gmail.com',
+    	:subject => 'Your top Tweets from the Last Four Hours',
+    	:body => body.to_s,
+    	:port => '587',
+    	:via => :smtp,
+    	:via_options => { 
+    		:address => 'smtp.sendgrid.net', 
+    		:port => '587', 
+    		:enable_starttls_auto => true, 
+    		:user_name => ENV['SENDGRID_USERNAME'], 
+    		:password => ENV['SENDGRID_PASSWORD'], 
+    		:authentication => :plain, 
+    		:domain => ENV['SENDGRID_DOMAIN']
+    	}
+     )    
+    
   end # end check if user hasn't receved an email in the last four hours
-  
-  ## Delete words that have not been followed ##
-  averageseen = Word.average(:seen_count, :conditions => ["user_id = ?", user.id])
-	@oldwords = Word.find(:all, :conditions => ["user_id = ?", user.id])
-	for oldword in @oldwords
-	  if oldword.seen_count < averageseen and oldword.follows < 1
-		  oldword.destroy
-		end
-	end
-  
-  body = %{<h1>Top Link Tweets</h1>}+@links.to_s+%{<br /><br /><h1>Top Non-Link Tweets</h1>}+@nonlinks.to_s
-
-  user.last_interaction = Time.now
-  user.save
-
-  Pony.mail(
-    :headers => {'Content-Type' => 'text/html'},
-  	:from => 'toptweets@eloono.com',
-  	:to => 'raleigh.gresham@gmail.com',
-  	:subject => 'Your top Tweets from the Last Four Hours',
-  	:body => body.to_s,
-  	:port => '587',
-  	:via => :smtp,
-  	:via_options => { 
-  		:address => 'smtp.sendgrid.net', 
-  		:port => '587', 
-  		:enable_starttls_auto => true, 
-  		:user_name => ENV['SENDGRID_USERNAME'], 
-  		:password => ENV['SENDGRID_PASSWORD'], 
-  		:authentication => :plain, 
-  		:domain => ENV['SENDGRID_DOMAIN']
-  	}
-   )
   
 end # end loop through users
