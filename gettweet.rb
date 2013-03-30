@@ -206,7 +206,7 @@ for user in @users
 							  # set all characters to lowercase
 							  cleanword = cleanword.downcase
 							  # look to see if word already exists, if not, create a new one using cleanword above
-							  word = Word.create!(:word => cleanword, :user_id => user.id)
+							  word = Word.find_or_create_by_cleanword_and_user_id(:word => cleanword, :user_id => user.id)
 							  # increment the number of times word has been seen counter by 1
 							  word.seen_count = word.seen_count.to_i+1
 							  word.save
