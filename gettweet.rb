@@ -340,7 +340,7 @@ for user in @users
 	for uword in @uwords
 	  scoreupdate = uword.seen_count.to_f/@uwords.size.to_f
 	  uword.score = uword.score.to_f+scoreupdate.to_f
-	  uword.comp_average = (word.score.to_f+word.follows.to_f+word.seen_count.to_f)/3
+	  uword.comp_average = (uword.score.to_f+uword.follows.to_f+uword.seen_count.to_f)/3
 	  uword.save
 	end # end looop through user's words
 		
