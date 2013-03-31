@@ -36,11 +36,11 @@ ActiveRecord::Base.establish_connection(
 
 @users = User.find(:all, :conditions => ["active_scoring <> ?", "yes"])
 for user in @users
-  fourago = Time.now-(4*60*60)
+  fourago = Time.now-(3*60*60)
   if user.last_interaction <= fourago
     
-    @linktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type = ? and last_action = ?", user.id, "link", "scored"], :order => "score DESC, updated_at DESC", :limit => 25)
-    @nonlinktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type <> ? and last_action = ?", user.id, "link", "scored"], :order => "score DESC, updated_at DESC", :limit => 25)   
+    @linktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type = ? and last_action = ?", user.id, "link", "scored"], :order => "score DESC, updated_at DESC", :limit => 15)
+    @nonlinktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type <> ? and last_action = ?", user.id, "link", "scored"], :order => "score DESC, updated_at DESC", :limit => 15)   
     
     @links = ""
     for linktweet in @linktweets
