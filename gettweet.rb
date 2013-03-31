@@ -398,11 +398,9 @@ for user in @users
 	  for source in @sources
 	    @sitweets = Itweets.find(:all, :conditions => ["user_id = ? and source_id = ? and last_action = ?", user.id, source.id, "new"])
 	    for sitweets in @sitweets
-	      if sitweet.created_at <= (Time.now - (4*60*60))
-	        source.ignores = source.ignores.to_i+1
-	        source.save
-        end # check if itweet is older then 4 hours
-	    end # end loop th
+        source.ignores = source.ignores.to_i+1
+        source.save
+	    end # end loop through itweets
 	  end # end loop through sources to give them number of ignores
 	  
 		# Reset users top words
@@ -431,46 +429,46 @@ for user in @users
 		end
 	
 		# Loop through user's sources to set net interaction score and average word score
-		for source in @sources                
-			if source.number_of_interactions.to_f+source.ignores.to_f == 0
-				source.net_interaction_score = 0
-			else
-				source.net_interaction_score = ((source.number_of_interactions.to_f)-(source.ignores.to_f))/(source.number_of_interactions.to_f+source.ignores.to_f)
-			end
-			averagetweet = 0 
-			averageitweet = 0
-			averagetweet = Tweet.average(:word_quality_score, :conditions => ["user_id = ? and source_id = ?", user.id, source.id])
-			averageitweet = Itweets.average(:word_quality_score, :conditions => ["user_id = ? and source_id = ?", user.id, source.id])
-			source.average_word_score = (averagetweet.to_f+averageitweet.to_f)/2
-			source.save
-		end # End loop through user's sources to set net interaction score
+		#for source in @sources                
+			#if source.number_of_interactions.to_f+source.ignores.to_f == 0
+				#source.net_interaction_score = 0
+			#else
+				#source.net_interaction_score = ((source.number_of_interactions.to_f)-(source.ignores.to_f))/(source.number_of_interactions.to_f+source.ignores.to_f)
+			#end
+			#averagetweet = 0 
+			#averageitweet = 0
+			#averagetweet = Tweet.average(:word_quality_score, :conditions => ["user_id = ? and source_id = ?", user.id, source.id])
+			#averageitweet = Itweets.average(:word_quality_score, :conditions => ["user_id = ? and source_id = ?", user.id, source.id])
+			#source.average_word_score = (averagetweet.to_f+averageitweet.to_f)/2
+			#source.save
+	  #end # End loop through user's sources to set net interaction score
 		
 		# Rank sources by net interaction score
-		ranker = 1
-		lastscore = 0
-		@rsources = Source.find(:all, :conditions => ["user_id = ? and user_name <> ?", user.id, "not seen"], :order => "net_interaction_score ASC")
-		for rsource in @rsources
-			if rsource.net_interaction_score != lastscore
-				ranker = ranker+1
-			end
-			rsource.interaction_score_rank = ranker
-			rsource.save
-			lastscore = rsource.net_interaction_score
-		end
+		#ranker = 1
+		#lastscore = 0
+		#@rsources = Source.find(:all, :conditions => ["user_id = ? and user_name <> ?", user.id, "not seen"], :order => "net_interaction_score ASC")
+		#for rsource in @rsources
+			#if rsource.net_interaction_score != lastscore
+				#ranker = ranker+1
+			#end
+			#rsource.interaction_score_rank = ranker
+			#rsource.save
+			#lastscore = rsource.net_interaction_score
+		#end
 	
 		# Rank sources by their average word score & calculate aggregate source score
-		ranker = 1
-		lastscore = 0
-		@rsources = Source.find(:all, :conditions => ["user_id = ? and user_name <> ?", user.id, "not seen"], :order => "average_word_score ASC")
-		for rsource in @rsources
-			if rsource.average_word_score != lastscore
-				ranker = ranker+1
-			end
-			rsource.word_score_rank = ranker
-			lastscore = rsource.average_word_score
-			rsource.score = (rsource.word_score_rank.to_f+rsource.interaction_score_rank.to_f)/2
-			rsource.save
-		end # end rank sources by their average word score & calculate aggregate source score
+		#ranker = 1
+		#lastscore = 0
+		#@rsources = Source.find(:all, :conditions => ["user_id = ? and user_name <> ?", user.id, "not seen"], :order => "average_word_score ASC")
+		#for rsource in @rsources
+			#if rsource.average_word_score != lastscore
+				#ranker = ranker+1
+			#end
+			#rsource.word_score_rank = ranker
+			#lastscore = rsource.average_word_score
+			#rsource.score = (rsource.word_score_rank.to_f+rsource.interaction_score_rank.to_f)/2
+			#rsource.save
+		#end # end rank sources by their average word score & calculate aggregate source score
 		
 		# Select all tweets that have not seen the score algorithm yet (e.g. last action = new)
 		@tweets = Tweet.find(:all, :conditions => ["user_id = ? and last_action = ?", user.id, "new"])			
@@ -482,7 +480,7 @@ for user in @users
 			tweet.word_quality_score = 0
 			tweet.save
 		
-			sourceaveragewordscore = Tweet.average(:word_quality_score, :conditions => ["user_id = ? and source_id = ?", user.id, tweet.source.id])
+			#sourceaveragewordscore = Tweet.average(:word_quality_score, :conditions => ["user_id = ? and source_id = ?", user.id, tweet.source.id])
 		
 			# Split the tweet's content at the spaces
 			@words = tweet.tweet_content.split(" ")		    
@@ -508,19 +506,19 @@ for user in @users
 			tweet.save
 			 
 			# Set tweet's source score
-			tweet.source_score_score = tweet.source.score
+			#tweet.source_score_score = tweet.source.score
 			tweet.save
 		
 		end # End loop through "new" Tweets to score
 		
 		# Build FINAL tweet scores
 		maxwordscore = Tweet.maximum(:word_quality_score, :conditions => ["user_id = ?", user.id])
-		maxsourcescore = Tweet.maximum(:source_score_score, :conditions => ["user_id = ?", user.id])
+		#maxsourcescore = Tweet.maximum(:source_score_score, :conditions => ["user_id = ?", user.id])
 		for tweet in @tweets
 			maxwordscore = maxwordscore.to_f+(maxwordscore.to_f*0.1)
 			wordindex = (tweet.word_quality_score.to_f/maxwordscore.to_f)*100
-			sourceindex = (tweet.source_score_score.to_f/maxsourcescore.to_f)*100
-			tweet.score = (wordindex.to_f+sourceindex.to_f)/2
+			#sourceindex = (tweet.source_score_score.to_f/maxsourcescore.to_f)*100
+			tweet.score = (wordindex.to_f)#+sourceindex.to_f)/2
 			tweet.last_action = "scored"
 			tweet.save
 		end
