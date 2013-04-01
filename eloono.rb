@@ -172,7 +172,7 @@ get '/ats/:word' do
   word.destroy
   topword = Tword.find_by_word(params[:word])
   if topword
-    topword.destory
+    topword.destroy
   end
   %{<b>}+params[:word].to_s+%{</b> has been added to the system ignore list.}
 end
