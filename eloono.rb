@@ -169,7 +169,9 @@ get '/ats/:word' do
   siw = Sysigword.find_or_create_by_word(:word => params[:word])
   siw.save
   word = Word.find_by_word(params[:word])
-  word.destroy
+  if word
+    word.destroy
+  end
   topword = Tword.find_by_word(params[:word])
   if topword
     topword.destroy
