@@ -166,7 +166,13 @@ get '/interact/:t' do
 end
 
 get '/ats/:word' do
-  siw = Sysigword.create!(:word => params[:word])
+  siw = Sysigword.find_or_create_by_word(:word => params[:word])
   siw.save
-  params[:word].to_s+" has been added to the system ignore list."
+  word = Word.find_by_word(params[:word])
+  word.destroy
+  topword = Tword.find_by_word(params[:word])
+  if topword
+    topword.destory
+  end
+  %{<b>}+params[:word].to_s+%{</b> has been added to the system ignore list.}
 end

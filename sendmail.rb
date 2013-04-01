@@ -36,8 +36,8 @@ ActiveRecord::Base.establish_connection(
 
 @users = User.find(:all, :conditions => ["active_scoring <> ?", "yes"])
 for user in @users
-  fourago = Time.now-(3*60*60)
-  if user.last_interaction <= fourago
+  sixago = Time.now-(5*60*60)
+  if user.last_interaction <= sixago
     
     @linktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type = ? and last_action = ?", user.id, "link", "scored"], :order => "score DESC, updated_at DESC", :limit => 15)
     @nonlinktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type <> ? and last_action = ?", user.id, "link", "scored"], :order => "score DESC, updated_at DESC", :limit => 15)   
@@ -131,7 +131,15 @@ for user in @users
   		end
   	end
 
-    body = %{<h1>Top Link Tweets</h1>}+@links.to_s+%{<br /><br /><h1>Top Non-Link Tweets</h1>}+@nonlinks.to_s
+    # Build list of top ten words for review
+    topwords= ""
+    @toptenwords = Topword.find(:all, :conditions => ["user_id = ?", user.id], :order => "rank DESC", :limit => 10)
+    for toptenword in @toptenwords
+      topwords = topwords.to_s+toptenword.to_s+%{ | <a href="http://eloono.com/ats/}+toptenword.to_s+%{" target="_blank">Remove</a><br /><br />}
+    end # end loop through top ten top words
+
+    # Build out body of email
+    body = %{<h1>Top Ten Words</h1>}+topwords.to_s+%{<h1>Top Link Tweets</h1>}+@links.to_s+%{<br /><br /><h1>Top Non-Link Tweets</h1>}+@nonlinks.to_s
     
     user.number_eloonos_sent = user.number_eloonos_sent.to_i+1
     user.last_interaction = Time.now
