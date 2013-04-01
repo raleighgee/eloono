@@ -65,7 +65,7 @@ for user in @users
   		i.source_score_score = linktweet.source_score_score
   		i.old_created_at = linktweet.created_at
   		i.save
-    	@links = @links.to_s+%{<img src="}+linktweet.source.profile_image_url.to_s+%{" /> <b>}+linktweet.source.user_name.to_s+%{</b> | }+linktweet.clean_tweet_content.to_s+%{ | <a href="http://eloono.com/follow/}+i.old_id.to_s+%{" target="_blank">Read</a> | <a href="http://eloono.com/interact/}+i.id.to_s+%{" target="_blank">Interact</a><br />}
+    	@links = @links.to_s+%{<img height="48px" width="48px" src="}+linktweet.source.profile_image_url.to_s+%{" /> <b>}+linktweet.source.user_name.to_s+%{</b> | }+linktweet.clean_tweet_content.to_s+%{ | <a href="http://eloono.com/follow/}+i.old_id.to_s+%{" target="_blank">Read</a> | <a href="http://eloono.com/interact/}+i.id.to_s+%{" target="_blank">Interact</a><br />}
     	linktweet.destroy
     	
     	# Clean out connections that are actualy sources
@@ -99,7 +99,7 @@ for user in @users
   		ni.source_score_score = nonlinktweet.source_score_score
   		ni.old_created_at = nonlinktweet.created_at
   		ni.save
-    	@nonlinks = @nonlinks.to_s+%{<img src="}+ni.source.profile_image_url.to_s+%{" /> <b>}+ni.source.user_name.to_s+%{</b> | }+ni.clean_tweet_content.to_s+%{ | <a href="http://eloono.com/interact/}+ni.id.to_s+%{" target="_blank">Interact</a><br />}
+    	@nonlinks = @nonlinks.to_s+%{<img height="48px" width="48px" src="}+ni.source.profile_image_url.to_s+%{" /> <b>}+ni.source.user_name.to_s+%{</b> | }+ni.clean_tweet_content.to_s+%{ | <a href="http://eloono.com/interact/}+ni.id.to_s+%{" target="_blank">Interact</a><br />}
     	nonlinktweet.destroy
     	
     	# Clean out connections that are actualy sources
@@ -135,7 +135,7 @@ for user in @users
     topwords = ""
     @toptenwords = Tword.find(:all, :conditions => ["user_id = ?", user.id], :order => "rank DESC", :limit => 10)
     for toptenword in @toptenwords
-      topwords = topwords.to_s+toptenword.to_s+%{ | <a href="http://eloono.com/ats/}+toptenword.to_s+%{" target="_blank">Remove</a><br /><br />}
+      topwords = topwords.to_s+toptenword.word.to_s+%{ | <a href="http://eloono.com/ats/}+toptenword.word.to_s+%{" target="_blank">Remove</a><br /><br />}
     end # end loop through top ten top words
 
     # Build out body of email
