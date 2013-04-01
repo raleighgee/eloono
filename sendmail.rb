@@ -36,7 +36,7 @@ ActiveRecord::Base.establish_connection(
 
 @users = User.find(:all, :conditions => ["active_scoring <> ?", "yes"])
 for user in @users
-  sixago = Time.now#-(5*60*60)
+  sixago = Time.now-(5*60*60)
   if user.last_interaction <= sixago
     
     @linktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type = ? and last_action = ?", user.id, "link", "scored"], :order => "score DESC, updated_at DESC", :limit => 15)
@@ -135,7 +135,7 @@ for user in @users
     topwords = ""
     @toptenwords = Tword.find(:all, :conditions => ["user_id = ?", user.id], :order => "rank DESC", :limit => 10)
     for toptenword in @toptenwords
-      topwords = topwords.to_s+toptenword.word.to_s+%{ | <a href="http://eloono.com/ats/}+toptenword.word.to_s+%{" target="_blank">Remove</a><br /><br />}
+      topwords = topwords.to_s+toptenword.word.to_s+%{ | <a href="http://eloono.com/ats/}+toptenword.word.to_s+%{">Remove</a><br /><br />}
     end # end loop through top ten top words
 
     # Build out body of email
@@ -149,7 +149,7 @@ for user in @users
       :headers => {'Content-Type' => 'text/html'},
     	:from => 'toptweets@eloono.com',
     	:to => 'raleigh.gresham@gmail.com',
-    	:subject => 'Your top Tweets from the Last Four Hours',
+    	:subject => 'Your top Tweets from the Last Few Hours',
     	:body => body.to_s,
     	:port => '587',
     	:via => :smtp,
