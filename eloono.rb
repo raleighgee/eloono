@@ -176,5 +176,14 @@ get '/ats/:word' do
   if topword
     topword.destroy
   end
-  %{<b>}+params[:word].to_s+%{</b> has been added to the system ignore list.}
+
+  @code = %{<b>}+params[:word].to_s+%{</b> has been added to the system ignore list.<br /><br /><br />}
+
+  @topwords = Twords.find(:all, :conditions => ["user_id  = ?", 1], :limit => 10, :order => "rank DESC")
+  for topword in @topwords
+	@code = @code.to_s+topword.word.to_s+%{ | <a href="http://eloono.com/ats/}+topword.word.to_s+%{">Remove</a><br /><br />}
+  end # end loop through top words
+  
+  @code
+  
 end
