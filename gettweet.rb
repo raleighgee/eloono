@@ -525,6 +525,15 @@ for user in @users
 		
 	end #end check is user has more than 1 score round
 	
+	## Delete words that have not been followed ##
+    averageseen = Word.average(:seen_count, :conditions => ["user_id = ?", user.id])
+  	@oldwords = Word.find(:all, :conditions => ["user_id = ?", user.id])
+  	for oldword in @oldwords
+  	  if oldword.seen_count < averageseen and oldword.follows < 1
+  		  oldword.destroy
+  		end
+  	end
+	
 	# Update user after scoring
 	# user.calls_left = Twitter.rate_limit_status.remaining_hits.to_i
 	user.num_score_rounds = user.num_score_rounds+1

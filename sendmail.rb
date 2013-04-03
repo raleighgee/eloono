@@ -121,15 +121,6 @@ for user in @users
         oldtweet.destroy
       end # end check if tweet is four hours old or older
     end # end loop through old tweets
-    
-    ## Delete words that have not been followed ##
-    averageseen = Word.average(:seen_count, :conditions => ["user_id = ?", user.id])
-  	@oldwords = Word.find(:all, :conditions => ["user_id = ?", user.id])
-  	for oldword in @oldwords
-  	  if oldword.seen_count < averageseen and oldword.follows < 1
-  		  oldword.destroy
-  		end
-  	end
 
     # Build list of top ten words for review
     topwords = ""
