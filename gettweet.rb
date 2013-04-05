@@ -351,12 +351,11 @@ for user in @users
 			scoreofwords = 0
 			# Loop through words in split up tweet
 			@words.each do |w|
-				# check if word is on the System ignore list
-				sysignore = Sysigword.find_by_word(w)
-				unless sysignore
-				  word = Word.find_by_word(w)
-					scoreofwords = scoreofwords.to_f+word.comp_average.to_f
-				end # end check if word is on the system ignore list
+				# check if word exists
+				word = Word.find_by_word(w)
+			  if word
+				  scoreofwords = scoreofwords.to_f+word.comp_average.to_f
+				end
 			end # End loop through words in split up tweet    
 			tweet.word_quality_score = (scoreofwords.to_f/@words.size.to_f)
 			tweet.score = tweet.word_quality_score
@@ -453,12 +452,12 @@ for user in @users
 		
 			# Loop through words in split up tweet
 			@words.each do |w|
-				# check if word is on the System ignore list
-				sysignore = Sysigword.find_by_word(w)
-				unless sysignore
+				# check if word exists
+				word = Word.find_by_word(w)
+  			if word
 				  word = Word.find_by_word(w)
 					scoreofwords = scoreofwords.to_f+word.comp_average.to_f
-				end # end check if word is on the system ignore list
+				end
 			end # End loop through words in split up tweet    
 			tweet.word_quality_score = (scoreofwords.to_f/@words.size.to_f)
 			tweet.save
