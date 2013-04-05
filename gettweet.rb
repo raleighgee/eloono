@@ -333,7 +333,7 @@ for user in @users
 	totalsees = Word.sum(:seen_count, :conditions => ["user_id = ?", user.id])
 	for uword in @uwords
 	  uword.score = uword.seen_count.to_f/totalsees.to_f
-	  uword.comp_average = uword.score.to_f*uword.follows.to_f
+	  uword.comp_average = uword.score.to_f+uword.follows.to_f
 	  uword.save
 	end # end looop through user's words
 		
