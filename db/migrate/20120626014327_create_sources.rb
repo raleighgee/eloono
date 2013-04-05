@@ -20,15 +20,19 @@ class CreateSources < ActiveRecord::Migration
 			t.string :user_time_zone
 			t.datetime :twitter_created_at
 			t.integer :number_links_followed, :default => 0
-			t.integer :number_of_interactions, :default => 0
-			t.integer :number_retweets, :default => 0
+			#t.integer :number_of_interactions, :default => 0
+			#t.integer :number_retweets, :default => 0
 			t.float :tweets_per_hour, :default => 0
 			t.integer :ignores, :default => 0
 			t.float :net_interaction_score, :default => 0
 			t.float :average_word_score, :default => 0
 			t.integer :word_score_rank, :default => 1
 			t.integer :interaction_score_rank, :default => 1
-			t.integer :ignore_order, :default => 21
+			#t.integer :ignore_order, :default => 21
+			t.string :tweets_at
+			t.float :total_tweets_seen
+			t.float :num_followers_rank
+			t.float :tph_rank
 			t.timestamps
 		end
 	end
