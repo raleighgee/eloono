@@ -354,7 +354,8 @@ for user in @users
 				# check if word is on the System ignore list
 				sysignore = Sysigword.find_by_word(w)
 				unless sysignore
-					scoreofwords = scoreofwords.to_f+scoreofwords.comp_average.to_f
+				  word = word.find_by_word(w)
+					scoreofwords = scoreofwords.to_f+word.comp_average.to_f
 				end # end check if word is on the system ignore list
 			end # End loop through words in split up tweet    
 			tweet.word_quality_score = (scoreofwords.to_f/@words.size.to_f)
