@@ -85,10 +85,6 @@ for user in @users
 		user.language = u.lang.to_s
 		#user.calls_left = Twitter.rate_limit_status.remaining_hits.to_i
 		user.save
-		#friends = Twitter.friend_ids
-		#friends.ids.each do |friend|
-			#s = Source.find_or_create_by_user_id_and_twitter_id(:twitter_id => friend, :user_id => user.id)
-		#end
 	end # end check if this is the first set of tweets fo this user
 	
 	# use Twitter api to pull last 200 tweets from current user in loop
@@ -337,32 +333,15 @@ for user in @users
 	####################### SCORE TWEETS ####################### 
 	
 	@uwords = Word.find(:all, :conditions => ["user_id = ?", user.id])
+	totalsees = Word.sum(:seen_count, :conditions => ["user_id = ?", user.id])
 	for uword in @uwords
-	  scoreupdate = uword.seen_count.to_f/@uwords.size.to_f
-	  uword.score = uword.score.to_f+scoreupdate.to_f
-	  uword.comp_average = (uword.score.to_f+uword.follows.to_f+uword.seen_count.to_f)/3
+	  uword.score = uword.seen_count.to_f/totalsees.to_f
+	  uword.comp_average = uword.score.to_f*uword.follows.to_f
 	  uword.save
 	end # end looop through user's words
 		
 	if user.number_eloonos_sent < 1
 	  
-		# Build user's top words
-		@userwords = Word.find(:all, :conditions => ["user_id = ?", user.id], :order => "comp_average DESC")
-		for userword in @userwords
-			ntopword = Tword.create!(:word => userword.word, :user_id => user.id, :score => userword.seen_count)
-		end
-		# Rank top words for use in scoring
-		ranker = 1
-		lastscore = 0
-		@ranks = Tword.find(:all, :conditions => ["user_id = ?", user.id], :order => "score ASC")
-		for rank in @ranks
-			if rank.score != lastscore
-				ranker = ranker+1
-			end
-			rank.rank = ranker
-			rank.save
-			lastscore = rank.score
-		end
 		# Select all tweets that have not seen the score algorithm yet (e.g. last action = new)
 		@tweets = Tweet.find(:all, :conditions => ["user_id = ? and last_action = ?", user.id, "new"])			
 		# Loop through "new" Tweets to score	
@@ -375,12 +354,7 @@ for user in @users
 				# check if word is on the System ignore list
 				sysignore = Sysigword.find_by_word(w)
 				unless sysignore
-					# see if word is a Top 1,000 word
-					ntopword = Tword.find(:first, :conditions => ["word = ? and user_id = ?", w, user.id])
-					# if word is a top 1,000 word, boost tweet score
-					if ntopword
-						scoreofwords = scoreofwords+ntopword.rank.to_f
-					end # end check if word is a top word
+					scoreofwords = scoreofwords.to_f+w.comp_average.to_f
 				end # end check if word is on the system ignore list
 			end # End loop through words in split up tweet    
 			tweet.word_quality_score = (scoreofwords.to_f/@words.size.to_f)
@@ -392,61 +366,51 @@ for user in @users
 	else # if this is not the user's first scoring round
 	  
 		# Get all sources for this user
-		@sources = Source.find(:all, :conditions => ["user_id = ? and user_name <> ?", user.id, "not_seen"])
+		@sources = Source.find(:all, :conditions => ["user_id = ?", user.id])
 	  
 	  # Add ignores to sources
+	  dayago = Time.now-(23*60*60)
 	  for source in @sources
-	    @sitweets = Itweets.find(:all, :conditions => ["user_id = ? and source_id = ? and last_action = ?", user.id, source.id, "new"])
+	    @sitweets = Itweets.find(:all, :conditions => ["user_id = ? and source_id = ? and last_action = ? and tweet_type = ?", user.id, source.id, "sent", "link"])
 	    for sitweets in @sitweets
-        source.ignores = source.ignores.to_i+1
-        source.save
+			  if sitweet.created_at <= dayago
+    			source.ignores = source.ignores.to_i+1
+    			source.save
+    			sitweet.last_action = "ignored"
+    			sitweet.save
+    			
+    			# Penalize ignored words
+    			@words = sitweet.tweet_content.split(" ")
+    			@words.each do |w|
+    			 w.seen_count = w.seen_count.to_f*0.75
+    			 w.follows = w.follows.to_f*0.75
+    			 w.save
+    			end # end loop through words to penalize
+
+        end
 	    end # end loop through itweets
 	  end # end loop through sources to give them number of ignores
-	  
-		# Reset users top words
-		@topwords = Tword.find(:all, :conditions => ["user_id = ?", user.id])
-		for topword in @topwords
-			topword.destroy
-		end
-	
-		# Rebuild user's top words
-		@userwords = Word.find(:all, :conditions => ["user_id = ?", user.id], :order => "comp_average DESC", :limit => 1000)
-		for userword in @userwords
-			ntopword = Tword.create!(:word => userword.word, :user_id => user.id, :score => userword.comp_average)
-		end
-		
-		# Rank top words for use in scoring
-		ranker = 1
-		lastscore = 0
-		@ranks = Tword.find(:all, :conditions => ["user_id = ?", user.id], :order => "score ASC")
-		for rank in @ranks
-			if rank.score != lastscore
-				ranker = ranker+1
-			end
-			rank.rank = ranker
-			rank.save
-			lastscore = rank.score
-		end
-	
+	  	
 		# Loop through user's sources to set net interaction score and average word score
-		#for source in @sources                
+		for source in @sources                
 			#if source.number_of_interactions.to_f+source.ignores.to_f == 0
 				#source.net_interaction_score = 0
 			#else
 				#source.net_interaction_score = ((source.number_of_interactions.to_f)-(source.ignores.to_f))/(source.number_of_interactions.to_f+source.ignores.to_f)
 			#end
-			#averagetweet = 0 
-			#averageitweet = 0
-			#averagetweet = Tweet.average(:word_quality_score, :conditions => ["user_id = ? and source_id = ?", user.id, source.id])
-			#averageitweet = Itweets.average(:word_quality_score, :conditions => ["user_id = ? and source_id = ?", user.id, source.id])
-			#source.average_word_score = (averagetweet.to_f+averageitweet.to_f)/2
-			#source.save
-	  #end # End loop through user's sources to set net interaction score
+			averagetweet = 0 
+			averageitweet = 0
+			averagetweet = Tweet.average(:word_quality_score, :conditions => ["user_id = ? and source_id = ?", user.id, source.id])
+			averageitweet = Itweets.average(:word_quality_score, :conditions => ["user_id = ? and source_id = ?", user.id, source.id])
+			source.average_word_score = (averagetweet.to_f+averageitweet.to_f)/2
+			source.score = source.average_word_score
+			source.save
+		end # End loop through user's sources to set net interaction score
 		
 		# Rank sources by net interaction score
 		#ranker = 1
 		#lastscore = 0
-		#@rsources = Source.find(:all, :conditions => ["user_id = ? and user_name <> ?", user.id, "not seen"], :order => "net_interaction_score ASC")
+		#@rsources = Source.find(:all, :conditions => ["user_id = ?", user.id], :order => "net_interaction_score ASC")
 		#for rsource in @rsources
 			#if rsource.net_interaction_score != lastscore
 				#ranker = ranker+1
@@ -459,7 +423,7 @@ for user in @users
 		# Rank sources by their average word score & calculate aggregate source score
 		#ranker = 1
 		#lastscore = 0
-		#@rsources = Source.find(:all, :conditions => ["user_id = ? and user_name <> ?", user.id, "not seen"], :order => "average_word_score ASC")
+		#@rsources = Source.find(:all, :conditions => ["user_id = ?", user.id], :order => "average_word_score ASC")
 		#for rsource in @rsources
 			#if rsource.average_word_score != lastscore
 				#ranker = ranker+1
@@ -488,18 +452,10 @@ for user in @users
 		
 			# Loop through words in split up tweet
 			@words.each do |w|
-		  
 				# check if word is on the System ignore list
 				sysignore = Sysigword.find_by_word(w)
 				unless sysignore
-			  
-					# see if word is a Top 1,000 word
-					ntopword = Tword.find(:first, :conditions => ["word = ? and user_id = ?", w, user.id])
-			  
-					# if word is a top 1,000 word, boost tweet score
-					if ntopword
-						scoreofwords = scoreofwords+ntopword.rank.to_f
-					end # end check if word is a top word
+          scoreofwords = scoreofwords.to_f+w.comp_average.to_f
 				end # end check if word is on the system ignore list
 			end # End loop through words in split up tweet    
 			tweet.word_quality_score = (scoreofwords.to_f/@words.size.to_f)
@@ -512,27 +468,13 @@ for user in @users
 		end # End loop through "new" Tweets to score
 		
 		# Build FINAL tweet scores
-		maxwordscore = Tweet.maximum(:word_quality_score, :conditions => ["user_id = ?", user.id])
-		#maxsourcescore = Tweet.maximum(:source_score_score, :conditions => ["user_id = ?", user.id])
 		for tweet in @tweets
-			maxwordscore = maxwordscore.to_f+(maxwordscore.to_f*0.1)
-			wordindex = (tweet.word_quality_score.to_f/maxwordscore.to_f)*100
-			#sourceindex = (tweet.source_score_score.to_f/maxsourcescore.to_f)*100
-			tweet.score = (wordindex.to_f)#+sourceindex.to_f)/2
+			tweet.score = (tweet.word_quality_score.to_f+tweet.source.score.to_f)/2
 			tweet.last_action = "scored"
 			tweet.save
 		end
 		
 	end #end check is user has more than 1 score round
-	
-	## Delete words that have not been followed ##
-    averageseen = Word.average(:seen_count, :conditions => ["user_id = ?", user.id])
-  	@oldwords = Word.find(:all, :conditions => ["user_id = ?", user.id])
-  	for oldword in @oldwords
-  	  if oldword.seen_count < averageseen and oldword.follows < 1
-  		  oldword.destroy
-  		end
-  	end
 	
 	# Update user after scoring
 	# user.calls_left = Twitter.rate_limit_status.remaining_hits.to_i

@@ -108,11 +108,7 @@ get '/follow/:t' do
 				cleanword = cleanword.downcase
 				word = Word.find(:first, :conditions => ["word = ? and user_id = ? and sys_ignore_flag <> ?", cleanword, tweet.user_id, "yes"])
 				if word
-					word.score = word.score.to_i+1
 					word.follows = word.follows.to_i+1
-					if word.word.include? %{#}
-						word.score = word.score.to_i+2
-					end
 					word.save
 				end # End check if word is exists
 			end # End loop through words
@@ -148,11 +144,7 @@ get '/interact/:t' do
 				cleanword = cleanword.downcase
 				word = Word.find(:first, :conditions => ["word = ? and user_id = ? and sys_ignore_flag <> ?", cleanword, tweet.user_id, "yes"])
 				if word
-					word.score = word.score.to_i+1
 					word.follows = word.follows.to_i+1
-					if word.word.include? %{#}
-						word.score = word.score.to_i+2
-					end
 					word.save
 				end # End check if word is exists
 			end # End loop through words
@@ -166,24 +158,22 @@ get '/interact/:t' do
 end
 
 get '/ats/:word' do
-  siw = Sysigword.find_or_create_by_word(:word => params[:word])
-  siw.save
+  if params[:sys] == "t"
+    siw = Sysigword.find_or_create_by_word(:word => params[:word])
+    siw.save
+  end
   word = Word.find_by_word(params[:word])
   if word
     word.destroy
   end
-  topword = Tword.find_by_word(params[:word])
-  if topword
-    topword.destroy
-  end
-
   @code = %{<b>}+params[:word].to_s+%{</b> has been added to the system ignore list.<br /><br /><br />}
-
-  @topwords = Tword.find(:all, :conditions => ["user_id  = ?", 1], :limit => 10, :order => "rank DESC")
-  for topword in @topwords
-	@code = @code.to_s+topword.word.to_s+%{ | <a href="http://eloono.com/ats/}+topword.word.to_s+%{">Remove</a><br /><br />}
+  @words = Word.find(:all, :conditions => ["user_id  = ?", 1], :limit => 10, :order => "comp_average DESC")
+  for word in @words
+	  @code = @code.to_s+word.word.to_s+%{ | <a href="http://eloono.com/ats/}+word.word.to_s+%{">Ignore</a>}
+	  if word.user_id == 1
+	    @code = @code.to_s+%{ | <a href="http://eloono.com/ats/}+word.word.to_s+%{&sys=t">Remove</a>}
+	  end
+	  @code = @code.to_s+%{<br /><br />}
   end # end loop through top words
-  
   @code
-  
 end

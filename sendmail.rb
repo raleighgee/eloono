@@ -36,6 +36,18 @@ ActiveRecord::Base.establish_connection(
 
 @users = User.find(:all, :conditions => ["active_scoring <> ?", "yes"])
 for user in @users
+  
+  ## Delete words that have not been followed ##
+  averagescore = Word.average(:score, :conditions => ["user_id = ?", user.id])
+  averagefollows = Word.average(:follows, :conditions => ["user_id = ?", user.id])
+	@oldwords = Word.find(:all, :conditions => ["user_id = ?", user.id])
+	for oldword in @oldwords
+	  if oldword.seen_count < averagescore and oldword.follows < averagefollows
+		  oldword.destroy
+		end
+	end
+  
+  
   sixago = Time.now-(5*60*60)
   if user.last_interaction <= sixago
     
@@ -51,7 +63,7 @@ for user in @users
   		i.tweet_type = linktweet.tweet_type
   		i.url_count = linktweet.url_count
   		i.followed_flag = linktweet.followed_flag
-  		i.last_action = linktweet.last_action
+  		i.last_action = "sent"
   		i.twitter_created_at = linktweet.twitter_created_at
   		i.retweet_count = linktweet.retweet_count
   		i.tweet_source = linktweet.tweet_source
@@ -85,7 +97,7 @@ for user in @users
   		ni.tweet_type = nonlinktweet.tweet_type
   		ni.url_count = nonlinktweet.url_count
   		ni.followed_flag = nonlinktweet.followed_flag
-  		ni.last_action = nonlinktweet.last_action
+  		ni.last_action = "sent"
   		ni.twitter_created_at = nonlinktweet.twitter_created_at
   		ni.retweet_count = nonlinktweet.retweet_count
   		ni.tweet_source = nonlinktweet.tweet_source
@@ -124,9 +136,13 @@ for user in @users
 
     # Build list of top ten words for review
     topwords = ""
-    @toptenwords = Tword.find(:all, :conditions => ["user_id = ?", user.id], :order => "rank DESC", :limit => 10)
+    @toptenwords = Word.find(:all, :conditions => ["user_id = ?", user.id], :order => "comp_average DESC", :limit => 10)
     for toptenword in @toptenwords
-      topwords = topwords.to_s+toptenword.word.to_s+%{ | <a href="http://eloono.com/ats/}+toptenword.word.to_s+%{">Remove</a><br /><br />}
+      topwords = topwords.to_s+toptenword.word.to_s+%{ | <a href="http://eloono.com/ats/}+toptenword.word.to_s+%{">Ignore</a>}
+      if toptenword.user_id == 1
+        topwords = topwords.to_s+%{ | <a href="http://eloono.com/ats/}+toptenword.word.to_s+%{&sys=t">Remove</a>}
+      end
+      topwords = topwords.to_s+%{<br /><br />}
     end # end loop through top ten top words
 
     # Build out body of email
