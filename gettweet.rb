@@ -323,7 +323,7 @@ for user in @users
 		
 		# Increase source total tweets seen count by one
 		source = Source.find_by_id(tweet.source_id)
-		source.total_tweets_seen = source.total_tweets_seen+1
+		source.total_tweets_seen = source.total_tweets_seen.to_f+1
 		source.save
 		
 		tweet.last_action = "new"
