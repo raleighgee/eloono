@@ -372,7 +372,7 @@ for user in @users
 	  dayago = Time.now-(23*60*60)
 	  for source in @sources
 	    @sitweets = Itweets.find(:all, :conditions => ["user_id = ? and source_id = ? and last_action = ? and tweet_type = ?", user.id, source.id, "sent", "link"])
-	    for sitweets in @sitweets
+	    for sitweet in @sitweets
 			  if sitweet.created_at <= dayago
     			source.ignores = source.ignores.to_i+1
     			source.save
