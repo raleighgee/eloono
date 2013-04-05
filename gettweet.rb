@@ -367,11 +367,11 @@ for user in @users
 		@sources = Source.find(:all, :conditions => ["user_id = ?", user.id])
 	  
 	  # Add ignores to sources
-	  dayago = Time.now-(23*60*60)
+	  oneeloonoago = Time.now-(5*60*60)
 	  for source in @sources
 	    @sitweets = Itweets.find(:all, :conditions => ["user_id = ? and source_id = ? and last_action = ? and tweet_type = ?", user.id, source.id, "sent", "link"])
 	    for sitweet in @sitweets
-			  if sitweet.created_at <= dayago
+			  if sitweet.created_at <= oneeloonoago
     			source.ignores = source.ignores.to_i+1
     			source.save
     			sitweet.last_action = "ignored"
