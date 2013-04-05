@@ -177,3 +177,7 @@ get '/ats/:word' do
   end # end loop through top words
   @code
 end
+
+get '/test'
+  totalsees = Word.sum(:seen_count, :conditions => ["user_id = ?", 1])
+end
