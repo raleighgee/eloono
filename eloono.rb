@@ -178,7 +178,7 @@ get '/ats/:word' do
   @code
 end
 
-get '/test'
+get '/test' do
   totalsees = Word.sum(:seen_count, :conditions => ["user_id = ?", 1])
   
   totalseees+%{ total words seen}
