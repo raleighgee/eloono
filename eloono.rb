@@ -180,4 +180,6 @@ end
 
 get '/test'
   totalsees = Word.sum(:seen_count, :conditions => ["user_id = ?", 1])
+  
+  totalseees+%{ total words seen}
 end
