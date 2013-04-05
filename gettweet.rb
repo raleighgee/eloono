@@ -327,9 +327,6 @@ for user in @users
 		
 	end # end loop though getting tweets
 	
-	
-	
-	
 	####################### SCORE TWEETS ####################### 
 	
 	@uwords = Word.find(:all, :conditions => ["user_id = ?", user.id])

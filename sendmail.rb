@@ -47,8 +47,7 @@ for user in @users
 		end
 	end
   
-  
-  sixago = Time.now#-(5*60*60)
+  sixago = Time.now-(5*60*60)
   if user.last_interaction <= sixago
     
     @linktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type = ? and last_action = ?", user.id, "link", "scored"], :order => "score DESC, updated_at DESC", :limit => 15)
@@ -140,7 +139,7 @@ for user in @users
     for toptenword in @toptenwords
       topwords = topwords.to_s+toptenword.word.to_s+%{ | <a href="http://eloono.com/ats/}+toptenword.word.to_s+%{">Ignore</a>}
       if toptenword.user_id == 1
-        topwords = topwords.to_s+%{ | <a href="http://eloono.com/ats/}+toptenword.word.to_s+%{&sys=t">Remove</a>}
+        topwords = topwords.to_s+%{ | <a href="http://eloono.com/ats/}+toptenword.word.to_s+%{?sys=t">Remove</a>}
       end
       topwords = topwords.to_s+%{<br /><br />}
     end # end loop through top ten top words

@@ -171,7 +171,7 @@ get '/ats/:word' do
   for word in @words
 	  @code = @code.to_s+word.word.to_s+%{ | <a href="http://eloono.com/ats/}+word.word.to_s+%{">Ignore</a>}
 	  if word.user_id == 1
-	    @code = @code.to_s+%{ | <a href="http://eloono.com/ats/}+word.word.to_s+%{&sys=t">Remove</a>}
+	    @code = @code.to_s+%{ | <a href="http://eloono.com/ats/}+word.word.to_s+%{?sys=t">Remove</a>}
 	  end
 	  @code = @code.to_s+%{<br /><br />}
   end # end loop through top words
