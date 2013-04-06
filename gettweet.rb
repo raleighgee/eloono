@@ -396,8 +396,8 @@ for user in @users
 					  cleanword = cleanword.downcase
     			  word = Word.find_by_word(cleanword)
     			  if word
-    			    word.seen_count = w.seen_count.to_f*0.75
-    			    word.follows = w.follows.to_f*0.75
+    			    word.seen_count = word.seen_count.to_f*0.75
+    			    word.follows = word.follows.to_f*0.75
     			    word.save
     			  end
     			end # end loop through words to penalize
