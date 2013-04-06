@@ -500,7 +500,11 @@ for user in @users
 		
 		# Build FINAL tweet scores
 		for tweet in @tweets
-			tweet.score = ((tweet.word_quality_score.to_f*70)+(tweet.source.score.to_f*30))/100
+		  if user.number_eloonos_sent < 5
+		    tweet.score = tweet.word_quality_score.to_f
+		  else
+		    tweet.score = ((tweet.word_quality_score.to_f*90)+(tweet.source.score.to_f*10))/100
+		  end
 			tweet.last_action = "scored"
 			tweet.save
 		end
