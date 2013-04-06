@@ -193,4 +193,6 @@ get '/reset_users' do
     user.active_scoring = "no"
     user.save
   end
+  
+  %{Users' Active Scoring has been Reset.}
 end

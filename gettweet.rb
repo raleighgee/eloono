@@ -392,9 +392,10 @@ for user in @users
     			# Penalize ignored words
     			@words = sitweet.tweet_content.split(" ")
     			@words.each do |w|
-    			 w.seen_count = w.seen_count.to_f*0.75
-    			 w.follows = w.follows.to_f*0.75
-    			 w.save
+    			  word = Word.find_by_word(w)
+    			  word.seen_count = w.seen_count.to_f*0.75
+    			  word.follows = w.follows.to_f*0.75
+    			  word.save
     			end # end loop through words to penalize
 
         end

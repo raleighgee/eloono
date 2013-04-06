@@ -37,6 +37,11 @@ ActiveRecord::Base.establish_connection(
 @users = User.find(:all, :conditions => ["active_scoring <> ?", "yes"])
 for user in @users
   
+  # Reboot inactive scoring after 2 hours
+  #if user.updated_at <= (Time.now-(1*60*60))
+    #if user.active_scoring == "yes"
+      #user.active_
+  
   ## Delete words that have not been followed ##
   averagescore = Word.average(:score, :conditions => ["user_id = ?", user.id])
   averagefollows = Word.average(:follows, :conditions => ["user_id = ?", user.id])
