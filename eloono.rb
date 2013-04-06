@@ -162,7 +162,7 @@ get '/ats/:word' do
   word = Word.find_by_word(params[:word])
   if word
     word.score = 0
-    word.comp_avg = 0
+    word.comp_average = 0
     word.sys_ignore_flag = "yes"
     if params[:sys] == "t"
       word.destroy
