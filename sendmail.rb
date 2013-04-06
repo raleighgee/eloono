@@ -143,9 +143,29 @@ for user in @users
       end
       topwords = topwords.to_s+%{<br /><br />}
     end # end loop through top ten top words
-
+    
+    # Find top and bottom sources
+    allsources = Source.count(:all, :conditions => ["user_id = ?", user.id])
+    @tsources = Source.find(:all, :conditions => ["user_id = ?", user.id], :limit => 10, :order => "score DESC, average_word_score DESC")
+    @bsources = Source.find(:all, :conditions => ["user_id = ?", user.id], :limit => 10, :order => "score ASC, average_word_score ASC")
+    topsrcs = ""
+    bottomsrc = ""
+    
+    tcount = 1
+    for tsource in @tsources
+      topsrcs = topsrcs.to_s+tcount.to_s+%{. <img height="48px" width="48px" src="}+tsource.profile_image_url.to_s+%{" /> <b>}+tsource.user_name.to_s+%{</b><br />}
+      tcount = tcount+1
+    end
+    
+    bcount = allsources
+    for bsource in @bsources
+      bottomsrcs = bottomsrcs.to_s+bcount.to_s+%{. <img height="48px" width="48px" src="}+bsource.profile_image_url.to_s+%{" /> <b>}+bsource.user_name.to_s+%{</b><br />}
+      bcount = bcount-1
+    end    
+    
+    
     # Build out body of email
-    body = %{<h1>Top Ten Words</h1>}+topwords.to_s+%{<h1>Top Link Tweets</h1>}+@links.to_s+%{<br /><br /><h1>Top Non-Link Tweets</h1>}+@nonlinks.to_s
+    body = %{<h1>Top Ten Words</h1>}+topwords.to_s+%{<h1>Top Link Tweets</h1>}+@links.to_s+%{<br /><br /><h1>Top Non-Link Tweets</h1>}+@nonlinks.to_s+%{<br /><br /><h1>Top Sources</h1>}+topsrcs.to_s+%{<br /><br /><h1>Bottom Sources</h1>}+bottomsrcs.to_s
     
     user.number_eloonos_sent = user.number_eloonos_sent.to_i+1
     user.last_interaction = Time.now

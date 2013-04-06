@@ -357,7 +357,9 @@ for user in @users
 				# check if word exists
 				word = Word.find_by_word(w)
 			  if word
-				  scoreofwords = scoreofwords.to_f+word.comp_average.to_f
+			    if word.sys_ignore_flag == "no"
+				    scoreofwords = scoreofwords.to_f+word.comp_average.to_f
+				  end
 				end
 			end # End loop through words in split up tweet    
 			tweet.word_quality_score = (scoreofwords.to_f/@words.size.to_f)
@@ -460,7 +462,7 @@ for user in @users
 		# Calculate aggregate source score
     @rsources = Source.find(:all, :conditions => ["user_id = ?", user.id])
 		for rsource in @rsources
-      rsource.score = ((rsource.interaction_score_rank.to_f*60)+(rsource.word_score_rank.to_f*20)+(rsource.tph_rank.to_f*10)+(rsource.num_followers_rank.to_f*10))/100
+      rsource.score = ((rsource.interaction_score_rank.to_f*60)+(rsource.word_score_rank.to_f*30)+(rsource.tph_rank.to_f*5)+(rsource.num_followers_rank.to_f*5))/100
 			rsource.save
 		end # end calculate aggregate source score
 		
@@ -503,7 +505,7 @@ for user in @users
 		  if user.number_eloonos_sent < 5
 		    tweet.score = tweet.word_quality_score.to_f
 		  else
-		    tweet.score = ((tweet.word_quality_score.to_f*90)+(tweet.source.score.to_f*10))/100
+		    tweet.score = ((tweet.word_quality_score.to_f*95)+(tweet.source.score.to_f*5))/100
 		  end
 			tweet.last_action = "scored"
 			tweet.save
