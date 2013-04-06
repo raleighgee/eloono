@@ -184,6 +184,13 @@ end
 
 get '/test' do
   totalsees = Word.sum(:seen_count, :conditions => ["user_id = ?", 1])
-  
   totalsees.to_s+%{ total words seen}
+end
+
+get '/reset_users' do
+  @users = User.find(:all)
+  for user in @users
+    user.active_scoring = "no"
+    user.save
+  end
 end

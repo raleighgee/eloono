@@ -154,6 +154,8 @@ for user in @users
 				sfollow = Source.find_by_twitter_id_and_user_id(p.retweeted_status.user.id, user.id)
 				unless sfollow
 					c = Connection.find_or_create_by_user_screen_name_and_source_id(:user_screen_name => p.retweeted_status.user.screen_name, :user_name => p.retweeted_status.user.name, :twitter_id => p.retweeted_status.user.id, :source_id => s.id, :user_id => user.id)
+					c.num_appears = c.num_appears.to_i+1
+					c.save
 				end
 			end
 
@@ -164,6 +166,8 @@ for user in @users
 				sfollow = Source.find_by_twitter_id_and_user_id(p.in_reply_to_user_id, user.id)
 				unless sfollow
 					c = Connection.find_or_create_by_user_screen_name_and_source_id(:user_screen_name => p.in_reply_to_screen_name, :twitter_id => p.in_reply_to_user_id, :source_id => s.id, :user_id => user.id)
+					c.num_appears = c.num_appears.to_i+1
+					c.save
 				end
 			end
 					
