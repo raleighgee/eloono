@@ -47,7 +47,7 @@ for user in @users
 		end
 	end
   
-  sixago = Time.now-(5*60*60)
+  sixago = Time.now#-(5*60*60)
   if user.last_interaction <= sixago
     
     @linktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type = ? and last_action = ?", user.id, "link", "scored"], :order => "score DESC, updated_at DESC", :limit => 15)
