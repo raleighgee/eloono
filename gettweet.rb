@@ -471,7 +471,7 @@ for user in @users
 		# Calculate aggregate source score
     @rsources = Source.find(:all, :conditions => ["user_id = ?", user.id])
 		for rsource in @rsources
-      rsource.score = ((rsource.interaction_score_rank.to_f*60)+(rsource.word_score_rank.to_f*30)+(rsource.tph_rank.to_f*5)+(rsource.num_followers_rank.to_f*5))/100
+      rsource.score = (((rsource.interaction_score_rank.to_f*20)+(rsource.word_score_rank.to_f*70)+(rsource.tph_rank.to_f*5)+(rsource.num_followers_rank.to_f*5))/100)/1000
 			rsource.save
 		end # end calculate aggregate source score
 		
