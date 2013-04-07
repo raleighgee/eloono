@@ -496,8 +496,9 @@ for user in @users
 				# check if word exists
 				word = Word.find_by_word(w)
   			if word
-				  word = Word.find_by_word(w)
-					scoreofwords = scoreofwords.to_f+word.comp_average.to_f
+				  if word.sys_ignore_flag == "no"
+				    scoreofwords = scoreofwords.to_f+word.comp_average.to_f
+				  end
 				end
 			end # End loop through words in split up tweet    
 			tweet.word_quality_score = (scoreofwords.to_f/@words.size.to_f)
