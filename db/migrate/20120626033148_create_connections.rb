@@ -2,6 +2,7 @@ class CreateConnections < ActiveRecord::Migration
 	def change
 		create_table :connections do |t|
 			t.integer :source_id
+			t.integer :tweet_id
 			t.string :twitter_id, :default => "wait"
 			t.integer :user_id
 			t.string :user_name, :default => "wait"
