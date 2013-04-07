@@ -338,7 +338,7 @@ for user in @users
 	
 	####################### SCORE TWEETS ####################### 
 	
-	@uwords = Word.find(:all, :conditions => ["user_id = ?", user.id])
+	@uwords = Word.find(:all, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
 	totalsees = Word.sum(:seen_count, :conditions => ["user_id = ?", user.id])
 	for uword in @uwords
 	  uword.score = (uword.seen_count.to_f/totalsees.to_f)*100
