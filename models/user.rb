@@ -4,12 +4,9 @@ class User < ActiveRecord::Base
   has_many :tweets
   has_many :itweets
   has_many :words
-  has_many :top_words
   has_many :connections
   has_many :links
   has_many :sources
-  has_many :scores
-  has_many :kids
   
   def self.create_with_omniauth(auth)
     create! do |user|
