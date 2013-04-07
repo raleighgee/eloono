@@ -164,11 +164,10 @@ get '/ats/:word' do
     word.score = 0
     word.comp_average = 0
     word.sys_ignore_flag = "yes"
+    word.save
     if params[:sys] == "t"
       word.destroy
-    else
-      word.save
-    end
+    end 
   end
   @code = %{<b>}+params[:word].to_s+%{</b> has been added to the system ignore list.<br /><br /><br />}
   @words = Word.find(:all, :conditions => ["user_id  = ?", 1], :limit => 10, :order => "comp_average DESC")
