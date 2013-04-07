@@ -34,20 +34,15 @@ ActiveRecord::Base.establish_connection(
   :encoding => 'utf8'
 )
 
-@users = User.find(:all, :conditions => ["active_scoring <> ?", "yes"])
+@users = User.find(:all)
 for user in @users
-  
-  # Reboot inactive scoring after 2 hours
-  #if user.updated_at <= (Time.now-(1*60*60))
-    #if user.active_scoring == "yes"
-      #user.active_
-  
+    
   ## Delete words that have not been followed ##
-  averagescore = Word.average(:score, :conditions => ["user_id = ?", user.id])
+  averagescore = Word.average(:comp_average, :conditions => ["user_id = ?", user.id])
   averagefollows = Word.average(:follows, :conditions => ["user_id = ?", user.id])
 	@oldwords = Word.find(:all, :conditions => ["user_id = ?", user.id])
 	for oldword in @oldwords
-	  if oldword.seen_count < averagescore and oldword.follows < averagefollows
+	  if oldword.comp_average <= averagescore and oldword.sys_ignore_flag == "no" and oldword.create_at <= (Time.now-(60*60))
 		  oldword.destroy
 		end
 	end
