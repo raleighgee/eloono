@@ -42,7 +42,7 @@ for user in @users
   averagefollows = Word.average(:follows, :conditions => ["user_id = ?", user.id])
 	@oldwords = Word.find(:all, :conditions => ["user_id = ?", user.id])
 	for oldword in @oldwords
-	  if oldword.comp_average <= averagescore and oldword.sys_ignore_flag == "no" and oldword.create_at <= (Time.now-(60*60))
+	  if oldword.comp_average <= averagescore and oldword.sys_ignore_flag == "no" and oldword.created_at <= (Time.now-(60*60))
 		  oldword.destroy
 		end
 	end
