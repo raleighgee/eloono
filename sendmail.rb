@@ -153,12 +153,16 @@ for user in @users
     
     tcount = 1
     for tsource in @tsources
+	  tsource.times_in_top = tsource.times_in_top+1
+	  tsource.save
       topsrcs = topsrcs.to_s+tcount.to_s+%{. <img height="48px" width="48px" src="}+tsource.profile_image_url.to_s+%{" /> <b>}+tsource.user_name.to_s+%{</b><br />}
       tcount = tcount+1
     end
     
     bcount = allsources
     for bsource in @bsources
+      tsource.times_in_bottom = tsource.times_in_bottom+1
+	  tsource.save
       bottomsrcs = bottomsrcs.to_s+bcount.to_s+%{. <img height="48px" width="48px" src="}+bsource.profile_image_url.to_s+%{" /> <b>}+bsource.user_name.to_s+%{</b><br />}
       bcount = bcount-1
     end    
