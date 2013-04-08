@@ -30,6 +30,8 @@ class CreateSources < ActiveRecord::Migration
 			t.float :total_tweets_seen
 			t.float :num_followers_rank
 			t.float :tph_rank
+			t.float :times_in_bottom, :default => 0
+			t.float :times_in_top, :default => 0
 			t.timestamps
 		end
 	end
