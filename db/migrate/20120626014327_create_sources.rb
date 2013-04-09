@@ -32,6 +32,7 @@ class CreateSources < ActiveRecord::Migration
 			t.float :tph_rank
 			t.float :times_in_bottom, :default => 0
 			t.float :times_in_top, :default => 0
+			t.string :target_flag, :default => "no"
 			t.timestamps
 		end
 	end
