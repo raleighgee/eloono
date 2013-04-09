@@ -547,23 +547,23 @@ for user in @users
 		callloop = numhits.ceil
 	end
 	
-	begin
-		@condescs = Connection.find(:all, :conditions => ["user_id = ? and user_description = ?", user.id, "null"], :limit => 100)
-		ids = ""
-		for condesc in @condescs
-			ids = ids.to_s+condesc.twitter_id.to_s+", "
-		end
-		ids = ids.chomp(', ')
-		@condescpops = Twitter.users(ids)
-		@condescpops.each do |c|
-			con = Connection.find_by_twitter_id(c.id)
-			if con
-				con.user_description = c.description.to_s
-				con.save
-			end
-		end
-		callloop = callloop-1
-	end while callloop > 0
+	#begin
+		#@condescs = Connection.find(:all, :conditions => ["user_id = ? and user_description = ?", user.id, "null"], :limit => 100)
+		#ids = ""
+		#for condesc in @condescs
+			#ids = ids.to_s+condesc.twitter_id.to_s+", "
+		#end
+		#ids = ids.chomp(', ')
+		#@condescpops = Twitter.users(ids)
+		#@condescpops.each do |c|
+		#	con = Connection.find_by_twitter_id(c.id)
+			#if con
+				#con.user_description = c.description.to_s
+				#con.save
+			#end
+		#end
+		#callloop = callloop-1
+	#end while callloop > 0
 
 	
 	# Update user after scoring
