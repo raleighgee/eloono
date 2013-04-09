@@ -9,7 +9,9 @@ class CreateConnections < ActiveRecord::Migration
 			t.string :user_screen_name, :default => "wait"
 			t.string :profile_image_url, :default => "wait"
 			t.integer :num_appears, :default => 0
-			t.text :user_description
+			t.float :avg_assoc_tweet_score, :default => 0
+			t.text :user_description, :default => "wait"
+			t.string :profile_image_url, :default => "wait"
 			t.timestamps
 		end
 	end

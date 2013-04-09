@@ -532,40 +532,16 @@ for user in @users
 	end
 	
 	@killcons = Connection.find(:all, :conditions => ["twitter_id = ? and user_id = ?", connection.twitter_id, user.id], :order => "created_at DESC")
-	keep  = @killcons[0].id
+	averagetscore = Connection.average(:avg_assoc_tweet_score, :conditions => ["twitter_id = ? and user_id = ?", connection.twitter_id, user.id])
+	keep = @killcons[0].id
+	@killcons[0].avg_assoc_tweet_score = averagetscore
+	@killcons[0].save
 	for killcon in @killcons
 		if killcon.id != keep
 			killcon.destroy
 		end
 	end
-	
-	@uconnections = Connection.find(:all, :conditions => ["user_id = ?", user.id])
-	numhits = @uconnections.size.to_f/100
-	if numhits < 21
-		callloop = 20
-	else
-		callloop = numhits.ceil
-	end
-	
-	#begin
-		#@condescs = Connection.find(:all, :conditions => ["user_id = ? and user_description = ?", user.id, "null"], :limit => 100)
-		#ids = ""
-		#for condesc in @condescs
-			#ids = ids.to_s+condesc.twitter_id.to_s+", "
-		#end
-		#ids = ids.chomp(', ')
-		#@condescpops = Twitter.users(ids)
-		#@condescpops.each do |c|
-		#	con = Connection.find_by_twitter_id(c.id)
-			#if con
-				#con.user_description = c.description.to_s
-				#con.save
-			#end
-		#end
-		#callloop = callloop-1
-	#end while callloop > 0
-
-	
+		
 	# Update user after scoring
 	# user.calls_left = Twitter.rate_limit_status.remaining_hits.to_i
 	user.num_score_rounds = user.num_score_rounds+1
