@@ -523,7 +523,8 @@ for user in @users
 	
 	
 	
-	####################### PROCESS CONNECTIONS ####################### 
+	####################### PROCESS CONNECTIONS #######################
+	
 	@connections = Connection.find(:all, :conditions => ["user_id = ?", user.id])
 	for connection in @connections
 		@cons = Connection.count(:conditions => ["twitter_id = ? and user_id = ?", connection.twitter_id, user.id])
@@ -547,7 +548,7 @@ for user in @users
 	end
 	
 	begin
-		@condescs = Connection.find(:all, :conditions => ["user_id = ? and user_description <> ?", user.id, "null"], :limit => 100)
+		@condescs = Connection.find(:all, :conditions => ["user_id = ? and user_description == ?", user.id, "null"], :limit => 100)
 		ids = ""
 		for condesc in @condescs
 			ids = ids.to_s+condesc.twitter_id.to_s+", "
