@@ -553,6 +553,7 @@ for user in @users
 		for condesc in @condescs
 			ids = ids.to_s+condesc.twitter_id.to_s+", "
 		end
+		ids = ids.chomp(', ')
 		@condescpops = Twitter.users(ids)
 		@condescpops.each do |c|
 			con = Connection.find_by_twitter_id(c.id)
