@@ -537,6 +537,7 @@ for user in @users
 	for connection in @connections
 		@cons = Connection.count(:conditions => ["twitter_id = ? and user_id = ? and source_id = ?", connection.twitter_id, user.id, connection.source_id])
 		connection.num_appears = connection.num_appears+@cons
+		connection.save
 		@killcons = Connection.find(:all, :conditions => ["twitter_id = ? and user_id = ?", connection.twitter_id, user.id], :order => "created_at DESC")
 		keep = @killcons[0].id
   	for killcon in @killcons
