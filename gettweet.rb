@@ -517,6 +517,14 @@ for user in @users
 		  end
 			tweet.last_action = "scored"
 			tweet.save
+			
+			# Add tweet socre to any associated connections
+			@connections = Connection.find(:all, :conditions => ["user_id = ? and tweet_id = ?", user.id, tweet.id])
+			for connection in @connections
+			  connection.avg_assoc_tweet_score = (connection.avg_assoc_tweet_score.to_f+tweet.score.to_f)/2
+			  connection.save
+			end
+			
 		end
 		
 	end #end check is user has more than 1 score round
@@ -527,20 +535,17 @@ for user in @users
 	
 	@connections = Connection.find(:all, :conditions => ["user_id = ?", user.id])
 	for connection in @connections
-		@cons = Connection.count(:conditions => ["twitter_id = ? and user_id = ?", connection.twitter_id, user.id])
-		connection.num_appears = connection.num_appears.to_f+@cons.to_f
+		@cons = Connection.count(:conditions => ["twitter_id = ? and user_id = ? and source_id = ?", connection.twitter_id, user.id, connection.source_id])
+		connection.num_appears = connection.num_appears+@cons
+		@killcons = Connection.find(:all, :conditions => ["twitter_id = ? and user_id = ?", connection.twitter_id, user.id], :order => "created_at DESC")
+		keep = @killcons[0].id
+  	for killcon in @killcons
+  		if killcon.id != keep
+  			killcon.destroy
+  		end
+  	end
 	end
 	
-	@killcons = Connection.find(:all, :conditions => ["twitter_id = ? and user_id = ?", connection.twitter_id, user.id], :order => "created_at DESC")
-	averagetscore = Connection.average(:avg_assoc_tweet_score, :conditions => ["twitter_id = ? and user_id = ?", connection.twitter_id, user.id])
-	keep = @killcons[0].id
-	@killcons[0].avg_assoc_tweet_score = averagetscore
-	@killcons[0].save
-	for killcon in @killcons
-		if killcon.id != keep
-			killcon.destroy
-		end
-	end
 		
 	# Update user after scoring
 	# user.calls_left = Twitter.rate_limit_status.remaining_hits.to_i
