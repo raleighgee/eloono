@@ -182,8 +182,12 @@ get '/ats/:word' do
 end
 
 get '/test' do
-  totalsees = Word.sum(:seen_count, :conditions => ["user_id = ?", 1])
-  totalsees.to_s+%{ total words seen}
+  @connections = Connection.find(:all)
+  for connection in @connections
+    connection.num_appears = 1
+    connection.save
+  end
+  %{OK BRO!}
 end
 
 get '/reset_users' do
