@@ -179,7 +179,7 @@ for user in @users
     # Find Interesting Connections
     concode = "<h1>Interesting Connections</h1>"
     if user.number_eloonos_sent > 9
-      @connections = Connection.find(:all, :conditions => ["user_id = ? and num_appears > ?", user.id, 0], :limit => 5, :order => "num_appears DESC, average_assoc_tweet_score DESC")
+      @connections = Connection.find(:all, :conditions => ["user_id = ? and num_appears > ?", user.id, 0], :limit => 5, :order => "num_appears DESC, avg_assoc_tweet_score DESC")
       if @connections.size > 0
         for connection in @connections
           c = Twitter.user(connection.twitter_id.to_s)
