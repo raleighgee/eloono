@@ -37,6 +37,14 @@ ActiveRecord::Base.establish_connection(
 @users = User.find(:all)
 for user in @users
     
+	# Authenticate user for pulling of Tweets
+	Twitter.configure do |config|
+		config.consumer_key = "DHBxwGvab2sJGw3XhsEmA"
+		config.consumer_secret = "530TCO6YMRuB23R7wse91rTcIKFPKQaxFQNVhfnk"
+		config.oauth_token = user.token
+		config.oauth_token_secret = user.secret
+	end  
+    
   ## Delete words that have not been followed ##
   averagescore = Word.average(:comp_average, :conditions => ["user_id = ?", user.id])
   averagefollows = Word.average(:follows, :conditions => ["user_id = ?", user.id])
@@ -168,8 +176,24 @@ for user in @users
     end    
     
     
+    # Find Interesting Connections
+    concode = "<h1>Interesting Connections</h1>"
+    if user.number_eloonos_sent > 9
+      @connections = Connection.find(:all, :conditions => ["user_id = ? and num_appears > ?", user.id, 0], :limit => 5, :order => "num_appears DESC, average_assoc_tweet_score DESC")
+      if @connections.size > 0
+        for connection in @connections
+          c = Twitter.user(connection.twitter_id.to_s)
+          connection.profile_image_url = c.profile_image_url
+          connection.user_description = c.description
+          connection.save
+          concode = concode.to_s+%{<img height="48px" width="48px" src="}+connection.profile_image_url.to_s+%{" /> <b><a href="http://twitter.com/}+connection.twitter_id.to_s+%{" target="_blank">See Profile</a></b><br />}+connection.user_description.to_s+%{<br /><br />}
+        end # end loop through connections
+      end # end check for connections
+    end # End check if user has had at least 10 eloonos sent
+    
+    
     # Build out body of email
-    body = %{<h1>Top Ten Words</h1>}+topwords.to_s+%{<h1>Top Link Tweets</h1>}+@links.to_s+%{<br /><br /><h1>Top Non-Link Tweets</h1><br />Language | Tops | Bottoms | Tweets | Follows | Ignores<br /><br />}+@nonlinks.to_s+%{<br /><br /><h1>Top Sources</h1><br />Language | Tops | Bottoms | Tweets | Follows | Ignores<br /><br />}+topsrcs.to_s+%{<br /><br /><h1>Bottom Sources</h1>}+bottomsrcs.to_s
+    body = %{<h1>Top Ten Words</h1>}+topwords.to_s+%{<h1>Top Link Tweets</h1>}+@links.to_s+%{<br /><br /><h1>Top Non-Link Tweets</h1><br />Language | Tops | Bottoms | Tweets | Follows | Ignores<br /><br />}+@nonlinks.to_s+%{<br /><br /><h1>Top Sources</h1><br />Language | Tops | Bottoms | Tweets | Follows | Ignores<br /><br />}+topsrcs.to_s+%{<br /><br /><h1>Bottom Sources</h1>}+bottomsrcs.to_s+%{<br /><br />}+concode.to_s
     
     user.number_eloonos_sent = user.number_eloonos_sent.to_i+1
     user.last_interaction = Time.now
