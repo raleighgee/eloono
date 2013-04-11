@@ -163,7 +163,7 @@ for user in @users
     for tsource in @tsources
 	    tsource.times_in_top = tsource.times_in_top+1
 	    tsource.save
-      topsrcs = topsrcs.to_s+tcount.to_s+%{. <img height="48px" width="48px" src="}+tsource.profile_image_url.to_s+%{" /> <b><a href="http://twitter.com/}+tsource.user_Screen_name.to_s+%{" target="_blank">}+tsource.user_name.to_s+%{</a></b> | }+tsource.user_language.to_s+%{ | }+tsource.times_in_top.to_s+%{ | }+tsource.times_in_bottom.to_s+%{ | }+tsource.total_tweets_seen.to_s+%{ | }+tsource.number_links_followed.to_s+%{ | }+tsource.ignores.to_s+%{ | TARGET<br />}
+      topsrcs = topsrcs.to_s+tcount.to_s+%{. <img height="48px" width="48px" src="}+tsource.profile_image_url.to_s+%{" /> <b><a href="http://twitter.com/}+tsource.user_screen_name.to_s+%{" target="_blank">}+tsource.user_name.to_s+%{</a></b> | }+tsource.user_language.to_s+%{ | }+tsource.times_in_top.to_s+%{ | }+tsource.times_in_bottom.to_s+%{ | }+tsource.total_tweets_seen.to_s+%{ | }+tsource.number_links_followed.to_s+%{ | }+tsource.ignores.to_s+%{ | TARGET<br />}
       tcount = tcount+1
     end
     
@@ -171,7 +171,7 @@ for user in @users
     for bsource in @bsources
       tsource.times_in_bottom = tsource.times_in_bottom+1
 	    tsource.save
-      bottomsrcs = bottomsrcs.to_s+bcount.to_s+%{. <img height="48px" width="48px" src="}+bsource.profile_image_url.to_s+%{" /> <b><a href="http://twitter.com/}+bsource.user_Screen_name.to_s+%{" target="_blank">}+bsource.user_name.to_s+%{</a></b> | }+bsource.user_language.to_s+%{ | }+bsource.times_in_top.to_s+%{ | }+bsource.times_in_bottom.to_s+%{ | }+bsource.total_tweets_seen.to_s+%{ | }+bsource.number_links_followed.to_s+%{ | }+bsource.ignores.to_s+%{ | UNFOLLOW<br />}
+      bottomsrcs = bottomsrcs.to_s+bcount.to_s+%{. <img height="48px" width="48px" src="}+bsource.profile_image_url.to_s+%{" /> <b><a href="http://twitter.com/}+bsource.user_screen_name.to_s+%{" target="_blank">}+bsource.user_name.to_s+%{</a></b> | }+bsource.user_language.to_s+%{ | }+bsource.times_in_top.to_s+%{ | }+bsource.times_in_bottom.to_s+%{ | }+bsource.total_tweets_seen.to_s+%{ | }+bsource.number_links_followed.to_s+%{ | }+bsource.ignores.to_s+%{ | UNFOLLOW<br />}
       bcount = bcount-1
     end    
     
