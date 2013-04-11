@@ -2,7 +2,7 @@ class CreateSources < ActiveRecord::Migration
 	def change
 		create_table :sources do |t|
 			t.integer :user_id
-			t.string :twitter_id
+			t.integer :twitter_id, :limit => 8
 			t.float :score, :default => 1
 			t.integer :statuses_count
 			t.integer :favorites_count
