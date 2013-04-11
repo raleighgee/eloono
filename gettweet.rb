@@ -379,6 +379,7 @@ for user in @users
 	  oneeloonoago = Time.now-(5*60*60)
 	  for source in @sources
 	    source.net_interaction_score = (source.number_links_followed.to_f-source.ignores.to_f)/source.total_tweets_seen.to_f
+	    source.save
 	    @sitweets = Itweets.find(:all, :conditions => ["user_id = ? and source_id = ? and last_action = ? and tweet_type = ?", user.id, source.id, "sent", "link"])
 	    for sitweet in @sitweets
 			  if sitweet.created_at <= oneeloonoago
