@@ -153,23 +153,23 @@ for user in @users
     
     tcount = 1
     for tsource in @tsources
-	  tsource.times_in_top = tsource.times_in_top+1
-	  tsource.save
-      topsrcs = topsrcs.to_s+tcount.to_s+%{. <img height="48px" width="48px" src="}+tsource.profile_image_url.to_s+%{" /> <b>}+tsource.user_name.to_s+%{</b><br />}
+	    tsource.times_in_top = tsource.times_in_top+1
+	    tsource.save
+      topsrcs = topsrcs.to_s+tcount.to_s+%{. <img height="48px" width="48px" src="}+tsource.profile_image_url.to_s+%{" /> <b><a href="http://twitter.com/}+tsource.user_Screen_name.to_s+%{" target="_blank">}+tsource.user_name.to_s+%{</a></b> | }+tsource.user_language.to_s+%{ | }+tsource.times_in_top.to_s+%{ | }+tsource.times_in_bottom.to_s+%{ | }+tsource.total_tweets_seen.to_s+%{ | }+tsource.number_links_followed.to_s+%{ | }+tsource.ignores.to_s+%{ | TARGET<br />}
       tcount = tcount+1
     end
     
     bcount = allsources
     for bsource in @bsources
       tsource.times_in_bottom = tsource.times_in_bottom+1
-	  tsource.save
-      bottomsrcs = bottomsrcs.to_s+bcount.to_s+%{. <img height="48px" width="48px" src="}+bsource.profile_image_url.to_s+%{" /> <b>}+bsource.user_name.to_s+%{</b><br />}
+	    tsource.save
+      bottomsrcs = bottomsrcs.to_s+bcount.to_s+%{. <img height="48px" width="48px" src="}+bsource.profile_image_url.to_s+%{" /> <b><a href="http://twitter.com/}+bsource.user_Screen_name.to_s+%{" target="_blank">}+bsource.user_name.to_s+%{</a></b> | }+bsource.user_language.to_s+%{ | }+bsource.times_in_top.to_s+%{ | }+bsource.times_in_bottom.to_s+%{ | }+bsource.total_tweets_seen.to_s+%{ | }+bsource.number_links_followed.to_s+%{ | }+bsource.ignores.to_s+%{ | UNFOLLOW<br />}
       bcount = bcount-1
     end    
     
     
     # Build out body of email
-    body = %{<h1>Top Ten Words</h1>}+topwords.to_s+%{<h1>Top Link Tweets</h1>}+@links.to_s+%{<br /><br /><h1>Top Non-Link Tweets</h1>}+@nonlinks.to_s+%{<br /><br /><h1>Top Sources</h1>}+topsrcs.to_s+%{<br /><br /><h1>Bottom Sources</h1>}+bottomsrcs.to_s
+    body = %{<h1>Top Ten Words</h1>}+topwords.to_s+%{<h1>Top Link Tweets</h1>}+@links.to_s+%{<br /><br /><h1>Top Non-Link Tweets</h1><br />Language | Tops | Bottoms | Tweets | Follows | Ignores<br /><br />}+@nonlinks.to_s+%{<br /><br /><h1>Top Sources</h1><br />Language | Tops | Bottoms | Tweets | Follows | Ignores<br /><br />}+topsrcs.to_s+%{<br /><br /><h1>Bottom Sources</h1>}+bottomsrcs.to_s
     
     user.number_eloonos_sent = user.number_eloonos_sent.to_i+1
     user.last_interaction = Time.now
