@@ -150,7 +150,11 @@ get '/interact/:t' do
 			tweet.save
 		end # end check if tweet has already been followed
 	end # end check if a tweet is found
-	linkcode = %{https://twitter.com/intent/tweet?in_reply_to=}+tweet.twitter_id.to_s#+%{&via=}+tweet.source.user_screen_name.to_s
+	if params[:i] == "interact"
+	  linkcode = %{https://twitter.com/intent/tweet?in_reply_to=}+tweet.twitter_id.to_s#+%{&via=}+tweet.source.user_screen_name.to_s
+	else
+	  linkcode = %{https://twitter.com/intent/tweet?retweet=}+tweet.twitter_id.to_s#+%{&via=}+tweet.source.user_screen_name.to_s
+	end
 	redirect linkcode
 end
 
