@@ -538,10 +538,10 @@ for user in @users
 	
 	@connections = Connection.find(:all, :conditions => ["user_id = ?", user.id])
 	for connection in @connections
-		@cons = Connection.count(:conditions => ["twitter_id = ? and user_id = ? and source_id = ?", connection.twitter_id, user.id, connection.source_id])
+		@cons = Connection.count(:conditions => ["user_screen_name = ? and user_id = ? and source_id = ?", connection.user_screen_name, user.id, connection.source_id])
 		connection.num_appears = connection.num_appears+@cons
 		connection.save
-		@killcons = Connection.find(:all, :conditions => ["twitter_id = ? and user_id = ?", connection.twitter_id, user.id], :order => "created_at DESC")
+		@killcons = Connection.find(:all, :conditions => ["user_screen_name = ? and user_id = ?", connection.user_screen_name, user.id], :order => "created_at DESC")
 		keep = @killcons[0].id
   	for killcon in @killcons
   		if killcon.id != keep
