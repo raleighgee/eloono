@@ -122,7 +122,7 @@ for user in @users
     	nonlinktweet.destroy
     	
     	# Clean out connections that are actualy sources
-			connection = Connection.find(:first, :conditions => ["user_id = ? and twitter_id = ?", ni.user_id, ni.source.twitter_id])
+			connection = Connection.find(:first, :conditions => ["user_id = ? and user_screen_name = ?", ni.user_id, ni.source.user_screen_name])
 			if connection
 			  connection.destroy
 			end
