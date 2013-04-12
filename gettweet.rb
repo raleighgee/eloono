@@ -142,7 +142,7 @@ for user in @users
 					# if mention is not already a source, create a connection
 					unless cfollow
 					  #:twitter_id => connection.id
-						c = Connection.find_or_create_by_twitter_id_and_source_id_and_tweet_id(:user_screen_name => connection.screen_name, :user_name => connection.name, :source_id => s.id, :user_id => user.id, :tweet_id => t.id)
+						c = Connection.find_or_create_by_user_screen_name_and_source_id_and_tweet_id(:user_screen_name => connection.screen_name, :user_name => connection.name, :source_id => s.id, :user_id => user.id, :tweet_id => t.id)
 					end
 				end # End loop through mentions in tweet
 			end # End check tweet has any mentions
@@ -166,7 +166,7 @@ for user in @users
 				t.convo_initiator = p.in_reply_to_screen_name
 				sfollow = Source.find_by_twitter_id_and_user_id(p.in_reply_to_user_id, user.id)
 				unless sfollow
-					c = Connection.find_or_create_by_user_screen_name_and_source_id_and_tweet_id(:user_screen_name => p.in_reply_to_screen_name, :twitter_id => p.in_reply_to_user_id, :source_id => s.id, :user_id => user.id, :tweet_id => t.id)
+					c = Connection.find_or_create_by_user_screen_name_and_source_id_and_tweet_id(:user_screen_name => p.in_reply_to_screen_name, :source_id => s.id, :user_id => user.id, :tweet_id => t.id)
 					c.save
 				end
 			end
