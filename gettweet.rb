@@ -141,7 +141,8 @@ for user in @users
 					cfollow = Source.find_by_twitter_id_and_user_id(connection.id, user.id)
 					# if mention is not already a source, create a connection
 					unless cfollow
-						c = Connection.find_or_create_by_twitter_id_and_source_id_and_tweet_id(:user_screen_name => connection.screen_name, :user_name => connection.name, :twitter_id => connection.id, :source_id => s.id, :user_id => user.id, :tweet_id => t.id)
+					  #:twitter_id => connection.id
+						c = Connection.find_or_create_by_twitter_id_and_source_id_and_tweet_id(:user_screen_name => connection.screen_name, :user_name => connection.name, :source_id => s.id, :user_id => user.id, :tweet_id => t.id)
 					end
 				end # End loop through mentions in tweet
 			end # End check tweet has any mentions
@@ -153,7 +154,8 @@ for user in @users
 				t.convo_initiator = p.retweeted_status.user.screen_name
 				sfollow = Source.find_by_twitter_id_and_user_id(p.retweeted_status.user.id, user.id)
 				unless sfollow
-					c = Connection.find_or_create_by_user_screen_name_and_source_id_and_tweet_id(:user_screen_name => p.retweeted_status.user.screen_name, :user_name => p.retweeted_status.user.name, :twitter_id => p.retweeted_status.user.id, :source_id => s.id, :user_id => user.id, :tweet_id => t.id)
+				  #:twitter_id => p.retweeted_status.user.id,
+					c = Connection.find_or_create_by_user_screen_name_and_source_id_and_tweet_id(:user_screen_name => p.retweeted_status.user.screen_name, :user_name => p.retweeted_status.user.name, :source_id => s.id, :user_id => user.id, :tweet_id => t.id)
 					c.save
 				end
 			end
