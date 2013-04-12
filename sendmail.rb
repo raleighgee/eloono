@@ -182,7 +182,8 @@ for user in @users
       @connections = Connection.find(:all, :conditions => ["user_id = ? and num_appears > ?", user.id, 0], :limit => 5, :order => "num_appears DESC, avg_assoc_tweet_score DESC")
       if @connections.size > 0
         for connection in @connections
-          c = Twitter.user(connection.twitter_id.to_s)
+          twitid = connection.twitter_id.to_s.gsub(",", "")
+          c = Twitter.user(twitid)
           connection.profile_image_url = c.profile_image_url
           connection.user_description = c.description
           connection.save
