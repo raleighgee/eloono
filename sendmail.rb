@@ -186,7 +186,7 @@ for user in @users
           connection.profile_image_url = c.profile_image_url
           connection.user_description = c.description
           connection.save
-          concode = concode.to_s+%{<img height="48px" width="48px" src="}+connection.profile_image_url.to_s+%{" /> <b><a href="http://twitter.com/}+connection.twitter_id.to_s+%{" target="_blank">See Profile</a></b><br />}+connection.user_description.to_s+%{<br /><br />}
+          concode = concode.to_s+%{<img height="48px" width="48px" src="}+connection.profile_image_url.to_s+%{" /> <b><a href="http://twitter.com/}+connection.user_screen_name.to_s+%{" target="_blank">See Profile</a></b><br />}+connection.user_description.to_s+%{<br /><br />}
         end # end loop through connections
       end # end check for connections
     #end # End check if user has had at least 10 eloonos sent
