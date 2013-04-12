@@ -178,19 +178,18 @@ for user in @users
     
     # Find Interesting Connections
     concode = "<h1>Interesting Connections</h1>"
-    if user.number_eloonos_sent > 9
+    #if user.number_eloonos_sent > 9
       @connections = Connection.find(:all, :conditions => ["user_id = ? and num_appears > ?", user.id, 0], :limit => 5, :order => "num_appears DESC, avg_assoc_tweet_score DESC")
       if @connections.size > 0
         for connection in @connections
-          twitid = connection.twitter_id.to_s.gsub(",", "")
-          c = Twitter.user(twitid)
+          c = Twitter.user(connection.user_screen_name.to_s)
           connection.profile_image_url = c.profile_image_url
           connection.user_description = c.description
           connection.save
           concode = concode.to_s+%{<img height="48px" width="48px" src="}+connection.profile_image_url.to_s+%{" /> <b><a href="http://twitter.com/}+connection.twitter_id.to_s+%{" target="_blank">See Profile</a></b><br />}+connection.user_description.to_s+%{<br /><br />}
         end # end loop through connections
       end # end check for connections
-    end # End check if user has had at least 10 eloonos sent
+    #end # End check if user has had at least 10 eloonos sent
     
     
     # Build out body of email

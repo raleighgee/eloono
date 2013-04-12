@@ -3,9 +3,7 @@ class CreateConnections < ActiveRecord::Migration
 		create_table :connections do |t|
 			t.integer :source_id
 			t.integer :tweet_id
-			t.integer :twitter_id, :limit => 8
 			t.integer :user_id
-			t.string :user_name, :default => "wait"
 			t.string :user_screen_name, :default => "wait"
 			t.string :profile_image_url, :default => "wait"
 			t.integer :num_appears, :default => 1
