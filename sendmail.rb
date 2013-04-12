@@ -55,7 +55,7 @@ for user in @users
 		end
 	end
   
-  sixago = Time.now#-(3*60*60)
+  sixago = Time.now-(3*60*60)
   if user.last_interaction <= sixago
     
     @linktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type = ? and last_action = ?", user.id, "link", "scored"], :order => "score DESC, updated_at DESC", :limit => 15)
@@ -186,14 +186,14 @@ for user in @users
           connection.profile_image_url = c.profile_image_url
           connection.user_description = c.description
           connection.save
-          concode = concode.to_s+%{<img height="48px" width="48px" src="}+connection.profile_image_url.to_s+%{" /> <b><a href="http://twitter.com/}+connection.user_screen_name.to_s+%{" target="_blank">See Profile</a></b><br />}+connection.user_description.to_s+%{<br /><br />}
+          concode = concode.to_s+%{<img height="48px" width="48px" src="}+connection.profile_image_url.to_s+%{" /> <b><a href="http://twitter.com/}+connection.user_screen_name.to_s+%{" target="_blank">}+connection.user_screen_name.to_s+%{</a></b><br />}+connection.user_description.to_s+%{<br /><br />}
         end # end loop through connections
       end # end check for connections
     #end # End check if user has had at least 10 eloonos sent
     
     
     # Build out body of email
-    body = %{<h1>Top Ten Words</h1>}+topwords.to_s+%{<h1>Top Link Tweets</h1>}+@links.to_s+%{<br /><br /><h1>Top Non-Link Tweets</h1><br />Language | Tops | Bottoms | Tweets | Follows | Ignores<br /><br />}+@nonlinks.to_s+%{<br /><br /><h1>Top Sources</h1><br />Language | Tops | Bottoms | Tweets | Follows | Ignores<br /><br />}+topsrcs.to_s+%{<br /><br /><h1>Bottom Sources</h1>}+bottomsrcs.to_s+%{<br /><br />}+concode.to_s
+    body = %{<h1>Top Ten Words</h1>}+topwords.to_s+%{<h1>Top Link Tweets</h1>}+@links.to_s+%{<br /><br /><h1>Top Non-Link Tweets</h1>}+@nonlinks.to_s+%{<br /><br /><h1>Top Sources</h1><br />Language | Tops | Bottoms | Tweets | Follows | Ignores<br /><br />}+topsrcs.to_s+%{<br /><br /><h1>Bottom Sources</h1><br />Language | Tops | Bottoms | Tweets | Follows | Ignores<br /><br />}+bottomsrcs.to_s+%{<br /><br />}+concode.to_s
     
     user.number_eloonos_sent = user.number_eloonos_sent.to_i+1
     user.last_interaction = Time.now
