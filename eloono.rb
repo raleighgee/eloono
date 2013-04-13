@@ -182,7 +182,14 @@ get '/ats/:word' do
 	  end
 	  @code = @code.to_s+%{<br /><br />}
   end # end loop through top words
-  @code
+  user = User.find_by_id(1)
+  if user
+	if user.active_scoring == "yes"
+		%{Getting new words - refresh in 30 seconds.}
+	else
+		@code
+	end
+  end
 end
 
 get '/test' do
