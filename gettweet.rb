@@ -57,6 +57,14 @@ get '/auth/:name/callback' do
   redirect '/thanks'
 end
 
+@users = User.find(:all, :conditions => ["active_scoring = ?", "yes"]))
+for user in @users
+  if user.updated_at <= (Time.now-(60*60))
+      user.active_scoring = "no"
+      user.save
+  end
+end
+
 @users = User.find(:all, :conditions => ["active_scoring <> ?", "yes"])
 
 for user in @users
@@ -550,7 +558,35 @@ for user in @users
   	end
 	end
 	
-		
+	####################### CLEAN OUT TABLES #######################
+	
+	@links = Link.find(:all, :conditions => ["user_id = ?", user.id])
+	if @links.size > 2000
+	  num = @links.size - 2000
+	  @dellinks = Link.find(:all, :conditions => ["user_id = ?", user.id], :limit => num, :order => "created_at ASC")
+	  for dellink in @dellinks
+	    dellink.destroy
+	  end
+	end
+	
+	@itweets = Itweets.find(:all, :conditions => ["user_id = ?", user.id])
+	if @itweets.size > 2000
+	  num = @itweets.size - 2000
+	  @delitweets = Link.find(:all, :conditions => ["user_id = ?", user.id], :limit => num, :order => "created_at ASC")
+	  for delitweet in @delitweets
+	    delitweet.destroy
+	  end
+	end
+	
+	@connections = Connection.find(:all, :conditions => ["user_id = ? and user_description = ?", user.id, "wait"])
+	if @connections.size > 3000
+	  num = @connections.size - 3000
+	  @delconnections = Connection.find(:all, :conditions => ["user_id = ? and user_description = ?", user.id, "wait"], :limit => num, :order => "created_at ASC")
+	  for delconnection in @delconnections
+	    delconnection.destroy
+	  end
+	end
+	
 	# Update user after scoring
 	# user.calls_left = Twitter.rate_limit_status.remaining_hits.to_i
 	user.num_score_rounds = user.num_score_rounds+1
