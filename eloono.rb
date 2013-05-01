@@ -193,11 +193,33 @@ get '/ats/:word' do
 end
 
 get '/test' do
-  @connections = Connection.find(:all)
-  for connection in @connections
-    connection.num_appears = 1
-    connection.save
-  end
+  user = User.find_by_id(1)
+	@links = Link.find(:all, :conditions => ["user_id = ?", user.id])
+	if @links.size > 2000
+	  num = @links.size - 2000
+	  @dellinks = Link.find(:all, :conditions => ["user_id = ?", user.id], :limit => num, :order => "created_at ASC")
+	  for dellink in @dellinks
+	    dellink.destroy
+	  end
+	end
+	
+	@itweets = Itweets.find(:all, :conditions => ["user_id = ?", user.id])
+	if @itweets.size > 2000
+	  num = @itweets.size - 2000
+	  @delitweets = Link.find(:all, :conditions => ["user_id = ?", user.id], :limit => num, :order => "created_at ASC")
+	  for delitweet in @delitweets
+	    delitweet.destroy
+	  end
+	end
+	
+	@connections = Connection.find(:all, :conditions => ["user_id = ? and user_description = ?", user.id, "wait"])
+	if @connections.size > 3000
+	  num = @connections.size - 3000
+	  @delconnections = Connection.find(:all, :conditions => ["user_id = ? and user_description = ?", user.id, "wait"], :limit => num, :order => "created_at ASC")
+	  for delconnection in @delconnections
+	    delconnection.destroy
+	  end
+	end
   %{OK BRO!}
 end
 
