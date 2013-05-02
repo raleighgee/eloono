@@ -194,28 +194,28 @@ end
 
 get '/test' do
   user = User.find_by_id(1)
-	@links = Link.find(:all, :conditions => ["user_id = ?", user.id])
+	@links = Link.find(:all, :conditions => ["user_id = ?", 1])
 	if @links.size > 2000
 	  num = @links.size - 2000
-	  @dellinks = Link.find(:all, :conditions => ["user_id = ?", user.id], :limit => num, :order => "created_at ASC")
+	  @dellinks = Link.find(:all, :conditions => ["user_id = ?", 1], :limit => num, :order => "created_at ASC")
 	  for dellink in @dellinks
 	    dellink.destroy
 	  end
 	end
 	
-	@itweets = Itweets.find(:all, :conditions => ["user_id = ?", user.id])
+	@itweets = Itweets.find(:all, :conditions => ["user_id = ?", 1])
 	if @itweets.size > 2000
 	  num = @itweets.size - 2000
-	  @delitweets = Link.find(:all, :conditions => ["user_id = ?", user.id], :limit => num, :order => "created_at ASC")
+	  @delitweets = Link.find(:all, :conditions => ["user_id = ?", 1], :limit => num, :order => "created_at ASC")
 	  for delitweet in @delitweets
 	    delitweet.destroy
 	  end
 	end
 	
-	@connections = Connection.find(:all, :conditions => ["user_id = ? and user_description = ?", user.id, "wait"])
+	@connections = Connection.find(:all, :conditions => ["user_id = ? and user_description = ?", 1, "wait"])
 	if @connections.size > 3000
 	  num = @connections.size - 3000
-	  @delconnections = Connection.find(:all, :conditions => ["user_id = ? and user_description = ?", user.id, "wait"], :limit => num, :order => "created_at ASC")
+	  @delconnections = Connection.find(:all, :conditions => ["user_id = ? and user_description = ?", 1, "wait"], :limit => num, :order => "created_at ASC")
 	  for delconnection in @delconnections
 	    delconnection.destroy
 	  end
