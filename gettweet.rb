@@ -57,7 +57,7 @@ get '/auth/:name/callback' do
   redirect '/thanks'
 end
 
-@users = User.find(:all, :conditions => ["active_scoring = ?", "yes"]))
+@users = User.find(:all, :conditions => ["active_scoring = ?", "yes"])
 for user in @users
   if user.updated_at <= (Time.now-(60*60))
       user.active_scoring = "no"
