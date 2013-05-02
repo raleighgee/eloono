@@ -207,8 +207,8 @@ get '/test' do
 	if @itweets.size > 2000
 	  num = @itweets.size - 2000
 	  @delitweets = Link.find(:all, :conditions => ["user_id = ?", 1], :limit => num, :order => "created_at ASC")
-	  for delitweet in @delitweets
-	    delitweet.destroy
+	  for itweet in @itweets
+	    itweet.destroy
 	  end
 	end
 	
