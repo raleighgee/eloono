@@ -44,16 +44,6 @@ for user in @users
 		config.oauth_token = user.token
 		config.oauth_token_secret = user.secret
 	end  
-    
-  ## Delete words that have not been followed ##
-  averagescore = Word.average(:comp_average, :conditions => ["user_id = ?", user.id])
-  averagefollows = Word.average(:follows, :conditions => ["user_id = ?", user.id])
-	@oldwords = Word.find(:all, :conditions => ["user_id = ?", user.id])
-	for oldword in @oldwords
-	  if oldword.comp_average <= averagescore and oldword.sys_ignore_flag == "no" and oldword.created_at <= (Time.now-(60*60))
-		  oldword.destroy
-		end
-	end
   
   sixago = Time.now#-(3*60*60)
   if user.last_interaction <= sixago

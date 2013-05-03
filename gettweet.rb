@@ -593,6 +593,16 @@ for user in @users
 	  end
 	end
 	
+	## Delete words that have not been followed ##
+  averagescore = Word.average(:comp_average, :conditions => ["user_id = ?", user.id])
+  averagefollows = Word.average(:follows, :conditions => ["user_id = ?", user.id])
+	@oldwords = Word.find(:all, :conditions => ["user_id = ?", user.id])
+	for oldword in @oldwords
+	  if oldword.comp_average <= averagescore and oldword.sys_ignore_flag == "no" and oldword.created_at <= (Time.now-(4*60*60))
+		  oldword.destroy
+		end
+	end	
+	
 	# Update user after scoring
 	# user.calls_left = Twitter.rate_limit_status.remaining_hits.to_i
 	user.num_score_rounds = user.num_score_rounds+1
