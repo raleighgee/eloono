@@ -58,11 +58,16 @@ get '/auth/:name/callback' do
 end
 
 @users = User.find(:all, :conditions => ["active_scoring = ?", "yes"])
-onehrago = Time.now-(60*60)
 for user in @users
-  if user.updated_at <= onehrago
+  tweet = Tweet.find(:first, :conditions => ["user_id = ?", user.id], :order => "created_at ASC")
+  if tweet
+    if tweet.created_at <= (Time.now-(60*60))
       user.active_scoring = "no"
       user.save
+    end
+  else
+    user.active_scoring = "no"
+    user.save
   end
 end
 
