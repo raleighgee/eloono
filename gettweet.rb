@@ -58,8 +58,9 @@ get '/auth/:name/callback' do
 end
 
 @users = User.find(:all, :conditions => ["active_scoring = ?", "yes"])
+onehrago = Time.now-(60*60)
 for user in @users
-  if user.updated_at <= (Time.now-(60*60))
+  if user.updated_at <= onehrago
       user.active_scoring = "no"
       user.save
   end
