@@ -552,7 +552,7 @@ for user in @users
 	
 	@connections = Connection.find(:all, :conditions => ["user_id = ?", user.id])
 	for connection in @connections
-		@cons = Connection.count(:conditions => ["user_screen_name = ? and user_id = ? and source_id = ?", connection.user_screen_name, user.id, connection.source_id])
+		@cons = Connection.count(:conditions => ["user_screen_name = ? and user_id = ?", connection.user_screen_name, user.id])
 		connection.num_appears = connection.num_appears+@cons
 		connection.save
 		@killcons = Connection.find(:all, :conditions => ["user_screen_name = ? and user_id = ?", connection.user_screen_name, user.id], :order => "created_at DESC")
