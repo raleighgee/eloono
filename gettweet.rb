@@ -497,8 +497,8 @@ for user in @users
 		for tweet in @tweets
 				  
 			# Reset tweet word quality score
-			tweet.word_quality_score = 0
-			tweet.save
+			#tweet.word_quality_score = 0
+			#tweet.save
 		
 			#sourceaveragewordscore = Tweet.average(:word_quality_score, :conditions => ["user_id = ? and source_id = ?", user.id, tweet.source.id])
 		
