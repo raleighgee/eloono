@@ -491,7 +491,7 @@ for user in @users
 		end # end calculate aggregate source score
 		
 		# Select all tweets that have not seen the score algorithm yet (e.g. last action = new)
-		@tweets = Tweet.find(:all, :conditions => ["user_id = ? and last_action = ?", user.id, "new"])			
+		@tweets = Tweet.find(:all, :conditions => ["user_id = ?", user.id])			
 	
 		# Loop through "new" Tweets to score	
 		for tweet in @tweets
