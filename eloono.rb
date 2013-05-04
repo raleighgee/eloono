@@ -192,6 +192,14 @@ get '/ats/:word' do
   end
 end
 
+get '/ignore_con/:id' do
+  con = Connection.find_by_id(params[:id])
+  if con
+    con.destroy
+  end
+  %{Eloono will not recommend this person again.}
+end
+
 get '/test' do
   user = User.find_by_id(1)
 	@links = Link.find(:all, :conditions => ["user_id = ?", 1])
