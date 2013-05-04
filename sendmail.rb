@@ -183,7 +183,10 @@ for user in @users
     
     
     # Build out body of email
-    body = %{<h1>Top Ten Words</h1>}+topwords.to_s+%{<h1>Top Link Tweets</h1>}+@links.to_s+%{<br /><br /><h1>Top Non-Link Tweets</h1>}+@nonlinks.to_s+%{<br /><br /><h1>Top Sources</h1><br />Language | Tops | Bottoms | Tweets | Follows | Ignores<br /><br />}+topsrcs.to_s+%{<br /><br /><h1>Bottom Sources</h1><br />Language | Tops | Bottoms | Tweets | Follows | Ignores<br /><br />}+bottomsrcs.to_s+%{<br /><br />}+concode.to_s
+    # %{<h1>Top Ten Words</h1>}+topwords.to_s+
+    #%{<br /><br /><h1>Top Sources</h1><br />Language | Tops | Bottoms | Tweets | Follows | Ignores<br /><br />}+topsrcs.to_s+%{<br /><br /><h1>Bottom Sources</h1><br />Language | Tops | Bottoms | Tweets | Follows | Ignores<br /><br />}+bottomsrcs.to_s+
+    
+    body = %{<h1>Top Link Tweets</h1>}+@links.to_s+%{<br /><br /><h1>Top Non-Link Tweets</h1>}+@nonlinks.to_s+%{<br /><br />}+concode.to_s
     
     user.number_eloonos_sent = user.number_eloonos_sent.to_i+1
     user.last_interaction = Time.now
