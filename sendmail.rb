@@ -176,7 +176,7 @@ for user in @users
           connection.profile_image_url = c.profile_image_url
           connection.user_description = c.description
           connection.save
-          concode = concode.to_s+%{<img height="48px" width="48px" src="}+connection.profile_image_url.to_s+%{" /> <b><a href="http://twitter.com/}+connection.user_screen_name.to_s+%{" target="_blank">}+connection.user_screen_name.to_s+%{</a></b><br />}+connection.user_description.to_s+%{ | <a href="http://eloono.com/ignore_con/}+connection.id+%{Ignore</a><br /><br />}
+          concode = concode.to_s+%{<img height="48px" width="48px" src="}+connection.profile_image_url.to_s+%{" /> <b><a href="http://twitter.com/}+connection.user_screen_name.to_s+%{" target="_blank">}+connection.user_screen_name.to_s+%{</a></b><br />}+connection.user_description.to_s+%{ | <a href="http://eloono.com/ignore_con/}+connection.id.to_s+%{">Ignore</a><br /><br />}
         end # end loop through connections
       end # end check for connections
     #end # End check if user has had at least 10 eloonos sent
