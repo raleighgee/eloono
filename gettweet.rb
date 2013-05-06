@@ -566,12 +566,14 @@ for user in @users
 	
 	####################### CLEAN OUT TABLES #######################
 	
+	tinterval = 2
+	
 	@links = Link.find(:all, :conditions => ["user_id = ?", user.id])
 	if @links.size > 2000
 	  num = @links.size - 2000
 	  @dellinks = Link.find(:all, :conditions => ["user_id = ?", user.id], :limit => num, :order => "created_at ASC")
 	  for dellink in @dellinks
-	    if dellink.created_at <= (Time.now-(4*60*60))
+	    if dellink.created_at <= (Time.now-(tinterval*60*60))
 	      dellink.destroy
 	    end
 	  end
@@ -582,7 +584,7 @@ for user in @users
 	  num = @itweets.size - 2000
 	  @delitweets = Link.find(:all, :conditions => ["user_id = ?", user.id], :limit => num, :order => "created_at ASC")
 	  for delitweet in @delitweets
-	    if delitweet.created_at <= (Time.now-(4*60*60))
+	    if delitweet.created_at <= (Time.now-(tinterval*60*60))
 	      delitweet.destroy
 	    end
 	  end
@@ -593,7 +595,7 @@ for user in @users
 	  num = @connections.size - 3000
 	  @delconnections = Connection.find(:all, :conditions => ["user_id = ? and user_description = ?", user.id, "wait"], :limit => num, :order => "created_at ASC")
 	  for delconnection in @delconnections
-	    if delconnection.created_at <= (Time.now-(4*60*60))
+	    if delconnection.created_at <= (Time.now-(tinterval*60*60))
 	      delconnection.destroy
 	    end
 	  end
@@ -604,7 +606,7 @@ for user in @users
   averagefollows = Word.average(:follows, :conditions => ["user_id = ?", user.id])
 	@oldwords = Word.find(:all, :conditions => ["user_id = ?", user.id])
 	for oldword in @oldwords
-	  if oldword.comp_average <= averagescore and oldword.sys_ignore_flag == "no" and oldword.created_at <= (Time.now-(4*60*60))
+	  if oldword.comp_average <= averagescore and oldword.sys_ignore_flag == "no" and oldword.created_at <= (Time.now-(tinterval*60*60))
 		  oldword.destroy
 		end
 	end	
@@ -612,7 +614,7 @@ for user in @users
 	# Delete tweets and links that are older than six hours and have not been served
   @oldtweets = Tweet.find(:all, :conditions => ["user_id = ?", user.id])
   for oldtweet in @oldtweets
-    if oldtweet.updated_at <= (Time.now-(4*60*60))
+    if oldtweet.updated_at <= (Time.now-(tinterval*60*60))
       @oldlinks = Link.find(:all, :conditions => ["tweet_id = ?", oldtweet.id])
       for oldlink in @oldlinks
         oldlink.destroy
