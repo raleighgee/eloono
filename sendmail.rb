@@ -45,11 +45,11 @@ for user in @users
 		config.oauth_token_secret = user.secret
 	end  
   
-  sixago = Time.now#-(3*60*60)
+  sixago = Time.now-(3*60*60)
   if user.last_interaction <= sixago
     
-    @linktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type = ? and last_action = ?", user.id, "link", "scored"], :order => "score DESC, updated_at DESC", :limit => 15)
-    @nonlinktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type <> ? and last_action = ?", user.id, "link", "scored"], :order => "score DESC, updated_at DESC", :limit => 15)   
+    @linktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type = ? and last_action = ?", user.id, "link", "scored"], :order => "score DESC, updated_at DESC", :limit => 100)
+    #@nonlinktweets = Tweet.find(:all, :conditions => ["user_id = ? and tweet_type <> ? and last_action = ?", user.id, "link", "scored"], :order => "score DESC, updated_at DESC", :limit => 15)   
     
     @links = ""
     for linktweet in @linktweets
@@ -85,39 +85,39 @@ for user in @users
     	
     end
     
-    @nonlinks = ""
-    for nonlinktweet in @nonlinktweets
-      ni = Itweets.find_or_create_by_user_id_and_twitter_id(:user_id => user.id, :twitter_id => nonlinktweet.twitter_id)
-  		ni.old_id = nonlinktweet.id
-  		ni.source_id = nonlinktweet.source_id
-  		ni.score = nonlinktweet.score
-  		ni.tweet_type = nonlinktweet.tweet_type
-  		ni.url_count = nonlinktweet.url_count
-  		ni.followed_flag = nonlinktweet.followed_flag
-  		ni.last_action = "sent"
-  		ni.twitter_created_at = nonlinktweet.twitter_created_at
-  		ni.retweet_count = nonlinktweet.retweet_count
-  		ni.tweet_source = nonlinktweet.tweet_source
-  		ni.tweet_content = nonlinktweet.tweet_content
-  		ni.clean_tweet_content = nonlinktweet.clean_tweet_content
-  		ni.truncated_flag = nonlinktweet.truncated_flag
-  		ni.reply_id = nonlinktweet.reply_id
-  		ni.convo_flag = nonlinktweet.convo_flag
-  		ni.convo_initiator = nonlinktweet.convo_initiator
-  		ni.word_quality_score = nonlinktweet.word_quality_score
-  		ni.source_score_score = nonlinktweet.source_score_score
-  		ni.old_created_at = nonlinktweet.created_at
-  		ni.save
-    	@nonlinks = @nonlinks.to_s+%{<img height="48px" width="48px" src="}+ni.source.profile_image_url.to_s+%{" /> <b>}+ni.source.user_name.to_s+%{</b> | }+ni.clean_tweet_content.to_s+%{<a href="http://eloono.com/interact/}+ni.id.to_s+%{?i=interact" target="_blank">Interact</a> | <a href="http://eloono.com/interact/}+ni.id.to_s+%{" target="_blank">Retweet</a><br />}
+    #@nonlinks = ""
+    #for nonlinktweet in @nonlinktweets
+      #ni = Itweets.find_or_create_by_user_id_and_twitter_id(:user_id => user.id, :twitter_id => nonlinktweet.twitter_id)
+  		#ni.old_id = nonlinktweet.id
+  		#ni.source_id = nonlinktweet.source_id
+  		#ni.score = nonlinktweet.score
+  		#ni.tweet_type = nonlinktweet.tweet_type
+  		#ni.url_count = nonlinktweet.url_count
+  		#ni.followed_flag = nonlinktweet.followed_flag
+  		#ni.last_action = "sent"
+  		#ni.twitter_created_at = nonlinktweet.twitter_created_at
+  		#ni.retweet_count = nonlinktweet.retweet_count
+  		#ni.tweet_source = nonlinktweet.tweet_source
+  		#ni.tweet_content = nonlinktweet.tweet_content
+  		#ni.clean_tweet_content = nonlinktweet.clean_tweet_content
+  		#ni.truncated_flag = nonlinktweet.truncated_flag
+  		#ni.reply_id = nonlinktweet.reply_id
+  		#ni.convo_flag = nonlinktweet.convo_flag
+  		#ni.convo_initiator = nonlinktweet.convo_initiator
+  		#ni.word_quality_score = nonlinktweet.word_quality_score
+  		#ni.source_score_score = nonlinktweet.source_score_score
+  		#ni.old_created_at = nonlinktweet.created_at
+  		#ni.save
+    	#@nonlinks = @nonlinks.to_s+%{<img height="48px" width="48px" src="}+ni.source.profile_image_url.to_s+%{" /> <b>}+ni.source.user_name.to_s+%{</b> | }+ni.clean_tweet_content.to_s+%{<a href="http://eloono.com/interact/}+ni.id.to_s+%{?i=interact" target="_blank">Interact</a> | <a href="http://eloono.com/interact/}+ni.id.to_s+%{" target="_blank">Retweet</a><br />}
     	nonlinktweet.destroy
     	
-    	# Clean out connections that are actualy sources
-			connection = Connection.find(:first, :conditions => ["user_id = ? and user_screen_name = ?", ni.user_id, ni.source.user_screen_name])
-			if connection
-			  connection.destroy
-			end
+    	##### Clean out connections that are actualy sources
+			#connection = Connection.find(:first, :conditions => ["user_id = ? and user_screen_name = ?", ni.user_id, ni.source.user_screen_name])
+			#if connection
+			  #connection.destroy
+			#end
     	
-    end
+    #end
     
     # Delete tweets and links that are older than six hours and have not been served
     @oldtweets = Tweet.find(:all, :conditions => ["user_id = ?", user.id])
@@ -131,39 +131,39 @@ for user in @users
       end # end check if tweet is four hours old or older
     end # end loop through old tweets
 
-    # Build list of top ten words for review
-    topwords = ""
-    @toptenwords = Word.find(:all, :conditions => ["user_id = ?", user.id], :order => "comp_average DESC", :limit => 10)
-    for toptenword in @toptenwords
-      topwords = topwords.to_s+toptenword.word.to_s+%{ | <a href="http://eloono.com/ats/}+toptenword.word.to_s+%{">Ignore</a>}
-      if toptenword.user_id == 1
-        topwords = topwords.to_s+%{ | <a href="http://eloono.com/ats/}+toptenword.word.to_s+%{?sys=t">Remove</a>}
-      end
-      topwords = topwords.to_s+%{<br /><br />}
-    end # end loop through top ten top words
+    ### Build list of top ten words for review
+    #topwords = ""
+    #@toptenwords = Word.find(:all, :conditions => ["user_id = ?", user.id], :order => "comp_average DESC", :limit => 10)
+    #for toptenword in @toptenwords
+      #topwords = topwords.to_s+toptenword.word.to_s+%{ | <a href="http://eloono.com/ats/}+toptenword.word.to_s+%{">Ignore</a>}
+      #if toptenword.user_id == 1
+        #topwords = topwords.to_s+%{ | <a href="http://eloono.com/ats/}+toptenword.word.to_s+%{?sys=t">Remove</a>}
+      #end
+      #topwords = topwords.to_s+%{<br /><br />}
+    #end # end loop through top ten top words
     
-    # Find top and bottom sources
-    allsources = Source.count(:all, :conditions => ["user_id = ?", user.id])
-    @tsources = Source.find(:all, :conditions => ["user_id = ?", user.id], :limit => 10, :order => "score DESC, average_word_score DESC")
-    @bsources = Source.find(:all, :conditions => ["user_id = ?", user.id], :limit => 10, :order => "score ASC, average_word_score ASC")
-    topsrcs = ""
-    bottomsrc = ""
+    #### Find top and bottom sources
+    #allsources = Source.count(:all, :conditions => ["user_id = ?", user.id])
+    #@tsources = Source.find(:all, :conditions => ["user_id = ?", user.id], :limit => 10, :order => "score DESC, average_word_score DESC")
+    #@bsources = Source.find(:all, :conditions => ["user_id = ?", user.id], :limit => 10, :order => "score ASC, average_word_score ASC")
+    #topsrcs = ""
+    #bottomsrc = ""
     
-    tcount = 1
-    for tsource in @tsources
-	    tsource.times_in_top = tsource.times_in_top+1
-	    tsource.save
-      topsrcs = topsrcs.to_s+tcount.to_s+%{. <img height="48px" width="48px" src="}+tsource.profile_image_url.to_s+%{" /> <b><a href="http://twitter.com/}+tsource.user_screen_name.to_s+%{" target="_blank">}+tsource.user_name.to_s+%{</a></b> | }+tsource.user_language.to_s+%{ | }+tsource.times_in_top.to_s+%{ | }+tsource.times_in_bottom.to_s+%{ | }+tsource.total_tweets_seen.to_s+%{ | }+tsource.number_links_followed.to_s+%{ | }+tsource.ignores.to_s+%{ | TARGET<br />}
-      tcount = tcount+1
-    end
+    #tcount = 1
+    #for tsource in @tsources
+	    #tsource.times_in_top = tsource.times_in_top+1
+	    #tsource.save
+      #topsrcs = topsrcs.to_s+tcount.to_s+%{. <img height="48px" width="48px" src="}+tsource.profile_image_url.to_s+%{" /> <b><a href="http://twitter.com/}+tsource.user_screen_name.to_s+%{" target="_blank">}+tsource.user_name.to_s+%{</a></b> | }+tsource.user_language.to_s+%{ | }+tsource.times_in_top.to_s+%{ | }+tsource.times_in_bottom.to_s+%{ | }+tsource.total_tweets_seen.to_s+%{ | }+tsource.number_links_followed.to_s+%{ | }+tsource.ignores.to_s+%{ | TARGET<br />}
+      #tcount = tcount+1
+    #end
     
-    bcount = allsources
-    for bsource in @bsources
-      tsource.times_in_bottom = tsource.times_in_bottom+1
-	    tsource.save
-      bottomsrcs = bottomsrcs.to_s+bcount.to_s+%{. <img height="48px" width="48px" src="}+bsource.profile_image_url.to_s+%{" /> <b><a href="http://twitter.com/}+bsource.user_screen_name.to_s+%{" target="_blank">}+bsource.user_name.to_s+%{</a></b> | }+bsource.user_language.to_s+%{ | }+bsource.times_in_top.to_s+%{ | }+bsource.times_in_bottom.to_s+%{ | }+bsource.total_tweets_seen.to_s+%{ | }+bsource.number_links_followed.to_s+%{ | }+bsource.ignores.to_s+%{ | UNFOLLOW<br />}
-      bcount = bcount-1
-    end    
+    #bcount = allsources
+    #for bsource in @bsources
+      #tsource.times_in_bottom = tsource.times_in_bottom+1
+	    #tsource.save
+      #bottomsrcs = bottomsrcs.to_s+bcount.to_s+%{. <img height="48px" width="48px" src="}+bsource.profile_image_url.to_s+%{" /> <b><a href="http://twitter.com/}+bsource.user_screen_name.to_s+%{" target="_blank">}+bsource.user_name.to_s+%{</a></b> | }+bsource.user_language.to_s+%{ | }+bsource.times_in_top.to_s+%{ | }+bsource.times_in_bottom.to_s+%{ | }+bsource.total_tweets_seen.to_s+%{ | }+bsource.number_links_followed.to_s+%{ | }+bsource.ignores.to_s+%{ | UNFOLLOW<br />}
+      #bcount = bcount-1
+    #end    
     
     
     # Find Interesting Connections
@@ -185,8 +185,9 @@ for user in @users
     # Build out body of email
     # %{<h1>Top Ten Words</h1>}+topwords.to_s+
     #%{<br /><br /><h1>Top Sources</h1><br />Language | Tops | Bottoms | Tweets | Follows | Ignores<br /><br />}+topsrcs.to_s+%{<br /><br /><h1>Bottom Sources</h1><br />Language | Tops | Bottoms | Tweets | Follows | Ignores<br /><br />}+bottomsrcs.to_s+
+    #+%{<br /><br /><h1>Top Non-Link Tweets</h1>}+@nonlinks.to_s
     
-    body = %{<h1>Top Link Tweets</h1>}+@links.to_s+%{<br /><br /><h1>Top Non-Link Tweets</h1>}+@nonlinks.to_s+%{<br /><br />}+concode.to_s
+    body = %{<h1>Top Link Tweets</h1>}+@links.to_s+%{<br /><br />}+concode.to_s
     
     user.number_eloonos_sent = user.number_eloonos_sent.to_i+1
     user.last_interaction = Time.now
