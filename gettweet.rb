@@ -571,7 +571,9 @@ for user in @users
 	  num = @links.size - 2000
 	  @dellinks = Link.find(:all, :conditions => ["user_id = ?", user.id], :limit => num, :order => "created_at ASC")
 	  for dellink in @dellinks
-	    dellink.destroy
+	    if dellink.created_at <= (Time.now-(4*60*60))
+	      dellink.destroy
+	    end
 	  end
 	end
 	
@@ -580,7 +582,9 @@ for user in @users
 	  num = @itweets.size - 2000
 	  @delitweets = Link.find(:all, :conditions => ["user_id = ?", user.id], :limit => num, :order => "created_at ASC")
 	  for delitweet in @delitweets
-	    delitweet.destroy
+	    if delitweet.created_at <= (Time.now-(4*60*60))
+	      delitweet.destroy
+	    end
 	  end
 	end
 	
@@ -589,7 +593,9 @@ for user in @users
 	  num = @connections.size - 3000
 	  @delconnections = Connection.find(:all, :conditions => ["user_id = ? and user_description = ?", user.id, "wait"], :limit => num, :order => "created_at ASC")
 	  for delconnection in @delconnections
-	    delconnection.destroy
+	    if delconnection.created_at <= (Time.now-(4*60*60))
+	      delconnection.destroy
+	    end
 	  end
 	end
 	
