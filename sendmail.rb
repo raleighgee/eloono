@@ -109,7 +109,7 @@ for user in @users
   		#ni.old_created_at = nonlinktweet.created_at
   		#ni.save
     	#@nonlinks = @nonlinks.to_s+%{<img height="48px" width="48px" src="}+ni.source.profile_image_url.to_s+%{" /> <b>}+ni.source.user_name.to_s+%{</b> | }+ni.clean_tweet_content.to_s+%{<a href="http://eloono.com/interact/}+ni.id.to_s+%{?i=interact" target="_blank">Interact</a> | <a href="http://eloono.com/interact/}+ni.id.to_s+%{" target="_blank">Retweet</a><br />}
-    	nonlinktweet.destroy
+    	#nonlinktweet.destroy
     	
     	##### Clean out connections that are actualy sources
 			#connection = Connection.find(:first, :conditions => ["user_id = ? and user_screen_name = ?", ni.user_id, ni.source.user_screen_name])
