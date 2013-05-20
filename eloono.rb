@@ -150,6 +150,7 @@ get '/tweets' do
   			
     			# Update user's and connection's count of tweets shown
     		  user.num_tweets_shown = user.num_tweets_shown.to_i+1
+    		  user.lastest_tweet_id = p.id
     		  c.total_tweets_seen = c.total_tweets_seen.to_f+1
     		  c.save
     			user.save
