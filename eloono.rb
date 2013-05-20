@@ -81,6 +81,7 @@ get '/tweets' do
   		user.handle = u.screen_name
   		user.profile_image_url = u.profile_image_url
   		user.language = u.lang.to_s
+  		user.lastest_tweet_id = 99999999999999999999
   		user.save
   	end
   	
