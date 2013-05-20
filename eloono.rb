@@ -28,7 +28,6 @@ ActiveRecord::Base.establish_connection(
   :encoding => 'utf8'
 )
 
-
 ########## TWITTER AUTHENTICATION ########## 
 
 use OmniAuth::Strategies::Twitter, 'DHBxwGvab2sJGw3XhsEmA', '530TCO6YMRuB23R7wse91rTcIKFPKQaxFQNVhfnk'
