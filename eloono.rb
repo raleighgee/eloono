@@ -93,93 +93,105 @@ get '/tweets' do
   	  # Check if tweet was created by current user
   		unless p.user.id == user.uid
   		  
-  			# find or create connection from tweet source
-  			c = Connection.find_or_create_by_twitter_id_and_user_id(:twitter_id => p.user.id, :user_id => user.id)
-  			c.profile_image_url = p.user.profile_image_url
-  		  c.user_name = p.user.name
-  			c.following_flag = p.user.following
-  			c.user_description = p.user.description
-  			c.user_url = p.user.url
-  			c.user_screen_name = p.user.screen_name
-  			c.user_language = p.user.lang
-  			c.twitter_created_at = p.user.created_at
-  			c.statuses_count = p.user.statuses_count
-  			c.followers_count = p.user.followers_count
-        c.friends_count = p.user.friends_count
-  			c.location = p.user.location
-  			c.connection_type = "following"
+  		  # check if tweet is newer than the user's latest tweet pulled
+  		  if p.id > user.lastest_tweet_id
+  		  
+    			# find or create connection from tweet source
+    			c = Connection.find_or_create_by_twitter_id_and_user_id(:twitter_id => p.user.id, :user_id => user.id)
+    			c.profile_image_url = p.user.profile_image_url
+    		  c.user_name = p.user.name
+    			c.following_flag = p.user.following
+    			c.user_description = p.user.description
+    			c.user_url = p.user.url
+    			c.user_screen_name = p.user.screen_name
+    			c.user_language = p.user.lang
+    			c.twitter_created_at = p.user.created_at
+    			c.statuses_count = p.user.statuses_count
+    			c.followers_count = p.user.followers_count
+          c.friends_count = p.user.friends_count
+    			c.location = p.user.location
+    			c.connection_type = "following"
         
-        # calculate connection's tweets per hour
-        ageinhours = ((Time.now-p.user.created_at)/60)/60
-        c.tweets_per_hour = p.user.statuses_count.to_f/ageinhours.to_f
+          # calculate connection's tweets per hour
+          ageinhours = ((Time.now-p.user.created_at)/60)/60
+          c.tweets_per_hour = p.user.statuses_count.to_f/ageinhours.to_f
   			
-  		  c.save
+    		  c.save
   		  
-  		  # Parse through mentions in tweet and create any connections
-  			@connections = p.user_mentions
-  			if @connections.size > 0
-  				for connection in @connections
-  					cfollow = Connection.find_by_twitter_id_and_user_id(connection.id, user.id)
-  					# if mention is not already a source, create a connection
-  					unless cfollow
-  						m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
-  					end
-  				end # End loop through mentions in tweet
-  			end # End check tweet has any mentions
+    		  # Parse through mentions in tweet and create any connections
+    			@connections = p.user_mentions
+    			if @connections.size > 0
+    				for connection in @connections
+    					cfollow = Connection.find_by_twitter_id_and_user_id(connection.id, user.id)
+    					# if mention is not already a source, create a connection
+    					unless cfollow
+    						m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
+    					end
+    				end # End loop through mentions in tweet
+    			end # End check tweet has any mentions
 
-  			# Check if tweet is a RT, if it is, convert source into a connection if user is not already following
-  			if p.retweeted_status
-  				cfollow = Connection.find_by_twitter_id_and_user_id(p.retweeted_status.user.id, user.id)
-  				# if mention is not already a source, create a connection
-  				unless cfollow
-  					m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
-  				end
-  			end
+    			# Check if tweet is a RT, if it is, convert source into a connection if user is not already following
+    			if p.retweeted_status
+    				cfollow = Connection.find_by_twitter_id_and_user_id(p.retweeted_status.user.id, user.id)
+    				# if mention is not already a source, create a connection
+    				unless cfollow
+    					m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
+    				end
+    			end
 
-  			# Check if tweet is in reply to another tweet and check if user follows the soruce of the tweet that is being responded to
-  			if p.in_reply_to_screen_name
-  				cfollow = Connection.find_by_twitter_id_and_user_id(p.in_reply_to_user_id, user.id)
-  				# if mention is not already a source, create a connection
-  				unless cfollow
-  					m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
-  				end
-  			end
+    			# Check if tweet is in reply to another tweet and check if user follows the soruce of the tweet that is being responded to
+    			if p.in_reply_to_screen_name
+    				cfollow = Connection.find_by_twitter_id_and_user_id(p.in_reply_to_user_id, user.id)
+    				# if mention is not already a source, create a connection
+    				unless cfollow
+    					m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
+    				end
+    			end
   			
-  			# Update user's and connection's count of tweets shown
-  		  user.num_tweets_shown = user.num_tweets_shown.to_i+1
-  		  c.total_tweets_seen = c.total_tweets_seen.to_f+1
-  		  c.save
-  			user.save
+    			# Update user's and connection's count of tweets shown
+    		  user.num_tweets_shown = user.num_tweets_shown.to_i+1
+    		  c.total_tweets_seen = c.total_tweets_seen.to_f+1
+    		  c.save
+    			user.save
   		  
-  		  #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
+  		    #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
+    		  @words =  p.full_text.split(" ")
+      		# begin looping through words in tweet
+      		@words.each do |w|
+      			unless w.include? %{http}
+      				unless w.include? %{@}
+      					unless w.is_a? (Numeric)
+      						unless w == ""
+      							# remove any non alphanumeric charactes from word
+      							cleanword = w.gsub(/[^0-9a-z]/i, '')
+      							# check if word is on the System ignore list
+      							# set all characters to lowercase
+      						  cleanword = cleanword.downcase
+      							sysignore = Sysigword.find_by_word(cleanword)
+      							unless sysignore
+      							  # look to see if word already exists, if not, create a new one using cleanword above
+      							  word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
+      							  # increment the number of times word has been seen counter by 1
+      							  word.seen_count = word.seen_count.to_i+1
+      							  word.save
+      							  user.num_words_scored = user.num_words_scored+1
+      							end # end check if word is on the system ignore list
+      						end # End check if word is empty
+      					end # End check if word is just a number
+      				end # End check if word contains the @ symbol
+      			end # End check if word is a link
+      		end # end loop through words
+      		
+      	end # end check if tweet is newer than user's latest tweet	
+    		
+    			
+      	#### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
   		  @words =  p.full_text.split(" ")
   		  # reset cleantweet variable instance
     		cleantweet = ""
     		# begin looping through words in tweet
     		@words.each do |w|
-    			unless w.include? %{http}
-    				unless w.include? %{@}
-    					unless w.is_a? (Numeric)
-    						unless w == ""
-    							# remove any non alphanumeric charactes from word
-    							cleanword = w.gsub(/[^0-9a-z]/i, '')
-    							# check if word is on the System ignore list
-    							# set all characters to lowercase
-    						  cleanword = cleanword.downcase
-    							sysignore = Sysigword.find_by_word(cleanword)
-    							unless sysignore
-    							  # look to see if word already exists, if not, create a new one using cleanword above
-    							  word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
-    							  # increment the number of times word has been seen counter by 1
-    							  word.seen_count = word.seen_count.to_i+1
-    							  word.save
-    							  user.num_words_scored = user.num_words_scored+1
-    							end # end check if word is on the system ignore list
-    						end # End check if word is empty
-    					end # End check if word is just a number
-    				end # End check if word contains the @ symbol
-    			end # End check if word is a link
-    			# if the number of words in the tweet is less than 3, set the tweet content to exactly what the tweet says - no clean required
+    		  # if the number of words in the tweet is less than 3, set the tweet content to exactly what the tweet says - no clean required
     			if @words.size < 3
     				cleantweet = tweet.tweet_content
     			else
@@ -239,7 +251,7 @@ get '/tweets' do
     					cleantweet = cleantweet.to_s+w.to_s+" "
     				end
     			end # End check if tweet is smaller than 3 words
-    		end # End create words
+  		  end # End create clean tweet
   		
   		end # end check if tweet was created by user  
   	end # end loop through tweets
