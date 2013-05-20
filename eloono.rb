@@ -85,7 +85,7 @@ get '/tweets' do
   	end
   	
   	# use Twitter api to pull last 200 tweets from current user in loop
-  	@tweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true)
+  	@tweets = Twitter.home_timeline(:count => 50, :include_entities => true, :include_rts => true)
   	
   	# loop through Tweets pulled
   	@tweets.each do |p|
@@ -122,7 +122,7 @@ get '/tweets' do
   					cfollow = Connection.find_by_twitter_id_and_user_id(connection.id, user.id)
   					# if mention is not already a source, create a connection
   					unless cfollow
-  						c = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
+  						m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
   					end
   				end # End loop through mentions in tweet
   			end # End check tweet has any mentions
@@ -132,7 +132,7 @@ get '/tweets' do
   				cfollow = Connection.find_by_twitter_id_and_user_id(p.retweeted_status.user.id, user.id)
   				# if mention is not already a source, create a connection
   				unless cfollow
-  					c = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
+  					m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
   				end
   			end
 
@@ -141,7 +141,7 @@ get '/tweets' do
   				cfollow = Connection.find_by_twitter_id_and_user_id(p.in_reply_to_user_id, user.id)
   				# if mention is not already a source, create a connection
   				unless cfollow
-  					c = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
+  					m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
   				end
   			end
   			
@@ -173,6 +173,7 @@ get '/tweets' do
     							  # increment the number of times word has been seen counter by 1
     							  word.seen_count = word.seen_count.to_i+1
     							  word.save
+    							  user.num_words_scored = user.num_words_scored+1
     							end # end check if word is on the system ignore list
     						end # End check if word is empty
     					end # End check if word is just a number
@@ -242,6 +243,9 @@ get '/tweets' do
   		
   		end # end check if tweet was created by user  
   	end # end loop through tweets
+  	
+  	user.last_interaction = Time.now
+  	user.save
   	
   end # end check if a user exists in the session
   
