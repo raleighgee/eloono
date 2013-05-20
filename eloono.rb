@@ -107,7 +107,6 @@ get '/tweets' do
   			c.followers_count = p.user.followers_count
         c.friends_count = p.user.friends_count
   			c.location = p.user.location
-  			c.total_tweets_seen = c.totatl_tweets_seen+1
   			c.connection_type = "following"
         
         # calculate connection's tweets per hour
@@ -146,8 +145,10 @@ get '/tweets' do
   				end
   			end
   			
-  			# Update user's count of tweets shown
+  			# Update user's and connection's count of tweets shown
   		  user.num_tweets_shown = user.num_tweets_shown.to_i+1
+  		  c.total_tweets_seen = c.total_tweets_seen+1
+  		  c.save
   			user.save
   		  
   		  #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
