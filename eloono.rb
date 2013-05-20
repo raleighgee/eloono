@@ -86,6 +86,7 @@ get '/tweets' do
   	
   	# use Twitter api to pull last 200 tweets from current user in loop
   	@tweets = Twitter.home_timeline(:count => 50, :include_entities => true, :include_rts => true)
+  	newesttweetid = 0
   	
   	# loop through Tweets pulled
   	@tweets.each do |p|
@@ -150,7 +151,9 @@ get '/tweets' do
   			
     			# Update user's and connection's count of tweets shown
     		  user.num_tweets_shown = user.num_tweets_shown.to_i+1
-    		  user.lastest_tweet_id = p.id
+    		  if p.id > newesttweetid
+    		    newesttweetid = p.id
+    		  end
     		  c.total_tweets_seen = c.total_tweets_seen.to_f+1
     		  c.save
     			user.save
@@ -258,6 +261,7 @@ get '/tweets' do
   	end # end loop through tweets
   	
   	user.last_interaction = Time.now
+  	user.lastest_tweet_id = newesttweetid
   	user.save
   	
   end # end check if a user exists in the session
