@@ -110,7 +110,7 @@ get '/tweets' do
   			c.connection_type = "following"
         
         # calculate connection's tweets per hour
-        ageinhours = ((Time.now-p.user_created_at)/60)/60
+        ageinhours = ((Time.now-p.user.created_at)/60)/60
         c.tweets_per_hour = p.user.statuses_count.to_f/ageinhours.to_f
   			
   		  c.save
