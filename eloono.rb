@@ -95,7 +95,7 @@ get '/tweets' do
   		unless p.user.id == user.uid
   		  
   		  # check if tweet is newer than the user's latest tweet pulled
-  		  if p.id > user.lastest_tweet_id
+  		  if p.id > user.latest_tweet_id
   		  
     			# find or create connection from tweet source
     			c = Connection.find_or_create_by_twitter_id_and_user_id(:twitter_id => p.user.id, :user_id => user.id)
@@ -261,7 +261,7 @@ get '/tweets' do
   	end # end loop through tweets
   	
   	user.last_interaction = Time.now
-  	user.lastest_tweet_id = newesttweetid
+  	user.latest_tweet_id = newesttweetid
   	user.save
   	
   end # end check if a user exists in the session
