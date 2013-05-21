@@ -197,7 +197,7 @@ get '/tweets' do
     		@words.each do |w|
     		  # if the number of words in the tweet is less than 3, set the tweet content to exactly what the tweet says - no clean required
     			if @words.size < 3
-    				cleantweet = tweet.tweet_content
+    				cleantweet = p.full_text
     			else
     				# build clean version of tweet
     				if w.include? %{http}
