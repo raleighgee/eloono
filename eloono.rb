@@ -95,7 +95,7 @@ get '/tweets' do
   		unless p.user.id == user.uid
   		  
   		  # check if tweet is newer than the user's latest tweet pulled
-  		  if p.id > user.latest_tweet_id
+  		  if p.id.to_i > user.latest_tweet_id
   		  
     			# find or create connection from tweet source
     			c = Connection.find_or_create_by_twitter_id_and_user_id(:twitter_id => p.user.id, :user_id => user.id)
@@ -151,7 +151,7 @@ get '/tweets' do
   			
     			# Update user's and connection's count of tweets shown
     		  user.num_tweets_shown = user.num_tweets_shown.to_i+1
-    		  if p.id > newesttweetid
+    		  if p.id.to_i > newesttweetid
     		    newesttweetid = p.id
     		  end
     		  c.total_tweets_seen = c.total_tweets_seen.to_f+1
