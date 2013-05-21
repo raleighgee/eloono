@@ -17,7 +17,7 @@ class CreateUsers < ActiveRecord::Migration
 			t.float :max_word_score, :default => 0
 			t.float :firstq_word_score, :default => 0
 			t.float :thirdq_word_score, :default => 0
-			t.integer :lastest_tweet_id, :limit => 8
+			t.integer :latest_tweet_id, :limit => 8
 			t.timestamps
 		end
 	end
