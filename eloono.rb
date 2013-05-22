@@ -167,7 +167,7 @@ get '/tweets' do
 		    #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
         @words =  p.full_text.split(" ")
         # reset cleantweet variable instance
-        cleantweet = p.id.to_s
+        cleantweet = ""
         # begin looping through words in tweet
         @words.each do |w|
           # if the number of words in the tweet is less than 3, set the tweet content to exactly what the tweet says - no clean required
