@@ -269,7 +269,29 @@ get '/tweets' do
   		end # end check if tweet was created by user  
   	end # end loop through tweets
   	
+  	# Aggregate word scores
+  	@words = Word.find(:all, :conditions => ["user_id = ?", user_id])
+  	for word in @words
+  	  if word.follows > 0 
+  	    word.score = word.seen_count*(word.follows+1)
+  	  else
+  	    word.score = word.seen_count
+  	  end
+  	  word.save
+  	end # end loop through words to aggregate scores
+  	
+  	# Update user's word scoring ranges and last interaction time
   	user.last_interaction = Time.now
+  	wmaxscore = Word.maximum(:score, :conditions => ["user_id = ?", user_id])
+  	wminscore = Word.minimum(:score, :conditions => ["user_id = ?", user_id])
+  	wavgscore = Word.average(:score, :conditions => ["user_id = ?", user_id])
+  	oneq = (wminscore.to_f+wavgscore.to_f)/2
+  	threeq = (wmaxscore.to_f+wavgscore.to_f)/2
+  	user.avg_word_score = wavgscore
+		user.min_word_score = wminscore
+		user.max_word_score = wmaxscore
+		user.firstq_word_score = oneq
+		user.thirdq_word_score = threeq	
   	user.save
   	
   	@tweetcode.to_s
