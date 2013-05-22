@@ -200,7 +200,6 @@ get '/tweets' do
         	end # End check if tweet is smaller than 3 words
         	tweetcode = tweetcode.to_s+cleantweet.to_s+%{<br /><br />}
         end # End create clean tweet  		
-  		
   		end # end check if tweet was created by user  
   	end # end loop through tweets
   	
@@ -213,7 +212,7 @@ get '/tweets' do
   	user.save
   	
   	
-  	tweetcode.to_s
+  	%{BOOM<br /><br />}+tweetcode.to_s
   	
   	
   else
