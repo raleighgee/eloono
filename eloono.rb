@@ -213,14 +213,14 @@ get '/tweets' do
   	user.save
   	
   	
-  	
+  	tweetcode.to_s
   	
   	
   else
     redirect %{http://eloono.com}
   end # end check if a user exists in the session
   
-  tweetcode.to_s
+  
   
 end
 
