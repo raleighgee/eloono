@@ -100,15 +100,13 @@ get '/tweets' do
   		unless p.user.id == user.uid
   		  
   		  # set user latest tweet
-  		  if p.id.to_i > user.latest_tweet_id
+  		  if p.id.to_i > user.latest_tweet_id.to_i
   		    user.latest_tweet_id = p.id.to_i
   		    user.save
   		  end
-  		    
-  		    			
+  		    		
   			# Update user's and connection's count of tweets shown
   		  user.num_tweets_shown = user.num_tweets_shown.to_i+1
-  		  user.latest_tweet_id = p.id
   			user.save
 		  
 		    #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
