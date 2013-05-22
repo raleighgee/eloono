@@ -348,16 +348,3 @@ get '/follow' do
 	redirect link
 	
 end
-
-
-########## VIEW CODE ########## 
-
-use_in_file_templates!
-
-__END__
-
-@@ tweets
-
-<div style="position:aboslute; top:0; right:0; width:133px;"><%= @topwords %></div>
-
-<%= @tweetcode %>
