@@ -231,18 +231,23 @@ get '/tweets' do
           # calcualte background opacity
           wordscore = Word.find(:first, :conditions => ["user_id = ? and word = ?", user.id, w])
           if wordscore
-            score = wordscore.score
-            if score <= user.firstq_word_score
-              wscore = "0.2"
-            elsif score <= user.avg_word_score
-              wscore = "0.4"
-            elsif score <= user.thirdq_word_score
-              wscore = "0.6"
+            sysignore = Sysigword.find_by_word(wordscore)
+            if sysignore
+              wscore = "0"
             else
-              wscore = "1"
+              score = wordscore.score
+              if score <= user.firstq_word_score
+                wscore = "0.1"
+              elsif score <= user.avg_word_score
+                wscore = "0.15"
+              elsif score <= user.thirdq_word_score
+                wscore = "0.20"
+              else
+                wscore = "0.4"
+              end
             end
           else
-            wscore = "1"
+            wscore = "0.4"
           end
           
           # if the number of words in the tweet is less than 3, set the tweet content to exactly what the tweet says - no clean required
