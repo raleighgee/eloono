@@ -231,7 +231,7 @@ get '/tweets' do
           # calcualte background opacity
           wordscore = Word.find(:first, :conditions => ["user_id = ? and word = ?", user.id, w])
           if wordscore
-            sysignore = Sysigword.find_by_word(wordscore)
+            sysignore = Sysigword.find_by_word(wordscore.word)
             if sysignore
               wscore = "0"
             else
