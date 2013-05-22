@@ -65,6 +65,7 @@ end
 get '/tweets' do
 
   user = User.find_by_id(session[:user_id])
+  
   if user
     
     # Authenticate user for pulling of Tweets
@@ -94,14 +95,11 @@ get '/tweets' do
   		unless p.user.id == user.uid
   		  
   		  # check if tweet is newer than the user's latest tweet pulled
-  		  #if p.id.to_i > user.latest_tweet_id
+  		  if p.id.to_i > user.latest_tweet_id
   		    			
     			# Update user's and connection's count of tweets shown
     		  user.num_tweets_shown = user.num_tweets_shown.to_i+1
-    		  #if p.id.to_i > newesttweetid
     		  user.latest_tweet_id = p.id
-    		  #end
-
     			user.save
   		  
   		    #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
@@ -132,7 +130,7 @@ get '/tweets' do
       			end # End check if word is a link
       		end # end loop through words
       		
-      	#end # end check if tweet is newer than user's latest tweet
+      	end # end check if tweet is newer than user's latest tweet
   		
   		end # end check if tweet was created by user  
   	end # end loop through tweets
@@ -140,9 +138,11 @@ get '/tweets' do
   	user.last_interaction = Time.now
   	user.save
   	
+  else
+    redirect %{http://eloono.com}
   end # end check if a user exists in the session
   
-  %{Just scored your words.}
+  %{Just scored your words | }+session[:user_id].to_s
   
 end
 
