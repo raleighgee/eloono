@@ -233,21 +233,21 @@ get '/tweets' do
           if wordscore
             sysignore = Sysigword.find_by_word(wordscore.word)
             if sysignore
-              wscore = "0"
+              wscore = "#CCCCCC"
             else
               score = wordscore.score
               if score <= user.firstq_word_score
-                wscore = "0.1"
+                wscore = "#ADD5F7"
               elsif score <= user.avg_word_score
-                wscore = "0.15"
+                wscore = "#7FB2F0"
               elsif score <= user.thirdq_word_score
-                wscore = "0.20"
+                wscore = "#4E7AC7"
               else
-                wscore = "0.4"
+                wscore = "#16193B"
               end
             end
           else
-            wscore = "0.4"
+            wscore = "#CCCCCC"
           end
           
           # if the number of words in the tweet is less than 3, set the tweet content to exactly what the tweet says - no clean required
@@ -292,10 +292,10 @@ get '/tweets' do
         					nohandle = nohandle.gsub("-", '')
         					cleantweet = cleantweet.to_s+%{<a href="http://twitter.com/}+nohandle.to_s+%{" target="_blank">}+w.to_s+%{</a> }
         				else
-        					cleantweet = cleantweet.to_s+%{<span style="background: rgb(255, 0, 0) ; opacity:}+wscore.to_s+%{;">}+w.to_s+"</span> "
+        					cleantweet = cleantweet.to_s+%{<span style="color:}+wscore.to_s+%{;">}+w.to_s+"</span> "
         				end
         			else
-        				cleantweet = cleantweet.to_s+%{<span style="background: rgb(255, 0, 0) ; opacity:}+wscore.to_s+%{;">}+w.to_s+"</span> "
+        				cleantweet = cleantweet.to_s+%{<span style="color:}+wscore.to_s+%{;">}+w.to_s+"</span> "
         			end
         		elsif w.include? %{#}
         			firstchar = w[0,1]
@@ -304,10 +304,10 @@ get '/tweets' do
         				nohandle = w.gsub('#', '')
         				cleantweet = cleantweet.to_s+%{<a href="https://twitter.com/search/}+nohandle.to_s+%{" target="_blank">}+w.to_s+%{</a> }
         			else
-        				cleantweet = cleantweet.to_s+%{<span style="background: rgb(255, 0, 0) ; opacity:}+wscore.to_s+%{;">}+w.to_s+"</span> "
+        				cleantweet = cleantweet.to_s+%{<span style="color:}+wscore.to_s+%{;">}+w.to_s+"</span> "
         			end
         		else
-        			cleantweet = cleantweet.to_s+%{<span style="background: rgb(255, 0, 0) ; opacity:}+wscore.to_s+%{;">}+w.to_s+"</span> "
+        			cleantweet = cleantweet.to_s+%{<span style="color:}+wscore.to_s+%{;">}+w.to_s+"</span> "
         		end
         	end # End check if tweet is smaller than 3 words
         end # End create clean tweet
