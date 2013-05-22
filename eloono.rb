@@ -88,6 +88,9 @@ get '/tweets' do
   	# use Twitter api to pull last 200 tweets from current user in loop
   	@tweets = Twitter.home_timeline(:count => 50, :include_entities => true, :include_rts => true)
   	
+  	# declare tweet code variable
+  	@tweetcode = ""
+  	
   	# loop through Tweets pulled
   	@tweets.each do |p|
   	  
@@ -134,7 +137,6 @@ get '/tweets' do
   		  #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
         @words =  p.full_text.split(" ")
         # reset cleantweet variable instance
-        tweetcode = ""
         cleantweet = ""
         # begin looping through words in tweet
         @words.each do |w|
@@ -198,23 +200,16 @@ get '/tweets' do
         			cleantweet = cleantweet.to_s+w.to_s+" "
         		end
         	end # End check if tweet is smaller than 3 words
-        	tweetcode = tweetcode.to_s+cleantweet.to_s+%{<br /><br />}
-        end # End create clean tweet  		
+        end # End create clean tweet
+        @tweetcode = @tweetcode.to_s+cleantweet.to_s+%{<br /><br />} 		
   		end # end check if tweet was created by user  
   	end # end loop through tweets
-  	
-  	
-  	
-  	
-  	
   	
   	user.last_interaction = Time.now
   	user.save
   	
-  	
-  	%{BOOM<br /><br />}+tweetcode.to_s
-  	
-  	
+  	@tweetcode.to_s
+  
   else
     redirect %{http://eloono.com}
   end # end check if a user exists in the session
