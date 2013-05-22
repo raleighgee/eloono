@@ -227,6 +227,24 @@ get '/tweets' do
         cleantweet = ""
         # begin looping through words in tweetto build clean tweet
         @words.each do |w|
+          
+          # calcualte background opacity
+          wordscore = Word.find(:first, :conditions => ["user_id = ? and word = ?", user.id, w])
+          if wordscore
+            score = wordscore.score
+            if score <= user.firstq_word_score
+              wscore = "0.2"
+            elsif score <= user.avg_word_score
+              wscore = "0.4"
+            elsif score <= user.thirdq_word_score
+              wscore = "0.6"
+            else
+              wscore = "1"
+            end
+          else
+            wscore = "1"
+          end
+          
           # if the number of words in the tweet is less than 3, set the tweet content to exactly what the tweet says - no clean required
         	if @words.size < 3
         		cleantweet = p.full_text
@@ -269,10 +287,10 @@ get '/tweets' do
         					nohandle = nohandle.gsub("-", '')
         					cleantweet = cleantweet.to_s+%{<a href="http://twitter.com/}+nohandle.to_s+%{" target="_blank">}+w.to_s+%{</a> }
         				else
-        					cleantweet = cleantweet.to_s+w.to_s+" "
+        					cleantweet = cleantweet.to_s+%{<span style="background: rgb(255, 0, 0) ; opacity:}+wscore.to_s+%{;">}+w.to_s+"</span> "
         				end
         			else
-        				cleantweet = cleantweet.to_s+w.to_s+" "
+        				cleantweet = cleantweet.to_s+%{<span style="background: rgb(255, 0, 0) ; opacity:}+wscore.to_s+%{;">}+w.to_s+"</span> "
         			end
         		elsif w.include? %{#}
         			firstchar = w[0,1]
@@ -281,10 +299,10 @@ get '/tweets' do
         				nohandle = w.gsub('#', '')
         				cleantweet = cleantweet.to_s+%{<a href="https://twitter.com/search/}+nohandle.to_s+%{" target="_blank">}+w.to_s+%{</a> }
         			else
-        				cleantweet = cleantweet.to_s+w.to_s+" "
+        				cleantweet = cleantweet.to_s+%{<span style="background: rgb(255, 0, 0) ; opacity:}+wscore.to_s+%{;">}+w.to_s+"</span> "
         			end
         		else
-        			cleantweet = cleantweet.to_s+w.to_s+" "
+        			cleantweet = cleantweet.to_s+%{<span style="background: rgb(255, 0, 0) ; opacity:}+wscore.to_s+%{;">}+w.to_s+"</span> "
         		end
         	end # End check if tweet is smaller than 3 words
         end # End create clean tweet
