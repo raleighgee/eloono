@@ -83,10 +83,12 @@ get '/tweets' do
   		user.profile_image_url = u.profile_image_url
   		user.language = u.lang.to_s
   		user.save
+  		@tweets = Twitter.home_timeline(:count => 50, :include_entities => true, :include_rts => true)
+  	else
+  	  @tweets = Twitter.home_timeline(:count => 50, :include_entities => true, :include_rts => true, :since_id => user.latest_tweet_id.to_i )
   	end
   	
   	# use Twitter api to pull last 200 tweets from current user in loop
-  	@tweets = Twitter.home_timeline(:count => 50, :include_entities => true, :include_rts => true)
   	
   	# declare tweet code variable
   	@tweetcode = ""
@@ -97,66 +99,71 @@ get '/tweets' do
   	  # Check if tweet was created by current user
   		unless p.user.id == user.uid
   		  
-  		  # check if tweet is newer than the user's latest tweet pulled
+  		  # set user latest tweet
   		  if p.id.to_i > user.latest_tweet_id
+  		    user.latest_tweet_id = p.id.to_i
+  		    user.save
+  		  end
+  		    
   		    			
-    			# Update user's and connection's count of tweets shown
-    		  user.num_tweets_shown = user.num_tweets_shown.to_i+1
-    		  user.latest_tweet_id = p.id
-    			user.save
-  		  
-  		    #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
-    		  @words =  p.full_text.split(" ")
-      		# begin looping through words in tweet
-      		@words.each do |w|
-      			unless w.include? %{http}
-      				unless w.include? %{@}
-      					unless w.is_a? (Numeric)
-      						unless w == ""
-      							# remove any non alphanumeric charactes from word
-      							cleanword = w.gsub(/[^0-9a-z]/i, '')
-      							# check if word is on the System ignore list
-      							# set all characters to lowercase
-      						  cleanword = cleanword.downcase
-      							sysignore = Sysigword.find_by_word(cleanword)
-      							unless sysignore
-      							  # look to see if word already exists, if not, create a new one using cleanword above
-      							  word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
-      							  # increment the number of times word has been seen counter by 1
-      							  word.seen_count = word.seen_count.to_i+1
-      							  word.save
-      							  user.num_words_scored = user.num_words_scored+1
-      							end # end check if word is on the system ignore list
-      						end # End check if word is empty
-      					end # End check if word is just a number
-      				end # End check if word contains the @ symbol
-      			end # End check if word is a link
-      		end # end loop through words
-      		
-      		# find or create connection from tweet source
-          c = Connection.find_or_create_by_twitter_id_and_user_id(:twitter_id => p.user.id, :user_id => user.id)
-          c.profile_image_url = p.user.profile_image_url
-          c.user_name = p.user.name
-          c.following_flag = p.user.following
-          c.user_description = p.user.description
-          c.user_url = p.user.url
-          c.user_screen_name = p.user.screen_name
-          c.user_language = p.user.lang
-          c.twitter_created_at = p.user.created_at
-          c.statuses_count = p.user.statuses_count
-          c.followers_count = p.user.followers_count
-          c.friends_count = p.user.friends_count
-          c.location = p.user.location
-          c.connection_type = "following"
+  			# Update user's and connection's count of tweets shown
+  		  user.num_tweets_shown = user.num_tweets_shown.to_i+1
+  		  user.latest_tweet_id = p.id
+  			user.save
+		  
+		    #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
+  		  @words =  p.full_text.split(" ")
+    		# begin looping through words in tweet
+    		@words.each do |w|
+    			unless w.include? %{http}
+    				unless w.include? %{@}
+    					unless w.is_a? (Numeric)
+    						unless w == ""
+    							# remove any non alphanumeric charactes from word
+    							cleanword = w.gsub(/[^0-9a-z]/i, '')
+    							# check if word is on the System ignore list
+    							# set all characters to lowercase
+    						  cleanword = cleanword.downcase
+    							sysignore = Sysigword.find_by_word(cleanword)
+    							unless sysignore
+    							  # look to see if word already exists, if not, create a new one using cleanword above
+    							  word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
+    							  # increment the number of times word has been seen counter by 1
+    							  word.seen_count = word.seen_count.to_i+1
+    							  word.save
+    							  user.num_words_scored = user.num_words_scored+1
+    							end # end check if word is on the system ignore list
+    						end # End check if word is empty
+    					end # End check if word is just a number
+    				end # End check if word contains the @ symbol
+    			end # End check if word is a link
+    		end # end loop through words
+    		
+    		# find or create connection from tweet source
+        c = Connection.find_or_create_by_twitter_id_and_user_id(:twitter_id => p.user.id, :user_id => user.id)
+        c.profile_image_url = p.user.profile_image_url
+        c.user_name = p.user.name
+        c.following_flag = p.user.following
+        c.user_description = p.user.description
+        c.user_url = p.user.url
+        c.user_screen_name = p.user.screen_name
+        c.user_language = p.user.lang
+        c.twitter_created_at = p.user.created_at
+        c.statuses_count = p.user.statuses_count
+        c.followers_count = p.user.followers_count
+        c.friends_count = p.user.friends_count
+        c.location = p.user.location
+        c.connection_type = "following"
 
-          # calculate connection's tweets per hour
-          ageinhours = ((Time.now-p.user.created_at)/60)/60
-          c.tweets_per_hour = p.user.statuses_count.to_f/ageinhours.to_f
-
-          c.save      		
-      		
-      	end # end check if tweet is newer than user's latest tweet
+        # calculate connection's tweets per hour
+        ageinhours = ((Time.now-p.user.created_at)/60)/60
+        c.tweets_per_hour = p.user.statuses_count.to_f/ageinhours.to_f
+        c.save      	
   		
+  		  
+  		  
+  		  
+  		  
   		  #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
         @words =  p.full_text.split(" ")
         # reset cleantweet variable instance
