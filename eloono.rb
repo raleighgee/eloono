@@ -157,12 +157,14 @@ get '/tweets' do
         ageinhours = ((Time.now-p.user.created_at)/60)/60
         c.tweets_per_hour = p.user.statuses_count.to_f/ageinhours.to_f
         c.save      	
-  		
+			end # end check if tweet was created by user  
+  	end # end loop through tweets
   		  
-  		  
-  		  
-  		  
-  		  #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
+		@atweets = Twitter.home_timeline(:count => 50, :include_entities => true, :include_rts => true)
+		@atweets.each do |p|
+		  # Check if tweet was created by current user
+    	unless p.user.id == user.uid
+		    #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
         @words =  p.full_text.split(" ")
         # reset cleantweet variable instance
         cleantweet = p.id.to_s
@@ -241,8 +243,6 @@ get '/tweets' do
   else
     redirect %{http://eloono.com}
   end # end check if a user exists in the session
-  
-  
   
 end
 
