@@ -146,7 +146,7 @@ get '/tweets' do
         	else
         		# build clean version of tweet
         		if w.include? %{http}
-        			cleantweet = cleantweet.to_s+%{[...] }
+        			cleantweet = cleantweet.to_s+%{<a href="}+w.to_s+%{" target="_blank" title="}+w.to_s+%{">[...]</a> }
         		elsif w.include? %{@}
         			firstchar = w[0,1]
         			secondchar = w[1,1]
