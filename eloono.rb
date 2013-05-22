@@ -307,7 +307,7 @@ get '/tweets' do
   	@twords = Word.find(:all, :conditions => ["user_id = ?", user.id], :limit => 10, :order => "score DESC")
   	@topwords = ""
   	for tword in @twords
-      @topwords = @topwords.to_s+%{<br /><br />}
+      @topwords = @topwords.to_s+tword.to_s+%{<br /><br />}
   	end # end lopp through top ten words
   	
   	# Update user's word scoring ranges and last interaction time
