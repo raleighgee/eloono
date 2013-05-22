@@ -303,6 +303,13 @@ get '/tweets' do
   	  word.save
   	end # end loop through words to aggregate scores
   	
+  	# Build top words list
+  	@twords = Word.find(:all, :conditions => ["user_id = ?", user.id], :limit => 10, :order => "score DESC")
+  	@topwords = ""
+  	for tword in @twords
+      @topwords = @topwords.to_s+%{<br /><br />}
+  	end # end lopp through top ten words
+  	
   	# Update user's word scoring ranges and last interaction time
   	user.last_interaction = Time.now
   	wmaxscore = Word.maximum(:score, :conditions => ["user_id = ?", user.id])
@@ -317,7 +324,7 @@ get '/tweets' do
 		user.thirdq_word_score = threeq	
   	user.save
   	
-  	@tweetcode.to_s
+  	erb :tweets
   
   else
     redirect %{http://eloono.com}
@@ -342,117 +349,15 @@ get '/follow' do
 	
 end
 
-get '/interact/:t' do
 
-	tweet = Itweets.find(params[:t])
-	
-	if tweet
-		if tweet.followed_flag != "yes"
-			source = Source.find_by_id(tweet.source_id)
-			source.number_links_followed = source.number_links_followed.to_i+1
-			source.save
-			@words = tweet.tweet_content.split(" ")
-			@words.each do |w|
-				cleanword = w.gsub(/[^0-9a-z]/i, '')
-				cleanword = cleanword.downcase
-				word = Word.find(:first, :conditions => ["word = ? and user_id = ? and sys_ignore_flag <> ?", cleanword, tweet.user_id, "yes"])
-				if word
-					word.follows = word.follows.to_i+1
-					word.save
-				end # End check if word is exists
-			end # End loop through words
-			tweet.followed_flag = "yes"
-			tweet.last_action = "tweeted"
-			tweet.save
-		end # end check if tweet has already been followed
-	end # end check if a tweet is found
-	if params[:i] == "interact"
-	  linkcode = %{https://twitter.com/intent/tweet?in_reply_to=}+tweet.twitter_id.to_s#+%{&via=}+tweet.source.user_screen_name.to_s
-	else
-	  linkcode = %{https://twitter.com/intent/tweet?retweet=}+tweet.twitter_id.to_s#+%{&via=}+tweet.source.user_screen_name.to_s
-	end
-	redirect linkcode
-end
+########## VIEW CODE ########## 
 
-get '/ats/:word' do
-  if params[:sys] == "t"
-    siw = Sysigword.find_or_create_by_word(:word => params[:word])
-    siw.save
-  end
-  word = Word.find_by_word(params[:word])
-  if word
-    word.score = 0
-    word.comp_average = 0
-    word.sys_ignore_flag = "yes"
-    word.save
-    if params[:sys] == "t"
-      word.destroy
-    end 
-  end
-  @code = %{<b>}+params[:word].to_s+%{</b> has been added to the system ignore list.<br /><br /><br />}
-  @words = Word.find(:all, :conditions => ["user_id  = ?", 1], :limit => 10, :order => "comp_average DESC")
-  for word in @words
-	  @code = @code.to_s+word.word.to_s+%{ | <a href="http://eloono.com/ats/}+word.word.to_s+%{">Ignore</a>}
-	  if word.user_id == 1
-	    @code = @code.to_s+%{ | <a href="http://eloono.com/ats/}+word.word.to_s+%{?sys=t">Remove</a>}
-	  end
-	  @code = @code.to_s+%{<br /><br />}
-  end # end loop through top words
-  user = User.find_by_id(1)
-  if user
-	if user.active_scoring == "yes"
-		%{Getting new words - refresh in 30 seconds.}
-	else
-		@code
-	end
-  end
-end
+use_in_file_templates!
 
-get '/ignore_con/:id' do
-  con = Connection.find_by_id(params[:id])
-  if con
-    con.destroy
-  end
-  %{Eloono will not recommend this person again.}
-end
+__END__
 
-get '/test' do
-  user = User.find_by_id(1)
-	@links = Link.find(:all, :conditions => ["user_id = ?", 1])
-	if @links.size > 2000
-	  num = @links.size - 2000
-	  @dellinks = Link.find(:all, :conditions => ["user_id = ?", 1], :limit => num, :order => "created_at ASC")
-	  for dellink in @dellinks
-	    dellink.destroy
-	  end
-	end
-	
-	@itweets = Itweets.find(:all, :conditions => ["user_id = ?", 1])
-	if @itweets.size > 2000
-	  num = @itweets.size - 2000
-	  @delitweets = Link.find(:all, :conditions => ["user_id = ?", 1], :limit => num, :order => "created_at ASC")
-	  for itweet in @itweets
-	    itweet.destroy
-	  end
-	end
-	
-	@connections = Connection.find(:all, :conditions => ["user_id = ? and user_description = ?", 1, "wait"])
-	if @connections.size > 3000
-	  num = @connections.size - 3000
-	  @delconnections = Connection.find(:all, :conditions => ["user_id = ? and user_description = ?", 1, "wait"], :limit => num, :order => "created_at ASC")
-	  for delconnection in @delconnections
-	    delconnection.destroy
-	  end
-	end
-  %{OK BRO!}
-end
+@@ tweets
 
-get '/reset_users' do
-  @users = User.find(:all)
-  for user in @users
-    user.active_scoring = "no"
-    user.save
-  end
-  
-  %{Users' Active Scoring has been Reset.}
-end
+<div style="position:aboslute; top:0; right:0; width:133px;"><%= @topwords %></div>
+
+<%= @tweetcode %>
