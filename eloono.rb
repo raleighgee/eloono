@@ -157,6 +157,40 @@ get '/tweets' do
         ageinhours = ((Time.now-p.user.created_at)/60)/60
         c.tweets_per_hour = p.user.statuses_count.to_f/ageinhours.to_f
         c.save      	
+        
+        # Parse through mentions in tweet and create any connections
+        @connections = p.user_mentions
+        if @connections.size > 0
+        	for connection in @connections
+        		cfollow = Connection.find_by_twitter_id_and_user_id(connection.id, user.id)
+        		# if mention is not already a source, create a connection
+        		unless cfollow
+        			m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
+        		end
+        	end # End loop through mentions in tweet
+        end # End check tweet has any mentions
+
+        # Check if tweet is a RT, if it is, convert source into a connection if user is not already following
+        if p.retweeted_status
+        	cfollow = Connection.find_by_twitter_id_and_user_id(p.retweeted_status.user.id, user.id)
+        	# if mention is not already a source, create a connection
+        	unless cfollow
+        		m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
+        	end
+        end
+
+        # Check if tweet is in reply to another tweet and check if user follows the soruce of the tweet that is being responded to
+        if p.in_reply_to_screen_name
+        	cfollow = Connection.find_by_twitter_id_and_user_id(p.in_reply_to_user_id, user.id)
+        	# if mention is not already a source, create a connection
+        	unless cfollow
+        		m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
+        	end
+        end
+
+        c.total_tweets_seen = c.total_tweets_seen.to_f+1
+        c.save        
+        
 			end # end check if tweet was created by user  
   	end # end loop through tweets
   		  
