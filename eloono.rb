@@ -228,23 +228,21 @@ get '/tweets' do
         # begin looping through words in tweetto build clean tweet
         @words.each do |w|
           
+          findword = w.gsub(/[^0-9a-z]/i, '')
+          findword = findword.downcase
+          
           # calcualte background opacity
-          wordscore = Word.find(:first, :conditions => ["user_id = ? and word = ?", user.id, w])
+          wordscore = Word.find(:first, :conditions => ["user_id = ? and word = ?", user.id, findword])
           if wordscore
-            sysignore = Sysigword.find_by_word(wordscore.word)
-            if sysignore
-              wscore = "#CCCCCC"
+            score = wordscore.score
+            if score.to_f <= user.firstq_word_score
+              wscore = "#ADD5F7"
+            elsif score.to_f <= user.avg_word_score
+              wscore = "#7FB2F0"
+            elsif score.to_f <= user.thirdq_word_score
+              wscore = "#4E7AC7"
             else
-              score = wordscore.score
-              if score <= user.firstq_word_score
-                wscore = "#ADD5F7"
-              elsif score <= user.avg_word_score
-                wscore = "#7FB2F0"
-              elsif score <= user.thirdq_word_score
-                wscore = "#4E7AC7"
-              else
-                wscore = "#16193B"
-              end
+              wscore = "#16193B"
             end
           else
             wscore = "#CCCCCC"
