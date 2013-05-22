@@ -129,20 +129,98 @@ get '/tweets' do
       				end # End check if word contains the @ symbol
       			end # End check if word is a link
       		end # end loop through words
-      		
       	end # end check if tweet is newer than user's latest tweet
+  		
+  		  #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
+        @words =  p.full_text.split(" ")
+        # reset cleantweet variable instance
+        tweetcode = ""
+        cleantweet = ""
+        # begin looping through words in tweet
+        @words.each do |w|
+          # if the number of words in the tweet is less than 3, set the tweet content to exactly what the tweet says - no clean required
+        	if @words.size < 3
+        		cleantweet = p.full_text
+        	else
+        		# build clean version of tweet
+        		if w.include? %{http}
+        			cleantweet = cleantweet.to_s+%{[...] }
+        		elsif w.include? %{@}
+        			firstchar = w[0,1]
+        			secondchar = w[1,1]
+        			if firstchar == %{@} or secondchar == %{@}
+        				if w.length.to_i > 1
+        					nohandle = w.gsub('@', '')
+        					nohandle = nohandle.gsub(" ", '')
+        					nohandle = nohandle.gsub(":", '')
+        					nohandle = nohandle.gsub(";", '')
+        					nohandle = nohandle.gsub(",", '')
+        					nohandle = nohandle.gsub(".", '')
+        					nohandle = nohandle.gsub(")", '')
+        					nohandle = nohandle.gsub("(", '')
+        					nohandle = nohandle.gsub("*", '')
+        					nohandle = nohandle.gsub("^", '')
+        					nohandle = nohandle.gsub("$", '')
+        					nohandle = nohandle.gsub("#", '')
+        					nohandle = nohandle.gsub("!", '')
+        					nohandle = nohandle.gsub("~", '')
+        					nohandle = nohandle.gsub("`", '')
+        					nohandle = nohandle.gsub("+", '')
+        					nohandle = nohandle.gsub("=", '')
+        					nohandle = nohandle.gsub("[", '')
+        					nohandle = nohandle.gsub("]", '')
+        					nohandle = nohandle.gsub("{", '')
+        					nohandle = nohandle.gsub("}", '')
+        					nohandle = nohandle.gsub("/", '')
+        					nohandle = nohandle.gsub("<", '')
+        					nohandle = nohandle.gsub(">", '')
+        					nohandle = nohandle.gsub("?", '')
+        					nohandle = nohandle.gsub("&", '')
+        					nohandle = nohandle.gsub("|", '')
+        					nohandle = nohandle.gsub("-", '')
+        					cleantweet = cleantweet.to_s+%{<a href="http://twitter.com/}+nohandle.to_s+%{" target="_blank" class="embed_handle">}+w.to_s+%{</a> }
+        				else
+        					cleantweet = cleantweet.to_s+w.to_s+" "
+        				end
+        			else
+        				cleantweet = cleantweet.to_s+w.to_s+" "
+        			end
+        		elsif w.include? %{#}
+        			firstchar = w[0,1]
+        			secondchar = [1,1]
+        			if firstchar == %{#} or secondchar == %{#}
+        				nohandle = w.gsub('#', '')
+        				cleantweet = cleantweet.to_s+%{<a href="https://twitter.com/search/}+nohandle.to_s+%{" target="_blank" class="embed_handle">}+w.to_s+%{</a> }
+        			else
+        				cleantweet = cleantweet.to_s+w.to_s+" "
+        			end
+        		else
+        			cleantweet = cleantweet.to_s+w.to_s+" "
+        		end
+        	end # End check if tweet is smaller than 3 words
+        	tweetcode = tweetcode.to_s+cleantweet.to_s+%{<br /><br />}
+        end # End create clean tweet  		
   		
   		end # end check if tweet was created by user  
   	end # end loop through tweets
   	
+  	
+  	
+  	
+  	
+  	
   	user.last_interaction = Time.now
   	user.save
+  	
+  	
+  	
+  	
   	
   else
     redirect %{http://eloono.com}
   end # end check if a user exists in the session
   
-  %{Just scored your words | }+session[:user_id].to_s
+  tweetcode.to_s
   
 end
 
