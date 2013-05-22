@@ -270,7 +270,7 @@ get '/tweets' do
   	end # end loop through tweets
   	
   	# Aggregate word scores
-  	@words = Word.find(:all, :conditions => ["user_id = ?", user_id])
+  	@words = Word.find(:all, :conditions => ["user_id = ?", user.id])
   	for word in @words
   	  if word.follows > 0 
   	    word.score = word.seen_count*(word.follows+1)
@@ -282,9 +282,9 @@ get '/tweets' do
   	
   	# Update user's word scoring ranges and last interaction time
   	user.last_interaction = Time.now
-  	wmaxscore = Word.maximum(:score, :conditions => ["user_id = ?", user_id])
-  	wminscore = Word.minimum(:score, :conditions => ["user_id = ?", user_id])
-  	wavgscore = Word.average(:score, :conditions => ["user_id = ?", user_id])
+  	wmaxscore = Word.maximum(:score, :conditions => ["user_id = ?", user.id])
+  	wminscore = Word.minimum(:score, :conditions => ["user_id = ?", user.id])
+  	wavgscore = Word.average(:score, :conditions => ["user_id = ?", user.id])
   	oneq = (wminscore.to_f+wavgscore.to_f)/2
   	threeq = (wmaxscore.to_f+wavgscore.to_f)/2
   	user.avg_word_score = wavgscore
