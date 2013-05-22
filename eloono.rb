@@ -200,9 +200,32 @@ get '/tweets' do
     	unless p.user.id == user.uid
 		    #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
         @words =  p.full_text.split(" ")
+        
+        # Loop through words to create wording for links
+        followwords = ""
+        @words.each do |w|
+    			unless w.include? %{http}
+    				unless w.include? %{@}
+    					unless w.is_a? (Numeric)
+    						unless w == ""
+    							# remove any non alphanumeric charactes from word
+    							cleanword = w.gsub(/[^0-9a-z]/i, '')
+    							# check if word is on the System ignore list
+    							# set all characters to lowercase
+    						  cleanword = cleanword.downcase
+    							sysignore = Sysigword.find_by_word(cleanword)
+    							unless sysignore
+                    followwords = followwords.to_s+"-"+cleanword.to_s
+    							end # end check if word is on the system ignore list
+    						end # End check if word is empty
+    					end # End check if word is just a number
+    				end # End check if word contains the @ symbol
+    			end # End check if word is a link
+    		end # end loop through words
+        
         # reset cleantweet variable instance
         cleantweet = ""
-        # begin looping through words in tweet
+        # begin looping through words in tweetto build clean tweet
         @words.each do |w|
           # if the number of words in the tweet is less than 3, set the tweet content to exactly what the tweet says - no clean required
         	if @words.size < 3
@@ -210,7 +233,7 @@ get '/tweets' do
         	else
         		# build clean version of tweet
         		if w.include? %{http}
-        			cleantweet = cleantweet.to_s+%{<a href="}+w.to_s+%{" target="_blank" title="}+w.to_s+%{">[...]</a> }
+        			cleantweet = cleantweet.to_s+%{<a href="http://eloono.com/follow?l=}+w.to_s+%{&w=}+followwords.to_s+%{&u=}+user.id.to_s+%{" target="_blank" title="}+w.to_s+%{">[...]</a> }
         		elsif w.include? %{@}
         			firstchar = w[0,1]
         			secondchar = w[1,1]
@@ -244,7 +267,7 @@ get '/tweets' do
         					nohandle = nohandle.gsub("&", '')
         					nohandle = nohandle.gsub("|", '')
         					nohandle = nohandle.gsub("-", '')
-        					cleantweet = cleantweet.to_s+%{<a href="http://twitter.com/}+nohandle.to_s+%{" target="_blank" class="embed_handle">}+w.to_s+%{</a> }
+        					cleantweet = cleantweet.to_s+%{<a href="http://twitter.com/}+nohandle.to_s+%{" target="_blank">}+w.to_s+%{</a> }
         				else
         					cleantweet = cleantweet.to_s+w.to_s+" "
         				end
@@ -256,7 +279,7 @@ get '/tweets' do
         			secondchar = [1,1]
         			if firstchar == %{#} or secondchar == %{#}
         				nohandle = w.gsub('#', '')
-        				cleantweet = cleantweet.to_s+%{<a href="https://twitter.com/search/}+nohandle.to_s+%{" target="_blank" class="embed_handle">}+w.to_s+%{</a> }
+        				cleantweet = cleantweet.to_s+%{<a href="https://twitter.com/search/}+nohandle.to_s+%{" target="_blank">}+w.to_s+%{</a> }
         			else
         				cleantweet = cleantweet.to_s+w.to_s+" "
         			end
@@ -302,36 +325,20 @@ get '/tweets' do
   
 end
 
-get '/follow/:t' do
-	tweet = Itweets.find_by_old_id(params[:t])
+get '/follow' do
+  
+  link = params[:l]
+  fwords = params[:w]
+  @words = fwords.split("-")
+  @words.each do |w|
+    word = Word.find(:first, :conditions => ["word = ? and user_id = ?", w, params[:u]])
+    if word
+      word.follows = word.follows.to_i+1
+      word.save
+    end # End check if word is exists
+  end # End loop through words			
 	
-	if tweet
-		if tweet.followed_flag != "yes"
-			source = Source.find_by_id(tweet.source_id)
-			source.number_links_followed = source.number_links_followed.to_i+1
-			source.save
-			@words = tweet.tweet_content.split(" ")
-			@words.each do |w|
-				cleanword = w.gsub(/[^0-9a-z]/i, '')
-				cleanword = cleanword.downcase
-				word = Word.find(:first, :conditions => ["word = ? and user_id = ? and sys_ignore_flag <> ?", cleanword, tweet.user_id, "yes"])
-				if word
-					word.follows = word.follows.to_i+1
-					word.save
-				end # End check if word is exists
-			end # End loop through words
-			tweet.followed_flag = "yes"
-			tweet.last_action = "follow"
-			tweet.save				
-		end # End check if tweet followed flag does not = "yes"
-	end # end check if a tweet is found
-	
-	@links = Link.find(:all, :conditions => ["tweet_id = ?", params[:t]], :order => "created_at DESC")
-	if @links.size.to_i > 1
-		redirect %{http://twitter.com/}+tweet.source.user_screen_name.to_s+%{/status/}+tweet.twitter_id.to_s
-	else
-		redirect @links[0].expanded_url
-	end
+	redirect link
 	
 end
 
