@@ -132,6 +132,29 @@ get '/tweets' do
       				end # End check if word contains the @ symbol
       			end # End check if word is a link
       		end # end loop through words
+      		
+      		# find or create connection from tweet source
+          c = Connection.find_or_create_by_twitter_id_and_user_id(:twitter_id => p.user.id, :user_id => user.id)
+          c.profile_image_url = p.user.profile_image_url
+          c.user_name = p.user.name
+          c.following_flag = p.user.following
+          c.user_description = p.user.description
+          c.user_url = p.user.url
+          c.user_screen_name = p.user.screen_name
+          c.user_language = p.user.lang
+          c.twitter_created_at = p.user.created_at
+          c.statuses_count = p.user.statuses_count
+          c.followers_count = p.user.followers_count
+          c.friends_count = p.user.friends_count
+          c.location = p.user.location
+          c.connection_type = "following"
+
+          # calculate connection's tweets per hour
+          ageinhours = ((Time.now-p.user.created_at)/60)/60
+          c.tweets_per_hour = p.user.statuses_count.to_f/ageinhours.to_f
+
+          c.save      		
+      		
       	end # end check if tweet is newer than user's latest tweet
   		
   		  #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
