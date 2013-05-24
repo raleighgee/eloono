@@ -1,10 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>Reverse!</title>
+		<title>Eloono</title>
 		<meta charset=utf-8 />
+		<script type="text/javascript" src="http://eloono.com/assets/javascripts/jquery-1.10.0.min.js"></script>
 	</head>
 	<body>
 		<%= yield %>
+		
+		<!-- Ye Olde jQuery -->
+		
+		<script>
+		
+			window.addEventListener("load", function() {
+				setTimeout(function(){
+					window.scrollTo("-13px", 0);
+				}, 0);
+			});
+			
+			$(document).ready(function(){
+				setTimeout (getTweets, 1500);
+				function getTweets ()
+					{
+						$(function() {
+							$.ajax({
+								url: "http://eloono.com/get_tweets",
+								type: "post",
+								success: function(responsetext) {
+									$("#result").html(responsetext);
+								}
+							});
+						});
+
+					}
+			});
+
+
+		</script>
 	</body>
 </html>

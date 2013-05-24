@@ -61,8 +61,11 @@ get '/' do
   %{<a href="http://eloono.com/signin">Click Here to Sign In<a/>}
 end
 
-
 get '/tweets' do
+  erb :tweets
+end
+
+get '/get_tweets' do
 
   user = User.find_by_id(session[:user_id])
   
@@ -121,15 +124,15 @@ get '/tweets' do
     							cleanword = w.gsub(/[^0-9a-z]/i, '')
     							# check if word is on the System ignore list
     							# set all characters to lowercase
-    						  cleanword = cleanword.downcase
+								cleanword = cleanword.downcase
     							sysignore = Sysigword.find_by_word(cleanword)
     							unless sysignore
-    							  # look to see if word already exists, if not, create a new one using cleanword above
-    							  word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
-    							  # increment the number of times word has been seen counter by 1
-    							  word.seen_count = word.seen_count.to_i+1
-    							  word.save
-    							  user.num_words_scored = user.num_words_scored+1
+									# look to see if word already exists, if not, create a new one using cleanword above
+									word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
+									# increment the number of times word has been seen counter by 1
+									word.seen_count = word.seen_count.to_i+1
+									word.save
+									user.num_words_scored = user.num_words_scored+1
     							end # end check if word is on the system ignore list
     						end # End check if word is empty
     					end # End check if word is just a number
@@ -137,7 +140,7 @@ get '/tweets' do
     			end # End check if word is a link
     		end # end loop through words
     		
-    		# find or create connection from tweet source
+    	# find or create connection from tweet source
         c = Connection.find_or_create_by_twitter_id_and_user_id(:twitter_id => p.user.id, :user_id => user.id)
         c.profile_image_url = p.user.profile_image_url
         c.user_name = p.user.name
@@ -344,9 +347,10 @@ get '/tweets' do
 		user.firstq_word_score = oneq
 		user.thirdq_word_score = threeq	
   	user.save
-  	
-  	erb :tweets
   
+    @response = %{<div style="position:absolute; top:0px; right:33px; width:333px;">}+@topwords.to_s+%{</div>}+@tweetcode.to_s
+    render :text => @response
+      
   else
     redirect %{http://eloono.com}
   end # end check if a user exists in the session
