@@ -241,7 +241,7 @@ get '/tweets' do
             tscore = "#16193B"
           end
           
-          cleantweet = %{<div style="color:}+tscore.to_s+%{">}+cleantweet.to_s+%{</div>}
+          cleantweet = %{<div style="color:}+tscore.to_s+%{ class="tweet_contianer">}+cleantweet.to_s+%{</div>}
           
         end # End create clean tweet
           
