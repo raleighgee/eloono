@@ -7,6 +7,7 @@ class CreateWords < ActiveRecord::Migration
       t.float :score, :default => 0
       t.integer :user_id
       t.string :thumb_status, :default => "neutral" # down, up, neutral
+      t.string :sys_ignore_flag, :default => "no"
       t.timestamps
     end
   end

@@ -87,6 +87,54 @@ get '/tweets' do
   	  #@tweets = Twitter.home_timeline(:count => 50, :include_entities => true, :include_rts => true, :since_id => user.latest_tweet_id.to_i )
   	end
   	
+  	# declare tweet code variable
+    @tweetcode = ""
+
+    # loop through Tweets pulled
+    @tweets.each do |p|
+
+      # Check if tweet was created by current user
+    	unless p.user.id == user.uid
+
+    	  # set user latest tweet
+    	  if p.id.to_i > user.latest_tweet_id.to_i
+    	    user.latest_tweet_id = p.id.to_i
+    	    user.save
+    	  end
+
+    		# Update user's and connection's count of tweets shown
+    	  user.num_tweets_shown = user.num_tweets_shown.to_i+1
+    		user.save
+
+        #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
+    	  @words =  p.full_text.split(" ")
+    		# begin looping through words in tweet
+    		@words.each do |w|
+    			unless w.include? %{http}
+    				unless w.include? %{@}
+    					unless w.is_a? (Numeric)
+    						unless w == ""
+    							# remove any non alphanumeric charactes from word
+    							cleanword = w.gsub(/[^0-9a-z]/i, '')
+    							# set all characters to lowercase
+    						  cleanword = cleanword.downcase
+    						  # look to see if word already exists, if not, create a new one using cleanword above
+    							word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
+    							if word.sys_ignore_flag == "no"
+      							# increment the number of times word has been seen counter by 1
+      							word.seen_count = word.seen_count.to_i+1
+      							word.save
+      							user.num_words_scored = user.num_words_scored+1
+    							end # end check if word is on the system ignore list
+    						end # End check if word is empty
+    					end # End check if word is just a number
+    				end # End check if word contains the @ symbol
+    			end # End check if word is a link
+    		end # end loop through words  
+
+    	end # end check if tweet was created by user  
+    end # end loop through tweets
+  	
 		@atweets = Twitter.home_timeline(:count => 50, :include_entities => true, :include_rts => true)
 		@atweets.each do |p|
 		  # Check if tweet was created by current user
@@ -122,23 +170,10 @@ get '/tweets' do
           # Loop through words to create wording for links
           followwords = ""
           @words.each do |w|
-          	unless w.include? %{http}
-          		unless w.include? %{@}
-          			unless w.is_a? (Numeric)
-          				unless w == ""
-          					# remove any non alphanumeric charactes from word
-          					cleanword = w.gsub(/[^0-9a-z]/i, '')
-          					# check if word is on the System ignore list
-          					# set all characters to lowercase
-          				  cleanword = cleanword.downcase
-          					sysignore = Sysigword.find_by_word(cleanword)
-          					unless sysignore
-                      followwords = followwords.to_s+"-"+cleanword.to_s
-          					end # end check if word is on the system ignore list
-          				end # End check if word is empty
-          			end # End check if word is just a number
-          		end # End check if word contains the @ symbol
-          	end # End check if word is a link
+            # remove any non alphanumeric charactes from word
+          	cleanword = w.gsub(/[^0-9a-z]/i, '')
+          	cleanword = cleanword.downcase
+            followwords = followwords.to_s+"-"+cleanword.to_s
           end # end loop through words          
           
           # if the number of words in the tweet is less than 3, set the tweet content to exactly what the tweet says - no clean required
