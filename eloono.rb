@@ -107,7 +107,8 @@ get '/tweets' do
     		
     		# Reset total tweet score
     		totaltweetscore = 0
-
+        followwords = ""
+        
         #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
     	  @words =  p.full_text.split(" ")
     		# begin looping through words in tweet
