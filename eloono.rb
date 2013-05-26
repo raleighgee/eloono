@@ -105,6 +105,9 @@ get '/tweets' do
     		# Update user's and connection's count of tweets shown
     	  user.num_tweets_shown = user.num_tweets_shown.to_i+1
     		user.save
+    		
+    		# Reset total tweet score
+    		totaltweetscore = 0
 
         #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
     	  @words =  p.full_text.split(" ")
@@ -129,6 +132,7 @@ get '/tweets' do
                       word.score = word.seen_count
                     end
       							word.save
+      							totaltweetscore = totaltweetscore+word.score
       							user.num_words_scored = user.num_words_scored+1
     							end # end check if word is on the system ignore list
     						end # End check if word is empty
@@ -139,11 +143,7 @@ get '/tweets' do
 
         #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
         @words =  p.full_text.split(" ")
-        
-        # reset cleantweet variable instance
-        cleantweet = ""
-        # begin looping through words in tweetto build clean tweet
-        
+                
         # Loop through words to create wording for links
         followwords = ""
         @words.each do |w|
@@ -153,27 +153,10 @@ get '/tweets' do
           followwords = followwords.to_s+"-"+cleanword.to_s
         end # end loop through words
         
+        # reset cleantweet variable instance
+        cleantweet = ""
+        
         @words.each do |w|
-          
-          findword = w.gsub(/[^0-9a-z]/i, '')
-          findword = findword.downcase
-          
-          # calcualte background opacity
-          wordscore = Word.find(:first, :conditions => ["user_id = ? and word = ?", user.id, findword])
-          if wordscore
-            score = wordscore.score
-            if score.to_f <= user.firstq_word_score
-              wscore = "#ADD5F7"
-            elsif score.to_f <= user.avg_word_score
-              wscore = "#7FB2F0"
-            elsif score.to_f <= user.thirdq_word_score
-              wscore = "#4E7AC7"
-            else
-              wscore = "#16193B"
-            end
-          else
-            wscore = "#CCCCCC"
-          end         
           
           # if the number of words in the tweet is less than 3, set the tweet content to exactly what the tweet says - no clean required
         	if @words.size < 3
@@ -217,10 +200,10 @@ get '/tweets' do
         					nohandle = nohandle.gsub("-", '')
         					cleantweet = cleantweet.to_s+%{<a href="http://twitter.com/}+nohandle.to_s+%{" target="_blank">}+w.to_s+%{</a> }
         				else
-        					cleantweet = cleantweet.to_s+%{<span style="color:}+wscore.to_s+%{;">}+w.to_s+"</span> "
+        					cleantweet = cleantweet.to_s+w.to_s
         				end
         			else
-        				cleantweet = cleantweet.to_s+%{<span style="color:}+wscore.to_s+%{;">}+w.to_s+"</span> "
+        				cleantweet = cleantweet.to_s+w.to_s
         			end
         		elsif w.include? %{#}
         			firstchar = w[0,1]
@@ -229,12 +212,37 @@ get '/tweets' do
         				nohandle = w.gsub('#', '')
         				cleantweet = cleantweet.to_s+%{<a href="https://twitter.com/search/}+nohandle.to_s+%{" target="_blank">}+w.to_s+%{</a> }
         			else
-        				cleantweet = cleantweet.to_s+%{<span style="color:}+wscore.to_s+%{;">}+w.to_s+"</span> "
+        				cleantweet = cleantweet.to_s+w.to_s
         			end
         		else
-        			cleantweet = cleantweet.to_s+%{<span style="color:}+wscore.to_s+%{;">}+w.to_s+"</span> "
+        			cleantweet = cleantweet.to_s+w.to_s
         		end
         	end # End check if tweet is smaller than 3 words
+        	
+        	# Update user's tweet scoring ranges
+        	if totaltweetscore > user.max_word_score
+        	  user.max_word_score = totaltweetscore
+        	elsif totaltweetscore < user.min_word_score
+        	  user.min_word_score = totaltweetscore
+        	end
+        	user.avg_word_score = (user.avg_word_score.to_f+totaltweetscore.to_f)/2
+        	user.firstq_word_score = (user.min_word_score.to_f+user.avg_word_score.to_f)/2
+          user.thirdq_word_score = (user.max_word_score.to_f+user.avg_word_score.to_f)/2
+        	user.save
+            
+          # calcualte background opacity
+          if totaltweetscore.to_f <= user.firstq_word_score
+            tscore = "#ADD5F7"
+          elsif totaltweetscore.to_f <= user.avg_word_score
+            tscore = "#7FB2F0"
+          elsif totaltweetscore.to_f <= user.thirdq_word_score
+            tscore = "#4E7AC7"
+          else
+            tscore = "#16193B"
+          end
+          
+          cleantweet = %{<div style="color:}+tscore.to_s+%{">}+cleantweet.to_s+%{</div>}
+          
         end # End create clean tweet
           
         @tweetcode = @tweetcode.to_s+cleantweet.to_s+%{<br /><br />}
@@ -248,21 +256,9 @@ get '/tweets' do
       user.last_tweets = ""
     else
       user.last_tweets = @tweetcode
-    end
-    user.save
-      
+    end      
   	
-  	# Update user's word scoring ranges and last interaction time
-  	wmaxscore = Word.maximum(:score, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
-    wminscore = Word.minimum(:score, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
-    wavgscore = Word.average(:score, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
-    oneq = (wminscore.to_f+wavgscore.to_f)/2
-    threeq = (wmaxscore.to_f+wavgscore.to_f)/2
-    user.avg_word_score = wavgscore
-    user.min_word_score = wminscore
-    user.max_word_score = wmaxscore
-    user.firstq_word_score = oneq
-    user.thirdq_word_score = threeq
+  	# Update user's last interaction time
   	user.last_interaction = Time.now
   	user.save
     
