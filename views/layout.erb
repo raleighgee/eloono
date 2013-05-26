@@ -19,20 +19,7 @@
 			});
 			
 			$(document).ready(function(){
-				setTimeout (getTweets, 1500);
-				function getTweets ()
-					{
-						$(function() {
-							$.ajax({
-								url: "http://eloono.com/get_tweets",
-								type: "post",
-								success: function(responsetext) {
-									$("#result").html(responsetext);
-								}
-							});
-						});
 
-					}
 			});
 
 
