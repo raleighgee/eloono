@@ -82,9 +82,9 @@ get '/tweets' do
   		user.profile_image_url = u.profile_image_url
   		user.language = u.lang.to_s
   		user.save
-  		#@tweets = Twitter.home_timeline(:count => 50, :include_entities => true, :include_rts => true)
+  		@tweets = Twitter.home_timeline(:count => 50, :include_entities => true, :include_rts => true)
   	else
-  	  #@tweets = Twitter.home_timeline(:count => 50, :include_entities => true, :include_rts => true, :since_id => user.latest_tweet_id.to_i )
+  	  @tweets = Twitter.home_timeline(:count => 50, :include_entities => true, :include_rts => true, :since_id => user.latest_tweet_id.to_i )
   	end
   	
   	# declare tweet code variable
