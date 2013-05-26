@@ -240,11 +240,11 @@ get '/tweets' do
           else
             tscore = "#16193B"
           end
-          
-          cleantweet = %{<div style="color:}+tscore.to_s+%{" class="tweet_container">}+cleantweet.to_s+%{</div>}
-          
+                    
         end # End create clean tweet
-          
+        
+        cleantweet = %{<div style="color:}+tscore.to_s+%{" class="tweet_container">}+cleantweet.to_s+%{</div>}
+         
         @tweetcode = @tweetcode.to_s+cleantweet.to_s+%{<br /><br />}
         
     	end # end check if tweet was created by user  
