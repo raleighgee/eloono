@@ -5,7 +5,7 @@ class LoadSysIgnoreWords < ActiveRecord::Migration
     Word.create(:word=>"a", :user_id => 1, :sys_ignore_flag => "yes")
     Word.create(:word=>"of", :user_id => 1, :sys_ignore_flag => "yes")
     Word.create(:word=>"", :user_id => 1, :sys_ignore_flag => "yes")
-    Word.create(:word=>"rt", :user_id => 1, :sys_ignore_flag => "yes")\n
+    Word.create(:word=>"rt", :user_id => 1, :sys_ignore_flag => "yes")
     Word.create(:word=>"and", :user_id => 1, :sys_ignore_flag => "yes")
     Word.create(:word=>"in", :user_id => 1, :sys_ignore_flag => "yes")
     Word.create(:word=>"for", :user_id => 1, :sys_ignore_flag => "yes")
