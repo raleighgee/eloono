@@ -119,6 +119,28 @@ get '/tweets' do
             wscore = "#CCCCCC"
           end
           
+          # Loop through words to create wording for links
+          followwords = ""
+          @words.each do |w|
+          	unless w.include? %{http}
+          		unless w.include? %{@}
+          			unless w.is_a? (Numeric)
+          				unless w == ""
+          					# remove any non alphanumeric charactes from word
+          					cleanword = w.gsub(/[^0-9a-z]/i, '')
+          					# check if word is on the System ignore list
+          					# set all characters to lowercase
+          				  cleanword = cleanword.downcase
+          					sysignore = Sysigword.find_by_word(cleanword)
+          					unless sysignore
+                      followwords = followwords.to_s+"-"+cleanword.to_s
+          					end # end check if word is on the system ignore list
+          				end # End check if word is empty
+          			end # End check if word is just a number
+          		end # End check if word contains the @ symbol
+          	end # End check if word is a link
+          end # end loop through words          
+          
           # if the number of words in the tweet is less than 3, set the tweet content to exactly what the tweet says - no clean required
         	if @words.size < 3
         		cleantweet = p.full_text
