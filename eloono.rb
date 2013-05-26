@@ -99,7 +99,6 @@ get '/tweets' do
     	  # set user latest tweet
     	  if p.id.to_i > user.latest_tweet_id.to_i
     	    user.latest_tweet_id = p.id.to_i
-    	    user.save
     	  end
 
     		# Update user's and connection's count of tweets shown
@@ -139,19 +138,12 @@ get '/tweets' do
     					end # End check if word is just a number
     				end # End check if word contains the @ symbol
     			end # End check if word is a link
-    		end # end loop through words  
-
-        #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
-        @words =  p.full_text.split(" ")
-                
-        # Loop through words to create wording for links
-        followwords = ""
-        @words.each do |w|
-          # remove any non alphanumeric charactes from word
-        	cleanword = w.gsub(/[^0-9a-z]/i, '')
+    			
+    			#create wording for links
+    			cleanword = w.gsub(/[^0-9a-z]/i, '')
         	cleanword = cleanword.downcase
-          followwords = followwords.to_s+"-"+cleanword.to_s
-        end # end loop through words
+          followwords = followwords.to_s+"-"+cleanword.to_s          
+    		end # end loop through words  
         
         # reset cleantweet variable instance
         cleantweet = ""
@@ -201,10 +193,10 @@ get '/tweets' do
         					nohandle = nohandle.gsub("-", '')
         					cleantweet = cleantweet.to_s+%{<a href="http://twitter.com/}+nohandle.to_s+%{" target="_blank">}+w.to_s+%{</a> }
         				else
-        					cleantweet = cleantweet.to_s+w.to_s
+        					cleantweet = cleantweet.to_s+w.to_s+%{ }
         				end
         			else
-        				cleantweet = cleantweet.to_s+w.to_s
+        				cleantweet = cleantweet.to_s+w.to_s+%{ }
         			end
         		elsif w.include? %{#}
         			firstchar = w[0,1]
@@ -213,10 +205,10 @@ get '/tweets' do
         				nohandle = w.gsub('#', '')
         				cleantweet = cleantweet.to_s+%{<a href="https://twitter.com/search/}+nohandle.to_s+%{" target="_blank">}+w.to_s+%{</a> }
         			else
-        				cleantweet = cleantweet.to_s+w.to_s
+        				cleantweet = cleantweet.to_s+w.to_s+%{ }
         			end
         		else
-        			cleantweet = cleantweet.to_s+w.to_s
+        			cleantweet = cleantweet.to_s+w.to_s+%{ }
         		end
         	end # End check if tweet is smaller than 3 words
         	
