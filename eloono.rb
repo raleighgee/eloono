@@ -155,6 +155,7 @@ get '/tweets' do
         
         # reset cleantweet variable instance
         cleantweet = ""
+        tscore = "#CCCCCC"
         
         @words.each do |w|
           
