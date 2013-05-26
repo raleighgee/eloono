@@ -82,10 +82,9 @@ get '/tweets' do
   		user.profile_image_url = u.profile_image_url
   		user.language = u.lang.to_s
   		user.save
-  		@tweets = Twitter.home_timeline(:count => 50, :include_entities => true, :include_rts => true)
-  		@oldtweetcode = ""
+  		@tweets = Twitter.home_timeline(:count => 25, :include_entities => true, :include_rts => true)
   	else
-  	  @tweets = Twitter.home_timeline(:count => 50, :include_entities => true, :include_rts => true, :since_id => user.latest_tweet_id.to_i )
+  	  @tweets = Twitter.home_timeline(:count => 25, :include_entities => true, :include_rts => true, :since_id => user.latest_tweet_id.to_i )
   	end
   	
   	# declare tweet code variable
@@ -237,15 +236,26 @@ get '/tweets' do
         		end
         	end # End check if tweet is smaller than 3 words
         end # End create clean tweet
+          
         @tweetcode = @tweetcode.to_s+cleantweet.to_s+%{<br /><br />}
         
     	end # end check if tweet was created by user  
     end # end loop through tweets
+    
+    # Create full tweet code for display
+    @tweetcode = @tweetcode.to_s+user.last_tweets.to_s
+    if user.last_interaction < (Time.now-(15*60))
+      user.last_tweets = ""
+    else
+      user.last_tweets = @tweetcode
+    end
+    user.save
+      
   	
   	# Update user's word scoring ranges and last interaction time
-  	wmaxscore = Word.maximum(:score, :conditions => ["user_id = ?", user.id])
-    wminscore = Word.minimum(:score, :conditions => ["user_id = ?", user.id])
-    wavgscore = Word.average(:score, :conditions => ["user_id = ?", user.id])
+  	wmaxscore = Word.maximum(:score, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
+    wminscore = Word.minimum(:score, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
+    wavgscore = Word.average(:score, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
     oneq = (wminscore.to_f+wavgscore.to_f)/2
     threeq = (wmaxscore.to_f+wavgscore.to_f)/2
     user.avg_word_score = wavgscore
