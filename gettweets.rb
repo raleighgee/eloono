@@ -31,7 +31,7 @@ ActiveRecord::Base.establish_connection(
 
 #### CODE #####
 
-@user = User.find(:all)
+@users = User.find(:all)
 
 for user in @users
   # Authenticate user for pulling of Tweets
