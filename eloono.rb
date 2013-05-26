@@ -83,6 +83,7 @@ get '/tweets' do
   		user.language = u.lang.to_s
   		user.save
   		@tweets = Twitter.home_timeline(:count => 50, :include_entities => true, :include_rts => true)
+  		@oldtweetcode = ""
   	else
   	  @tweets = Twitter.home_timeline(:count => 50, :include_entities => true, :include_rts => true, :since_id => user.latest_tweet_id.to_i )
   	end
@@ -121,8 +122,13 @@ get '/tweets' do
     						  # look to see if word already exists, if not, create a new one using cleanword above
     							word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
     							if word.sys_ignore_flag == "no"
-      							# increment the number of times word has been seen counter by 1
+      							# increment the number of times word has been seen counter by 1 and aggregate the score
       							word.seen_count = word.seen_count.to_i+1
+      							if word.follows > 0 
+                      word.score = word.seen_count*(word.follows+1)
+                    else
+                      word.score = word.seen_count
+                    end
       							word.save
       							user.num_words_scored = user.num_words_scored+1
     							end # end check if word is on the system ignore list
@@ -132,19 +138,22 @@ get '/tweets' do
     			end # End check if word is a link
     		end # end loop through words  
 
-    	end # end check if tweet was created by user  
-    end # end loop through tweets
-  	
-		@atweets = Twitter.home_timeline(:count => 50, :include_entities => true, :include_rts => true)
-		@atweets.each do |p|
-		  # Check if tweet was created by current user
-    	unless p.user.id == user.uid
-		    #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
+        #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
         @words =  p.full_text.split(" ")
         
         # reset cleantweet variable instance
         cleantweet = ""
         # begin looping through words in tweetto build clean tweet
+        
+        # Loop through words to create wording for links
+        followwords = ""
+        @words.each do |w|
+          # remove any non alphanumeric charactes from word
+        	cleanword = w.gsub(/[^0-9a-z]/i, '')
+        	cleanword = cleanword.downcase
+          followwords = followwords.to_s+"-"+cleanword.to_s
+        end # end loop through words
+        
         @words.each do |w|
           
           findword = w.gsub(/[^0-9a-z]/i, '')
@@ -165,16 +174,7 @@ get '/tweets' do
             end
           else
             wscore = "#CCCCCC"
-          end
-          
-          # Loop through words to create wording for links
-          followwords = ""
-          @words.each do |w|
-            # remove any non alphanumeric charactes from word
-          	cleanword = w.gsub(/[^0-9a-z]/i, '')
-          	cleanword = cleanword.downcase
-            followwords = followwords.to_s+"-"+cleanword.to_s
-          end # end loop through words          
+          end         
           
           # if the number of words in the tweet is less than 3, set the tweet content to exactly what the tweet says - no clean required
         	if @words.size < 3
@@ -237,13 +237,22 @@ get '/tweets' do
         		end
         	end # End check if tweet is smaller than 3 words
         end # End create clean tweet
-        @tweetcode = @tweetcode.to_s+cleantweet.to_s+%{<br /><br />} 		
-  		end # end check if tweet was created by user  
-  	end # end loop through tweets
-  	
-
+        @tweetcode = @tweetcode.to_s+cleantweet.to_s+%{<br /><br />}
+        
+    	end # end check if tweet was created by user  
+    end # end loop through tweets
   	
   	# Update user's word scoring ranges and last interaction time
+  	wmaxscore = Word.maximum(:score, :conditions => ["user_id = ?", user.id])
+    wminscore = Word.minimum(:score, :conditions => ["user_id = ?", user.id])
+    wavgscore = Word.average(:score, :conditions => ["user_id = ?", user.id])
+    oneq = (wminscore.to_f+wavgscore.to_f)/2
+    threeq = (wmaxscore.to_f+wavgscore.to_f)/2
+    user.avg_word_score = wavgscore
+    user.min_word_score = wminscore
+    user.max_word_score = wmaxscore
+    user.firstq_word_score = oneq
+    user.thirdq_word_score = threeq
   	user.last_interaction = Time.now
   	user.save
     
