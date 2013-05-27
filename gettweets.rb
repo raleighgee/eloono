@@ -212,7 +212,7 @@ for user in @users
 
       end # End loop through words to create clean tweet
       
-      cleantweet = %{<b>}+tscore.to_s+%{<b> | }+cleantweet.to_s
+      cleantweet = %{<b>}+tscore.round.to_s+%{<b> | }+cleantweet.to_s
 
       @tweetcode = @tweetcode.to_s+cleantweet.to_s+%{<br /><br />}
       
@@ -226,10 +226,10 @@ for user in @users
   
     body = %{<style>
       body{color:#777777;}
-      a{color:#999999; text-decoration:none;}
+      a{color:#CCCCCC; text-decoration:none; font-size:0.2em;}
       .wscore_one{color:#5979CD; font-weight:bold; font-size:1.2em;}
       .wscore_three{font-size:0.6em;}
-      .wscore_four{color:#CCCCCC; font-size:0.6em;}
+      .wscore_four{color:#CCCCCC; font-size:0.4em;}
       </style>}+user.last_tweets.to_s
   
     Pony.mail(
