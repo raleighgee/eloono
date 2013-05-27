@@ -222,7 +222,7 @@ for user in @users
   # Update user's last interaction time
   user.last_tweets = @tweetcode.to_s+user.last_tweets.to_s
   
-  if user.last_interaction <= (Time.now)#-(2*60*60))
+  if user.last_interaction <= (Time.now)-(2*60*60))
   
     body = %{<style>
       body{color:#777777;}
