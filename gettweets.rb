@@ -133,18 +133,14 @@ for user in @users
         cleanword = cleanword.downcase
         word = Word.find(:first, :conditions => ["word = ? and user_id = ? and sys_ignore_flag = ?", cleanword, user.id, "no"])
         if word
-          if word.score.to_f <= user.firstq_word_score
+          if word.score.to_f < user.thirdq_word_score
             wscore = "wscore_two"
-          elsif word.score.to_f <= user.avg_word_score
-            wscore = "wscore_three"
-          elsif word.score.to_f <= user.thirdq_word_score
-            wscore = "wscore_four"
           else
             wscore = "wscore_one"
           end
           tscore = (tscore.to_f+word.score.to_f)/2
         else
-          wscore = "wscore_one"
+          wscore = "wscore_two"
         end
         
         
@@ -224,7 +220,12 @@ for user in @users
   
   if user.last_interaction <= (Time.now)#-(2*60*60))
   
-    body = %{<style>a{color:#999999; text-decoration:none;} a:hover;{color:#000000; text-decoration:underline;} .tweet_container{width:100%;} .wscore_one{color:#888888;} .wscore_two{color:#1A1F2B;} .wscore_three{color:#85A5CC;} .wscore_four{color:#85A5CC;}</style>}+user.last_tweets.to_s
+    body = %{<style>
+      body{color:#CCCCCC;}
+      a{color:#999999; text-decoration:none;}
+      .wscore_one{color:#5979CD; font-weight:bold; font-size:1.2em;}
+      .wscore_two{color:#1C2640;}
+      </style>}+user.last_tweets.to_s
   
     Pony.mail(
       :headers => {'Content-Type' => 'text/html'},
