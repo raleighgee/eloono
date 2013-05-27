@@ -225,6 +225,8 @@ for user in @users
       		unless cfollow
       			m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
       			m.average_word_score = (m.average_word_score.to_f+tscore.to_f)/2
+      			m.appearances = m.appearances+1
+      			m.save
       		end
       	end # End loop through mentions in tweet
       end # End check tweet has any mentions
@@ -236,6 +238,8 @@ for user in @users
       	unless cfollow
       		m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
       		m.average_word_score = (m.average_word_score.to_f+tscore.to_f)/2
+    			m.appearances = m.appearances+1
+    			m.save
       	end
       end
 
@@ -246,6 +250,8 @@ for user in @users
       	unless cfollow
       		m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
       		m.average_word_score = (m.average_word_score.to_f+tscore.to_f)/2
+    			m.appearances = m.appearances+1
+    			m.save
       	end
       end
       

@@ -14,6 +14,7 @@ class CreateConnections < ActiveRecord::Migration
 			t.datetime :twitter_created_at
 			t.float :average_word_score, :default => 0
 			t.float :average_stream_word_score, :default => 0
+			t.float :appearances, :default => 0
 			t.string :earliest_tweets_at
 			t.string :latest_tweets_at
 			t.string :avg_tweets_at
