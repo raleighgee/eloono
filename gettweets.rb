@@ -116,6 +116,7 @@ for user in @users
 	    # reset cleantweet variable instance
       cleantweet = ""
       wscore = "#CCCCCC"
+      tscore = 0
       
       # Update user's tweet scoring ranges
     	user.max_word_score = Word.maximum(:score, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
@@ -144,6 +145,8 @@ for user in @users
         else
           wscore = "wscore_one"
         end
+        
+        tscore = (tscore.to_f+word.score.to_f)/2
         
         # if the number of words in the tweet is less than 3, set the tweet content to exactly what the tweet says - no clean required
       	if @words.size < 3
