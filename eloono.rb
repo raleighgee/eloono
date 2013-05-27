@@ -65,6 +65,15 @@ get '/tweets' do
   %{You will receive and email shortly!}
 end
 
+get '/test_connections' do
+  @code = ""
+  @tweets = Twitter.user_timeline('freelancersu', :count => 200)
+  @tweets.each do |p|
+    @code = @code.to_s+p.full_text.to_s+%{<br /><br />}
+  end # end loop through tweets
+  @code
+end
+
 get '/follow' do
   
   link = params[:l]
