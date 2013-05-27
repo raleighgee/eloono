@@ -225,7 +225,7 @@ for user in @users
   if user.last_interaction <= (Time.now)-(2*60*60))
   
     body = %{<style>
-      body{color:#777777;}
+      body{color:#999999;}
       a{color:#CCCCCC; text-decoration:none; font-size:0.2em;}
       .wscore_one{color:#5979CD; font-weight:bold; font-size:1.2em;}
       .wscore_three{font-size:0.6em;}
@@ -253,6 +253,16 @@ for user in @users
      
      user.last_tweets = ""
      user.save
+     
+     # Clean out words once user gets to 5000
+     wordcount = Word.count(:conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
+     if wordcount > 5,000
+       wordlimit = wordcount.to_i-5000
+       @killwords = Word.find(:all, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"], :order => "score ASC", :limit => wordlimit)
+       for killword in @killwords
+        killword.destroy
+       end
+     end
      
   end
     
