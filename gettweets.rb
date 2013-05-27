@@ -203,14 +203,14 @@ for user in @users
 
       end # End loop through words to create clean tweet
 
-      cleantweet = %{<div class="}+tscore.to_s+%{" class="tweet_container">}+cleantweet.to_s+%{</div>}
+      cleantweet = %{<div class="}+tscore.to_s+%{ tweet_container"><b>}tscore.to_s+%{<b> | }+cleantweet.to_s+%{</div>}
 
       @tweetcode = @tweetcode.to_s+cleantweet.to_s+%{<br /><br />}
   	end # end check if tweet was created by user  
   end # end loop through tweets
   
   # Update user's last interaction time
-  user.last_tweets = user.last_tweets.to_s+@tweetcode.to_s
+  user.last_tweets = @tweetcode.to_s+user.last_tweets.to_s
   
   if user.last_interaction <= (Time.now)#-(2*60*60))
   
@@ -234,6 +234,10 @@ for user in @users
     		:domain => ENV['SENDGRID_DOMAIN']
     	}
      )
+     
+     user.last_tweets = ""
+     user.save
+     
   end
     
   user.last_interaction = Time.now
