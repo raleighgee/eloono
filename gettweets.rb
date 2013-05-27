@@ -133,14 +133,18 @@ for user in @users
         cleanword = cleanword.downcase
         word = Word.find(:first, :conditions => ["word = ? and user_id = ? and sys_ignore_flag = ?", cleanword, user.id, "no"])
         if word
-          if word.score.to_f < user.thirdq_word_score
+          if word.score.to_f < user.firstq_word_score
+            wscore = "wscore_four"
+          elsif word.score.to_f < user.avg_word_score
+            wscore = "wscore_three"
+          elsif word.score.to_f < user.thirdq_word_score
             wscore = "wscore_two"
-          else
+          elsif word.score.to_f <= user.max_word_score
             wscore = "wscore_one"
           end
           tscore = (tscore.to_f+word.score.to_f)/2
         else
-          wscore = "wscore_two"
+          wscore = "wscore_four"
         end
         
         
@@ -221,10 +225,11 @@ for user in @users
   if user.last_interaction <= (Time.now)#-(2*60*60))
   
     body = %{<style>
-      body{color:#CCCCCC;}
+      body{color:#777777;}
       a{color:#999999; text-decoration:none;}
       .wscore_one{color:#5979CD; font-weight:bold; font-size:1.2em;}
-      .wscore_two{color:#1C2640;}
+      .wscore_three{font-size:0.6em;}
+      .wscore_four{color:#CCCCCC; font-size:0.6em;}
       </style>}+user.last_tweets.to_s
   
     Pony.mail(
