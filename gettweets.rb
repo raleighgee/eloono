@@ -210,13 +210,11 @@ for user in @users
   end # end loop through tweets
   
   # Update user's last interaction time
-  user.last_tweets = @tweetcode
+  user.last_tweets = user.last_tweets.to_s+@tweetcode.to_s
   
   if user.last_interaction <= (Time.now)#-(2*60*60))
   
-    %{<style>a{color:#999999; text-decoration:none;} a:hover;{color:#000000; text-decoration:underline;} .tweet_container{width:100%;} .tscore_one{color:#888888;} .tscore_two{color:#1A1F2B;} .tscore_three{color:#85A5CC;} .tscore_four{color:#85A5CC;}</style>}
-  
-    body = %{<h1>Your tweets from the last three hours:<br />}+user.last_tweets.to_s
+    body = %{<style>a{color:#999999; text-decoration:none;} a:hover;{color:#000000; text-decoration:underline;} .tweet_container{width:100%;} .tscore_one{color:#888888;} .tscore_two{color:#1A1F2B;} .tscore_three{color:#85A5CC;} .tscore_four{color:#85A5CC;}</style>}+user.last_tweets.to_s
   
     Pony.mail(
       :headers => {'Content-Type' => 'text/html'},
