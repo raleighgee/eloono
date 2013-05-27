@@ -256,7 +256,7 @@ for user in @users
      
      # Clean out words once user gets to 5000
      wordcount = Word.count(:conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
-     if wordcount > 5,000
+     if wordcount > 5000
        wordlimit = wordcount.to_i-5000
        @killwords = Word.find(:all, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"], :order => "score ASC", :limit => wordlimit)
        for killword in @killwords
