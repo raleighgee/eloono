@@ -117,7 +117,26 @@ for user in @users
       cleantweet = ""
       tscore = "#CCCCCC"
       
+      # Update user's tweet scoring ranges
+    	user.max_word_score = Word.maximum(:score, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
+    	user.min_word_score = Word.minimum(:score, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
+    	user.avg_word_score = Word.average(:score, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
+    	user.firstq_word_score = (user.min_word_score.to_f+user.avg_word_score.to_f)/2
+      user.thirdq_word_score = (user.max_word_score.to_f+user.avg_word_score.to_f)/2
+    	user.save
+      
       @words.each do |w|
+        
+        #set class based on word score
+        if w.score.to_f <= user.firstq_word_score
+          wscore = "wscore_two"
+        elsif w.score.to_f <= user.avg_word_score
+          wscore = "wscore_three"
+        elsif w.score.to_f <= user.thirdq_word_score
+          wscore = "wscore_four"
+        else
+          wscore = "wscore_one"
+        end
         
         # if the number of words in the tweet is less than 3, set the tweet content to exactly what the tweet says - no clean required
       	if @words.size < 3
@@ -161,10 +180,10 @@ for user in @users
       					nohandle = nohandle.gsub("-", '')
       					cleantweet = cleantweet.to_s+%{<a href="http://twitter.com/}+nohandle.to_s+%{" target="_blank">}+w.to_s+%{</a> }
       				else
-      					cleantweet = cleantweet.to_s+w.to_s+%{ }
+      					cleantweet = cleantweet.to_s+%{<span class="}+wscore.to_s+%{">}+w.to_s+%{</span> }
       				end
       			else
-      				cleantweet = cleantweet.to_s+w.to_s+%{ }
+      				cleantweet = cleantweet.to_s+%{<span class="}+wscore.to_s+%{">}+w.to_s+%{</span> }
       			end
       		elsif w.include? %{#}
       			firstchar = w[0,1]
@@ -173,49 +192,28 @@ for user in @users
       				nohandle = w.gsub('#', '')
       				cleantweet = cleantweet.to_s+%{<a href="https://twitter.com/search/}+nohandle.to_s+%{" target="_blank">}+w.to_s+%{</a> }
       			else
-      				cleantweet = cleantweet.to_s+w.to_s+%{ }
+      				cleantweet = cleantweet.to_s+%{<span class="}+wscore.to_s+%{">}+w.to_s+%{</span> }
       			end
       		else
-      			cleantweet = cleantweet.to_s+w.to_s+%{ }
+      			cleantweet = cleantweet.to_s+%{<span class="}+wscore.to_s+%{">}+w.to_s+%{</span> }
       		end
       	end # End check if tweet is smaller than 3 words
-      	
-      	# Update user's tweet scoring ranges
-      	if totaltweetscore > user.max_word_score
-      	  user.max_word_score = totaltweetscore
-      	elsif totaltweetscore < user.min_word_score
-      	  user.min_word_score = totaltweetscore
-      	end
-      	user.avg_word_score = (user.avg_word_score.to_f+totaltweetscore.to_f)/2
-      	user.firstq_word_score = (user.min_word_score.to_f+user.avg_word_score.to_f)/2
-        user.thirdq_word_score = (user.max_word_score.to_f+user.avg_word_score.to_f)/2
-      	user.save
-      	
-    	  # calcualte background opacity
-        if totaltweetscore.to_f <= user.firstq_word_score
-          tscore = "tscore_four"
-        elsif totaltweetscore.to_f <= user.avg_word_score
-          tscore = "tscore_three"
-        elsif totaltweetscore.to_f <= user.thirdq_word_score
-          tscore = "tscore_two"
-        else
-          tscore = "tscore_one"
-        end
 
       end # End loop through words to create clean tweet
       
-      cleantweet = %{<div class="}+tscore.to_s+%{ tweet_container"><b>}+tscore.to_s+%{<b> | }+cleantweet.to_s+%{</div>}
+      cleantweet = %{<b>}+tscore.to_s+%{<b> | }+cleantweet.to_s
 
       @tweetcode = @tweetcode.to_s+cleantweet.to_s+%{<br /><br />}
+      
   	end # end check if tweet was created by user  
   end # end loop through tweets
   
   # Update user's last interaction time
   user.last_tweets = @tweetcode.to_s+user.last_tweets.to_s
   
-  #if user.last_interaction <= (Time.now)#-(2*60*60))
+  if user.last_interaction <= (Time.now)#-(2*60*60))
   
-    body = %{<style>a{color:#999999; text-decoration:none;} a:hover;{color:#000000; text-decoration:underline;} .tweet_container{width:100%;} .tscore_one{color:#888888;} .tscore_two{color:#1A1F2B;} .tscore_three{color:#85A5CC;} .tscore_four{color:#85A5CC;}</style>}+user.last_tweets.to_s
+    body = %{<style>a{color:#999999; text-decoration:none;} a:hover;{color:#000000; text-decoration:underline;} .tweet_container{width:100%;} .wscore_one{color:#888888;} .wscore_two{color:#1A1F2B;} .wscore_three{color:#85A5CC;} .wscore_four{color:#85A5CC;}</style>}+user.last_tweets.to_s
   
     Pony.mail(
       :headers => {'Content-Type' => 'text/html'},
@@ -239,7 +237,7 @@ for user in @users
      user.last_tweets = ""
      user.save
      
-  #end
+  end
     
   user.last_interaction = Time.now
   user.save
