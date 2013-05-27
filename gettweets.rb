@@ -142,11 +142,12 @@ for user in @users
           else
             wscore = "wscore_one"
           end
+          tscore = (tscore.to_f+word.score.to_f)/2
         else
           wscore = "wscore_one"
         end
         
-        tscore = (tscore.to_f+word.score.to_f)/2
+        
         
         # if the number of words in the tweet is less than 3, set the tweet content to exactly what the tweet says - no clean required
       	if @words.size < 3
