@@ -213,7 +213,7 @@ for user in @users
   # Update user's last interaction time
   user.last_tweets = @tweetcode.to_s+user.last_tweets.to_s
   
-  if user.last_interaction <= (Time.now)#-(2*60*60))
+  #if user.last_interaction <= (Time.now)#-(2*60*60))
   
     body = %{<style>a{color:#999999; text-decoration:none;} a:hover;{color:#000000; text-decoration:underline;} .tweet_container{width:100%;} .tscore_one{color:#888888;} .tscore_two{color:#1A1F2B;} .tscore_three{color:#85A5CC;} .tscore_four{color:#85A5CC;}</style>}+user.last_tweets.to_s
   
@@ -239,7 +239,7 @@ for user in @users
      user.last_tweets = ""
      user.save
      
-  end
+  #end
     
   user.last_interaction = Time.now
   user.save
