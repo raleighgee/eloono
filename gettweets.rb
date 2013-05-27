@@ -115,7 +115,7 @@ for user in @users
 	
 	    # reset cleantweet variable instance
       cleantweet = ""
-      tscore = "#CCCCCC"
+      wscore = "#CCCCCC"
       
       # Update user's tweet scoring ranges
     	user.max_word_score = Word.maximum(:score, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
@@ -128,12 +128,19 @@ for user in @users
       @words.each do |w|
         
         #set class based on word score
-        if w.score.to_f <= user.firstq_word_score
-          wscore = "wscore_two"
-        elsif w.score.to_f <= user.avg_word_score
-          wscore = "wscore_three"
-        elsif w.score.to_f <= user.thirdq_word_score
-          wscore = "wscore_four"
+        cleanword = w.gsub(/[^0-9a-z]/i, '')
+        cleanword = cleanword.downcase
+        word = Word.find(:first, :conditions => ["word = ? and user_id = ? and sys_ignore_flag = ?", cleanword, user.id, "no"])
+        if word
+          if word.score.to_f <= user.firstq_word_score
+            wscore = "wscore_two"
+          elsif word.score.to_f <= user.avg_word_score
+            wscore = "wscore_three"
+          elsif word.score.to_f <= user.thirdq_word_score
+            wscore = "wscore_four"
+          else
+            wscore = "wscore_one"
+          end
         else
           wscore = "wscore_one"
         end
