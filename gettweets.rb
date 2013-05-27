@@ -203,11 +203,7 @@ for user in @users
 
       end # End loop through words to create clean tweet
       
-      unless tscore
-        tscore = "Did Not Score"
-      end
-      
-      cleantweet = %{<div class="}+tscore.to_s+%{ tweet_container"><b>}tscore.to_s+%{<b> | }+cleantweet.to_s+%{</div>}
+      cleantweet = %{<div class="}+tscore.to_s+%{ tweet_container"><b>}+tscore.to_s+%{<b> | }+cleantweet.to_s+%{</div>}
 
       @tweetcode = @tweetcode.to_s+cleantweet.to_s+%{<br /><br />}
   	end # end check if tweet was created by user  
