@@ -65,27 +65,6 @@ get '/tweets' do
   %{You will receive and email shortly!}
 end
 
-get '/test_connections' do
-  @users = User.find(:all)
-
-  for user in @users
-    # Authenticate user for pulling of Tweets
-  	Twitter.configure do |config|
-  		config.consumer_key = "DHBxwGvab2sJGw3XhsEmA"
-  		config.consumer_secret = "530TCO6YMRuB23R7wse91rTcIKFPKQaxFQNVhfnk"
-  		config.oauth_token = user.token
-  		config.oauth_token_secret = user.secret
-  	end
-  	
-    @code = ""
-    @tweets = Twitter.user_timeline('freelancersu', :count => 200)
-    @tweets.each do |p|
-      @code = @code.to_s+p.full_text.to_s+%{<br /><br />}
-    end # end loop through tweets
-  end # end loop through users
-  @code
-end
-
 get '/follow' do
   
   link = params[:l]

@@ -244,7 +244,7 @@ for user in @users
       end # End loop through words to create clean tweet
       
       # Set tweet class based on aggregate Tweet score
-      if tscore >= thirdqtscore && user.num_tweets_shown >= 400
+      if tscore >= thirdqtscore && user.num_tweets_shown >= 400     
         tclass = "tscore_one"
       else
         tclass = "tscore_two"
@@ -267,6 +267,8 @@ for user in @users
       			m.save
       		end
       	end # End loop through mentions in tweet
+      	# 
+      	# 
       end # End check tweet has any mentions
 
       # Check if tweet is a RT, if it is, convert source into a connection if user is not already following
@@ -302,11 +304,11 @@ for user in @users
   if user.last_interaction <= (Time.now-(60*60))
   
     body = %{<style>
-      body{color:#999999;}
-      a{color:#CCCCCC; text-decoration:none; font-size:1em;}
-      .wscore_one{color:#5979CD; font-weight:bold; font-size:1.6em;}
-      .wscore_three{font-size:1.2em;}
-      .wscore_four{color:#CCCCCC; font-size:1.1em;}
+      body{color:#CCCCCC;}
+      a{color:#CCCCCC; text-decoration:none;}
+      .wscore_one{color:#5979CD; font-weight:bold; font-size:1.8em;}
+      .wscore_three{font-size:1.3em; color:#5979CD; font-weight:bold;}
+      .wscore_four{color:#CCCCCC;}
       .tscore_one{font-weight:bold; color:#600000;}
       </style>}+user.last_tweets.to_s
   
