@@ -50,6 +50,134 @@ for user in @users
 		user.language = u.lang.to_s
 		user.save
 		@tweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true)
+		aid = @tweets.size.to_i-1
+		@atweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true, :max_id => aid.to_i)
+		bid = @tweets.size.to_i-1
+		@btweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true, :max_id => bid.to_i)
+		cid = @tweets.size.to_i-1
+		@ctweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true, :max_id => cid.to_i)
+		did = @tweets.size.to_i-1
+		@dtweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true, :max_id => did.to_i)
+		
+		@atweets.each do |p|
+	    #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
+  	  @words =  p.full_text.split(" ")
+  		# begin looping through words in tweet
+  		@words.each do |w|
+  			unless w.include? %{http}
+  				unless w.include? %{@}
+  					unless w.is_a? (Numeric)
+  						unless w == ""
+  							# remove any non alphanumeric charactes from word
+  							cleanword = w.gsub(/[^0-9a-z]/i, '')
+  							# set all characters to lowercase
+  						  cleanword = cleanword.downcase
+  						  # look to see if word already exists, if not, create a new one using cleanword above
+  							word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
+  							if word.sys_ignore_flag == "no"
+    							# increment the number of times word has been seen counter by 1 and aggregate the score
+    							word.seen_count = word.seen_count.to_i+1
+                  word.score = word.seen_count
+    							word.save
+  							end # end check if word is on the system ignore list
+  						end # End check if word is empty
+  					end # End check if word is just a number
+  				end # End check if word contains the @ symbol
+  			end # End check if word is a link       
+		  end # end loop through words
+		end # end loop through atweets
+		@btweets.each do |p|
+	    #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
+  	  @words =  p.full_text.split(" ")
+  		# begin looping through words in tweet
+  		@words.each do |w|
+  			unless w.include? %{http}
+  				unless w.include? %{@}
+  					unless w.is_a? (Numeric)
+  						unless w == ""
+  							# remove any non alphanumeric charactes from word
+  							cleanword = w.gsub(/[^0-9a-z]/i, '')
+  							# set all characters to lowercase
+  						  cleanword = cleanword.downcase
+  						  # look to see if word already exists, if not, create a new one using cleanword above
+  							word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
+  							if word.sys_ignore_flag == "no"
+    							# increment the number of times word has been seen counter by 1 and aggregate the score
+    							word.seen_count = word.seen_count.to_i+1
+                  word.score = word.seen_count
+    							word.save
+  							end # end check if word is on the system ignore list
+  						end # End check if word is empty
+  					end # End check if word is just a number
+  				end # End check if word contains the @ symbol
+  			end # End check if word is a link       
+		  end # end loop through words
+		end # end loop through btweets
+		@ctweets.each do |p|
+	    #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
+  	  @words =  p.full_text.split(" ")
+  		# begin looping through words in tweet
+  		@words.each do |w|
+  			unless w.include? %{http}
+  				unless w.include? %{@}
+  					unless w.is_a? (Numeric)
+  						unless w == ""
+  							# remove any non alphanumeric charactes from word
+  							cleanword = w.gsub(/[^0-9a-z]/i, '')
+  							# set all characters to lowercase
+  						  cleanword = cleanword.downcase
+  						  # look to see if word already exists, if not, create a new one using cleanword above
+  							word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
+  							if word.sys_ignore_flag == "no"
+    							# increment the number of times word has been seen counter by 1 and aggregate the score
+    							word.seen_count = word.seen_count.to_i+1
+                  word.score = word.seen_count
+    							word.save
+  							end # end check if word is on the system ignore list
+  						end # End check if word is empty
+  					end # End check if word is just a number
+  				end # End check if word contains the @ symbol
+  			end # End check if word is a link       
+		  end # end loop through words
+		end # end loop through ctweets
+		@dtweets.each do |p|
+	    #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
+  	  @words =  p.full_text.split(" ")
+  		# begin looping through words in tweet
+  		@words.each do |w|
+  			unless w.include? %{http}
+  				unless w.include? %{@}
+  					unless w.is_a? (Numeric)
+  						unless w == ""
+  							# remove any non alphanumeric charactes from word
+  							cleanword = w.gsub(/[^0-9a-z]/i, '')
+  							# set all characters to lowercase
+  						  cleanword = cleanword.downcase
+  						  # look to see if word already exists, if not, create a new one using cleanword above
+  							word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
+  							if word.sys_ignore_flag == "no"
+    							# increment the number of times word has been seen counter by 1 and aggregate the score
+    							word.seen_count = word.seen_count.to_i+1
+                  word.score = word.seen_count
+    							word.save
+  							end # end check if word is on the system ignore list
+  						end # End check if word is empty
+  					end # End check if word is just a number
+  				end # End check if word contains the @ symbol
+  			end # End check if word is a link       
+		  end # end loop through words
+		end # end loop through dtweets
+		
+		# Clean out words once user gets to 3000
+    wordcount = Word.count(:conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
+    if wordcount > 3000
+      wordlimit = wordcount.to_i-3000
+      @killwords = Word.find(:all, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"], :order => "score ASC", :limit => wordlimit)
+      for killword in @killwords
+       killword.destroy
+      end
+    end
+    
 	else
 	  @tweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true, :since_id => user.latest_tweet_id.to_i)
 	end
