@@ -158,11 +158,11 @@ for user in @users
         cleanword = cleanword.downcase
         word = Word.find(:first, :conditions => ["word = ? and user_id = ? and sys_ignore_flag = ?", cleanword, user.id, "no"])
         if word
-          if word.score.to_f < user.firstq_word_score
+          if word.score.to_f <= user.firstq_word_score
             wscore = "wscore_four"
-          elsif word.score.to_f < user.avg_word_score
+          elsif word.score.to_f <= user.avg_word_score
             wscore = "wscore_three"
-          elsif word.score.to_f < user.thirdq_word_score
+          elsif word.score.to_f <= user.thirdq_word_score
             wscore = "wscore_two"
           elsif word.score.to_f <= user.max_word_score
             wscore = "wscore_one"
@@ -304,10 +304,11 @@ for user in @users
   if user.last_interaction <= (Time.now-(60*60))
   
     body = %{<style>
-      body{color:#CCCCCC;}
-      a{color:#CCCCCC; text-decoration:none;}
-      .wscore_one{color:#5979CD; font-weight:bold; font-size:1.8em;}
-      .wscore_three{font-size:1.3em; color:#5979CD; font-weight:bold;}
+      body{font-weight:200;}
+      a{text-decoration:none;}
+      .wscore_one{font-size:2em; color:#5979CD; font-weight:900;}
+      .wscore_two{font-size:1.6em; color:#4E7AC7; font-weight:700;};
+      .wscore_three{font-size:1.2em; color:#ADD5F7; font-weight:500;}
       .wscore_four{color:#CCCCCC;}
       .tscore_one{font-weight:bold; color:#600000;}
       </style>}+user.last_tweets.to_s
