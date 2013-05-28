@@ -332,13 +332,23 @@ for user in @users
      user.last_tweets = ""
      user.save
      
-     # Clean out words once user gets to 5000
+     # Clean out words once user gets to 3000
      wordcount = Word.count(:conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
-     if wordcount > 5000
-       wordlimit = wordcount.to_i-5000
+     if wordcount > 3000
+       wordlimit = wordcount.to_i-3000
        @killwords = Word.find(:all, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"], :order => "score ASC", :limit => wordlimit)
        for killword in @killwords
         killword.destroy
+       end
+     end
+     
+     # Clean out connections once user gets to 3000
+     concount = Connection.count(:conditions => ["user_id = ? and connection_type <> ?", user.id, "following"])
+     if concount > 3000
+       conlimit = concount.to_i-3000
+       @killcons = Connection.find(:all, :conditions => ["user_id = ? and connection_type <> ?", user.id, "following"], :order => "times_in_top ASC, appearances ASC, average_stream_word_score ASC, average_word_score ASC", :limit => conlimit)
+       for killcon in @killcons
+        killcon.destroy
        end
      end
      
