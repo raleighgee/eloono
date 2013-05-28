@@ -139,9 +139,6 @@ for user in @users
       cleantweet = ""
       wscore = "#CCCCCC"
       tscore = 0
-      avgtscore = 0
-      maxtscore = 0
-      thirdqtscore = 0
       
       # Update user's tweet scoring ranges
     	user.max_word_score = Word.maximum(:score, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
@@ -167,13 +164,7 @@ for user in @users
           elsif word.score.to_f <= user.max_word_score
             wscore = "wscore_one"
           end
-          tscore = (tscore.to_f+word.score.to_f)/2
-          avgtscore = (avgtscore.to_f+tscore.to_f)/2
-          if tscore.to_f > maxtscore.to_f
-            maxtscore = tscore.to_f
-          end
-          thirdqtscore = (avgtscore.to_f+maxtscore.to_f)/2
-          
+          tscore = (tscore.to_f+word.score.to_f)/2          
         else
           wscore = "wscore_four"
         end
@@ -244,7 +235,17 @@ for user in @users
       end # End loop through words to create clean tweet
       
       # Set tweet class based on aggregate Tweet score
-      if tscore >= thirdqtscore && user.num_tweets_shown >= 400     
+      if tscore.to_f > user.max_tweet_score.to_f
+        user.max_tweet_score = tscore.to_f
+      end
+      if tscore.to_f < user.min_tweet_score.to_f
+        user.min_tweet_score = tscore.to_f
+      end
+      user.avg_tweet_score = (user.avg_tweet_score.to_f+tscore.to_f)/2
+      user.firstq_tweet_score = (user.avg_tweet_score.to_f+user.min_tweet_score.to_f)/2
+      user.thirdq_tweet_score = (user.avg_tweet_score.to_f+user.max_tweet_score.to_f)/2
+      user.save
+      if tscore >= user.thirdq_tweet_score && user.num_tweets_shown >= 400     
         tclass = "tscore_one"
       else
         tclass = "tscore_two"
