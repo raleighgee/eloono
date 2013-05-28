@@ -170,7 +170,7 @@ for user in @users
           tscore = (tscore.to_f+word.score.to_f)/2
           avgtscore = (avgtscore.to_f+tscore.to_f)/2
           if tscore.to_f > maxtscore.to_f
-            maxtscore.to_f = tscore.to_f
+            maxtscore = tscore.to_f
           end
           thirdqtscore = (avgtscore.to_f+maxtscore.to_f)/2
           
