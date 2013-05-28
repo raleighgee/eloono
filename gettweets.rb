@@ -71,6 +71,28 @@ for user in @users
   		# Update user's and connection's count of tweets shown
   	  user.num_tweets_shown = user.num_tweets_shown.to_i+1
   		user.save
+  		
+  		# find or create connection from tweet source
+      c = Connection.find_or_create_by_twitter_id_and_user_id(:twitter_id => p.user.id, :user_id => user.id)
+      c.profile_image_url = p.user.profile_image_url
+      c.user_name = p.user.name
+      c.following_flag = p.user.following
+      c.user_description = p.user.description
+      c.user_url = p.user.url
+      c.user_screen_name = p.user.screen_name
+      c.user_language = p.user.lang
+      c.twitter_created_at = p.user.created_at
+      c.statuses_count = p.user.statuses_count
+      c.followers_count = p.user.followers_count
+      c.friends_count = p.user.friends_count
+      c.location = p.user.location
+      c.connection_type = "following"
+
+      # calculate connection's tweets per hour
+      ageinhours = ((Time.now-p.user.created_at)/60)/60
+      c.tweets_per_hour = p.user.statuses_count.to_f/ageinhours.to_f
+      c.total_tweets_seen = c.total_tweets_seen.to_f+1
+      c.save  		
 
   		# Reset total tweet score
   		totaltweetscore = 0
@@ -117,6 +139,9 @@ for user in @users
       cleantweet = ""
       wscore = "#CCCCCC"
       tscore = 0
+      avgtscore = 0
+      maxtscore = 0
+      thirdqtscore = 0
       
       # Update user's tweet scoring ranges
     	user.max_word_score = Word.maximum(:score, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
@@ -143,6 +168,12 @@ for user in @users
             wscore = "wscore_one"
           end
           tscore = (tscore.to_f+word.score.to_f)/2
+          avgtscore = (avgtscore.to_f+tscore.to_f)/2
+          if tscore.to_f > maxtscore.to_f
+            maxtscore.to_f = tscore.to_f
+          end
+          thirdqtscore = (avgtscore.to_f+maxtscore.to_f)/2
+          
         else
           wscore = "wscore_four"
         end
@@ -212,7 +243,14 @@ for user in @users
 
       end # End loop through words to create clean tweet
       
-      cleantweet = %{<b>}+tscore.round.to_s+%{<b> | }+cleantweet.to_s
+      # Set tweet class based on aggregate Tweet score
+      if tscore >= thirdqtscore
+        tclass = "tscore_one"
+      else
+        tclass = "tscore_two"
+      end
+      
+      cleantweet = %{<span class="}+tclass.to_s+%{">}+tscore.round(2).to_s+%{</span> | }+cleantweet.to_s
 
       @tweetcode = @tweetcode.to_s+cleantweet.to_s+%{<br /><br />}
       
@@ -265,10 +303,11 @@ for user in @users
   
     body = %{<style>
       body{color:#999999;}
-      a{color:#CCCCCC; text-decoration:none; font-size:0.2em;}
-      .wscore_one{color:#5979CD; font-weight:bold; font-size:1.2em;}
-      .wscore_three{font-size:0.6em;}
-      .wscore_four{color:#CCCCCC; font-size:0.4em;}
+      a{color:#CCCCCC; text-decoration:none; font-size:1em;}
+      .wscore_one{color:#5979CD; font-weight:bold; font-size:1.6em;}
+      .wscore_three{font-size:1.2em;}
+      .wscore_four{color:#CCCCCC; font-size:1.1em;}
+      .tscore_one{font-weight:bold; color:#600000;}
       </style>}+user.last_tweets.to_s
   
     Pony.mail(
