@@ -43,7 +43,7 @@ for user in @users
 	end
 	
 	# Pull initial information about the user and load all of the people they follow into the sources table if this is the first time we've hit this user
-	if user.num_tweets_shown < 1
+	if user.num_tweets_shown == 0
     u = Twitter.user(user.uid)
 		user.handle = u.screen_name
 		user.profile_image_url = u.profile_image_url
