@@ -304,12 +304,9 @@ for user in @users
   if user.last_interaction <= (Time.now-(60*60))
   
     body = %{<style>
-      body{font-weight:200;}
-      a{text-decoration:none;}
-      .wscore_one{font-size:2em; color:#5979CD; font-weight:900;}
-      .wscore_two{font-size:1.6em; color:#4E7AC7; font-weight:700;};
-      .wscore_three{font-size:1.2em; color:#ADD5F7; font-weight:500;}
-      .wscore_four{color:#CCCCCC;}
+      body{font-weight:200; color:#CCCCCC;}
+      a{color:#CCCCCC; text-decoration:none;}
+      .wscore_one{font-size:1.8em; color:#5979CD; font-weight:900;}
       .tscore_one{font-weight:bold; color:#600000;}
       </style>}+user.last_tweets.to_s
   

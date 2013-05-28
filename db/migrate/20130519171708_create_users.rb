@@ -17,6 +17,11 @@ class CreateUsers < ActiveRecord::Migration
 			t.float :max_word_score, :default => 0
 			t.float :firstq_word_score, :default => 0
 			t.float :thirdq_word_score, :default => 0
+			t.float :avg_tweet_score, :default => 0
+			t.float :min_tweet_score, :default => 0
+			t.float :max_tweet_score, :default => 0
+			t.float :firstq_tweet_score, :default => 0
+			t.float :thirdq_tweet_score, :default => 0
 			t.integer :latest_tweet_id, :limit => 8, :default => 0
 			t.text :last_tweets
 			t.string :email
