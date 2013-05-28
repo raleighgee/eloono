@@ -283,21 +283,17 @@ for user in @users
         cleanword = cleanword.downcase
         word = Word.find(:first, :conditions => ["word = ? and user_id = ? and sys_ignore_flag = ?", cleanword, user.id, "no"])
         if word
-          if word.score.to_f <= user.firstq_word_score
-            wscore = "wscore_four"
-          elsif word.score.to_f <= user.avg_word_score
-            wscore = "wscore_three"
-          elsif word.score.to_f <= user.thirdq_word_score
-            wscore = "wscore_two"
-          elsif word.score.to_f <= user.max_word_score
+          if word.score.to_f >= user.thirdq_word_score
+            wscore = "wscore_hot"
+          elsif word.score.to_f >= user.avg_word_score
             wscore = "wscore_one"
+          else
+            wscore = "wscore_four"
           end
           tscore = (tscore.to_f+word.score.to_f)/2          
         else
           wscore = "wscore_four"
         end
-        
-        
         
         # if the number of words in the tweet is less than 3, set the tweet content to exactly what the tweet says - no clean required
       	if @words.size < 3
@@ -430,12 +426,13 @@ for user in @users
   # Update user's last interaction time
   user.last_tweets = @tweetcode.to_s+user.last_tweets.to_s
   
-  if user.last_interaction <= (Time.now-(60*60))
+  if user.last_interaction <= (Time.now-(2*60*60))
   
     body = %{<style>
       body{font-weight:200; color:#CCCCCC;}
       a{color:#CCCCCC; text-decoration:none;}
-      .wscore_one{font-size:1.8em; color:#5979CD; font-weight:900;}
+      .wscore_one{font-size:1.4em; color:#5979CD; font-weight:bold;}
+      .wscore_hot{font-size:1.8em; color:#FF0000; font-weight:900;}
       .tscore_one{font-weight:bold; color:#600000;}
       </style>}+user.last_tweets.to_s
   
