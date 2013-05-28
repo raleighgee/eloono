@@ -244,7 +244,7 @@ for user in @users
       end # End loop through words to create clean tweet
       
       # Set tweet class based on aggregate Tweet score
-      if tscore >= thirdqtscore
+      if tscore >= thirdqtscore && user.num_tweets_shown >= 400
         tclass = "tscore_one"
       else
         tclass = "tscore_two"
