@@ -51,13 +51,13 @@ for user in @users
 		user.save
 		@tweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true)
 		aid = @tweets.size.to_i-1
-		@atweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true, :max_id => aid.to_i)
+		@atweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true, :max_id => @tweets[aid].id.to_i)
 		bid = @tweets.size.to_i-1
-		@btweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true, :max_id => bid.to_i)
+		@btweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true, :max_id => @tweets[bid].id.to_i)
 		cid = @tweets.size.to_i-1
-		@ctweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true, :max_id => cid.to_i)
+		@ctweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true, :max_id => @tweets[cid].id.to_i)
 		did = @tweets.size.to_i-1
-		@dtweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true, :max_id => did.to_i)
+		@dtweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true, :max_id => @tweets[did].id.to_i)
 		
 		@atweets.each do |p|
 	    #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
