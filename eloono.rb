@@ -131,7 +131,7 @@ get '/test_rec_email' do
 			config.oauth_token_secret = user.secret
 		end
 		body = ""
-		@connections = Connection.find(:all, :conditions => ["user_id = ? amd connection_type = ?", user.id, "mentioned"], :limit => 5, :order => "average_stream_word_score DESC")
+		@connections = Connection.find(:all, :conditions => ["user_id = ? and connection_type = ?", user.id, "mentioned"], :limit => 5, :order => "average_stream_word_score DESC")
 		for connection in @connections
 			c = Twitter.user(connection.user_scree_name)
 			if c
