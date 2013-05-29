@@ -81,3 +81,36 @@ get '/follow' do
 	redirect link
 	
 end
+
+get '/words/:id/:action' do
+  
+  message = ""
+  word = Word.find_by_id(id)
+  if word
+    if word.thumb_status == "neutral" && word.sys_ignore_flag == "no"
+      if action = "up"
+        word.thumb_status = "up"
+        word.score = word.score.to_f*5
+        word.save
+        message = %{increase the weight I use for <b>"}+word.word.to_s+%{"</b> when scoring your tweets. Thanks for making me smarter!}
+      elsif action = "down"
+        word.thumb_status = "down"
+        word.score = word.score.to_f/5
+        word.save
+        message = %{decrease the weight I use for <b>"}+word.word.to_s+%{"</b> when scoring your tweets. Thanks for making me smarter!}
+      elsif action = "ignore"
+        word.sys_ignore_flag = "yes"
+        word.score = 0
+        word.save
+        message = %{never use the word <b>"}+word.word.to_s+%{"</b> when scoring your tweets. Thanks for making me smarter!}
+      end
+    else
+      message = %{take care of that. Thanks for making me smarter!}
+    end
+  else
+    message = %{take care of that. Thanks for making me smarter!}
+  end
+  
+  %{Got it. I'll }+message.to_s
+    
+end
