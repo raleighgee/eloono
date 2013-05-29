@@ -570,14 +570,14 @@ for user in @users
   
   
   ###### SEND TOP WORDS EMAIL - DAILY ######
-  if user.last_wordemail <= (Time.now)#-(24*60*60))
+  if user.last_wordemail <= (Time.now-(24*60*60))
     
     #reset email content
     wordcode = ""
     
     @words = Word.find(:all, :conditions => ["user_id = ? and thumb_status = ? and sys_ignore_flag = ? and score > ?", user.id, "neutral", "no", 0], :order => "score DESC", :limit => 3)
     for word in @words
-      wordcode = wordcode.to_s+word.word.to_s+%{ | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/up" target="_blank">+</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/down" target="_blank">-</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/ignore" target="_blank">X</a><br /><br />}
+      wordcode = wordcode.to_s+word.word.to_s+%{ | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/up" target="_blank">+</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/down" target="_blank">-</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/ignore" target="_blank">x</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/neutral" target="_blank">o</a><br /><br />}
     end # End loop through words to build email content
     
     body = %{<div style="font-size:1.4em;">}+wordcode.to_s+%{</div>}

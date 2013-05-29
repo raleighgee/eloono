@@ -92,17 +92,22 @@ get '/words/:id/:action' do
         word.thumb_status = "up"
         word.score = word.score.to_f*5
         word.save
-        message = %{increase the weight I use for <b>"}+word.word.to_s+%{"</b> when scoring your tweets. Thanks for making me smarter!}
+        message = %{INCREASE the weight I use for <b>"}+word.word.to_s+%{"</b> when scoring your tweets. Thanks for making me smarter!}
       elsif params[:action].to_s == "down"
         word.thumb_status = "down"
         word.score = word.score.to_f/5
         word.save
-        message = %{decrease the weight I use for <b>"}+word.word.to_s+%{"</b> when scoring your tweets. Thanks for making me smarter!}
+        message = %{DECREASE the weight I use for <b>"}+word.word.to_s+%{"</b> when scoring your tweets. Thanks for making me smarter!}
       elsif params[:action].to_s == "ignore"
         word.sys_ignore_flag = "yes"
         word.score = 0
         word.save
-        message = %{never use the word <b>"}+word.word.to_s+%{"</b> when scoring your tweets. Thanks for making me smarter!}
+        message = %{NEVER use the word <b>"}+word.word.to_s+%{"</b> when scoring your tweets. Thanks for making me smarter!}
+      end
+      elsif params[:action].to_s == "neutral"
+        word.thumb_status = "neutral_final"
+        word.save
+        message = %{leave the weight I use for <b>"}+word.word.to_s+%{"</b> when scoring your tweets the SAME. Thanks for making me smarter!}
       end
     else
       message = %{take care of that. Thanks for making me smarter!}
