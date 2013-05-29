@@ -232,6 +232,12 @@ for user in @users
                   else
                     word.score = word.seen_count
                   end
+                  if word.thumb_status == "up"
+                    word.score = word.score.to_f*2
+                  end
+                  if word.thumb_status == "down"
+                    word.score = word.score.to_f/2
+                  end
     							word.save
     							totaltweetscore = totaltweetscore+word.score
     							user.num_words_scored = user.num_words_scored+1
@@ -444,7 +450,7 @@ for user in @users
  
  
   ###### SEND TWEETS EMAIL - BI-DAILY ######## 
-  if user.last_tweetemail <= (Time.now)#-(12*60*60))
+  if user.last_tweetemail <= (Time.now-(12*60*60))
     body = %{<style>
      body{font-weight:200; color:#CCCCCC;}
      a{color:#CCCCCC; text-decoration:none;}
@@ -503,7 +509,7 @@ for user in @users
   
   
   ###### SCORE CONNECTIONS - DAILY ########
-  if user.last_connectionsscore <= (Time.now-(24*60*60))
+  if user.last_connectionsscore <= (Time.now)#-(24*60*60))
     # calculate average_stream_word_score for top connections
   	@connections = Connection.find(:all, :conditions => ["user_id = ? and average_stream_word_score = ?", user.id, 0], :order_by => "appearances DESC, average_word_score DESC", :limit => 10)
   	for connection in @connections
