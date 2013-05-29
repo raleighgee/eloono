@@ -509,7 +509,7 @@ for user in @users
   
   
   ###### SCORE CONNECTIONS - DAILY ########
-  if user.last_connectionsscore <= (Time.now)#-(24*60*60))
+  if user.last_connectionsscore <= (Time.now-(24*60*60))
     # calculate average_stream_word_score for top connections
   	@connections = Connection.find(:all, :conditions => ["user_id = ? and average_stream_word_score = ?", user.id, 0], :order => "average_word_score DESC", :limit => 10)
   	for connection in @connections
@@ -570,7 +570,7 @@ for user in @users
   
   
   ###### SEND TOP WORDS EMAIL - DAILY ######
-  if user.last_wordemail <= (Time.now-(24*60*60))
+  if user.last_wordemail <= (Time.now)#-(24*60*60))
     
     #reset email content
     wordcode = ""
