@@ -85,20 +85,20 @@ end
 get '/words/:id/:action' do
   
   message = ""
-  word = Word.find_by_id(id)
+  word = Word.find_by_id(params[:id])
   if word
     if word.thumb_status == "neutral" && word.sys_ignore_flag == "no"
-      if action == "up"
+      if params[:action].to_s == "up"
         word.thumb_status = "up"
         word.score = word.score.to_f*5
         word.save
         message = %{increase the weight I use for <b>"}+word.word.to_s+%{"</b> when scoring your tweets. Thanks for making me smarter!}
-      elsif action == "down"
+      elsif params[:action].to_s == "down"
         word.thumb_status = "down"
         word.score = word.score.to_f/5
         word.save
         message = %{decrease the weight I use for <b>"}+word.word.to_s+%{"</b> when scoring your tweets. Thanks for making me smarter!}
-      elsif action == "ignore"
+      elsif params[:action].to_s == "ignore"
         word.sys_ignore_flag = "yes"
         word.score = 0
         word.save
