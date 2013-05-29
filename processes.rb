@@ -606,14 +606,11 @@ for user in @users
     
   end # end check if last connections score was at least 24 hours ago
 
-
-
-
   ###### SEND CONNECTIONS REC. EMAIL - WEEKLY ######
   if user.last_connectionsemail <= (Time.now-(7*24*60*60))
-    
-    user.last_connectionsemail = Time.now
-    user.save
+	
+
+	
   end # end check if last connections email was at least 7 days ago
   
   
