@@ -511,7 +511,7 @@ for user in @users
   ###### SCORE CONNECTIONS - DAILY ########
   if user.last_connectionsscore <= (Time.now)#-(24*60*60))
     # calculate average_stream_word_score for top connections
-  	@connections = Connection.find(:all, :conditions => ["user_id = ? and average_stream_word_score = ?", user.id, 0], :order_by => "appearances DESC, average_word_score DESC", :limit => 10)
+  	@connections = Connection.find(:all, :conditions => ["user_id = ? and average_stream_word_score = ?", user.id, 0], :order => "appearances DESC, average_word_score DESC", :limit => 10)
   	for connection in @connections
   	  avgconwordscore = 0
   	  @tweets = Twitter.user_timeline(connection.user_screen_name.to_s, :count => 200)
@@ -536,7 +536,7 @@ for user in @users
   	  connection.save
   	end # end loop through top connections
 
-  	@connections = Connection.find(:all, :conditions => ["user_id = ? and average_stream_word_score = ?", user.id, 0], :order_by => "average_stream_word_score DESC, appearances DESC, average_word_score DESC", :limit => 10)
+  	@connections = Connection.find(:all, :conditions => ["user_id = ? and average_stream_word_score = ?", user.id, 0], :order => "average_stream_word_score DESC, appearances DESC, average_word_score DESC", :limit => 10)
   	for connection in @connections
   		connection.times_in_top = connection.times_in_top+1
   		connection.save
