@@ -444,7 +444,7 @@ for user in @users
  
  
   ###### SEND TWEETS EMAIL - BI-DAILY ######## 
-  if user.last_tweetemail <= (Time.now-(12*60*60))
+  if user.last_tweetemail <= (Time.now)#-(12*60*60))
     body = %{<style>
      body{font-weight:200; color:#CCCCCC;}
      a{color:#CCCCCC; text-decoration:none;}
