@@ -11,7 +11,6 @@ class CreateUsers < ActiveRecord::Migration
 			t.string :language, :default => "en"
 			t.integer :num_tweets_shown, :default => 0
 			t.integer :num_words_scored, :default => 0
-			t.datetime :last_interaction, :default => Time.now
 			t.float :avg_word_score, :default => 0
 			t.float :min_word_score, :default => 0
 			t.float :max_word_score, :default => 0
@@ -25,6 +24,11 @@ class CreateUsers < ActiveRecord::Migration
 			t.integer :latest_tweet_id, :limit => 8, :default => 0
 			t.text :last_tweets
 			t.string :email
+			t.datetime :last_wordscore, :default => Time.now
+			t.datetime :last_connectionsscore, :default => Time.now
+			t.datetime :last_tweetemail, :default => Time.now
+			t.datetime :last_wordemail, :default => Time.now
+			t.datetime :last_connectionsemail, :default => Time.now
 			t.timestamps
 		end
 	end
