@@ -103,7 +103,6 @@ get '/words/:id/:action' do
         word.score = 0
         word.save
         message = %{NEVER use the word <b>"}+word.word.to_s+%{"</b> when scoring your tweets. Thanks for making me smarter!}
-      end
       elsif params[:action].to_s == "neutral"
         word.thumb_status = "neutral_final"
         word.save
