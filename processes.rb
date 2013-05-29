@@ -523,7 +523,7 @@ for user in @users
           # normalize word and look to see if word already exists, if not, create a new one using cleanword above
     			cleanword = w.gsub(/[^0-9a-z]/i, '')
     			cleanword = cleanword.downcase
-    			word = Word.find_by_word_and_user_id(:word => cleanword, :user_id => user.id)
+    			word = Word.find(:first, :conditions => ["word = ? and user_id = ?", cleanword, user.id])
     			if word
     			  if word.sys_ignore_flag == "no"
               avgtweetwscore = (avgtweetwscore.to_f+word.score.to_f)/2
