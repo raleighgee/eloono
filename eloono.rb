@@ -120,8 +120,15 @@ get '/words/:id/:action' do
 end
 
 get '/test_rec_email' do
+  
 	@users = User.find(:all)
-
+	
+	@connections = Connection.find(:all, :conditions => ["connection_type = ?", "reccomended"])
+	for connection in @connections
+	  connection.connection_type = "mentioned"
+	  connection.save
+	end
+	
 	for user in @users
 	  # Authenticate user for pulling of Tweets
 		Twitter.configure do |config|

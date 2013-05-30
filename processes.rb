@@ -500,7 +500,16 @@ for user in @users
        killcon.destroy
       end
     end
-
+    
+    # Clen out duplicate connections
+    @connections = Connection.find(:all, :conditions => ["user_id = ? and connection_type = ?", user.id, "following"])
+    for connection in @connections
+      @dupcons = Connection.find(:all, :conditions => ["user_screen_name = ? and user_id = ? and connection_type <> ?", connection.user_screen_name, user.id, "following"])
+      for dupcon in @dupcons
+        dupcon.destroy
+      end
+    end
+    
     user.last_tweetemail = Time.now
     user.save
     
