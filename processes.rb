@@ -61,7 +61,7 @@ for user in @users
 		
 		@atweets.each do |p|
 	    #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
-  	  @words =  p.full_text.split(" ")
+		@words =  p.full_text.split(" ")
   		# begin looping through words in tweet
   		@words.each do |w|
   			unless w.include? %{http}
@@ -77,7 +77,7 @@ for user in @users
   							if word.sys_ignore_flag == "no"
     							# increment the number of times word has been seen counter by 1 and aggregate the score
     							word.seen_count = word.seen_count.to_i+1
-                  word.score = word.seen_count
+								word.score = word.seen_count
     							word.save
   							end # end check if word is on the system ignore list
   						end # End check if word is empty
@@ -88,7 +88,7 @@ for user in @users
 		end # end loop through atweets
 		@btweets.each do |p|
 	    #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
-  	  @words =  p.full_text.split(" ")
+		@words =  p.full_text.split(" ")
   		# begin looping through words in tweet
   		@words.each do |w|
   			unless w.include? %{http}
@@ -104,7 +104,7 @@ for user in @users
   							if word.sys_ignore_flag == "no"
     							# increment the number of times word has been seen counter by 1 and aggregate the score
     							word.seen_count = word.seen_count.to_i+1
-                  word.score = word.seen_count
+								word.score = word.seen_count
     							word.save
   							end # end check if word is on the system ignore list
   						end # End check if word is empty
@@ -115,7 +115,7 @@ for user in @users
 		end # end loop through btweets
 		@ctweets.each do |p|
 	    #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
-  	  @words =  p.full_text.split(" ")
+		@words =  p.full_text.split(" ")
   		# begin looping through words in tweet
   		@words.each do |w|
   			unless w.include? %{http}
@@ -131,7 +131,7 @@ for user in @users
   							if word.sys_ignore_flag == "no"
     							# increment the number of times word has been seen counter by 1 and aggregate the score
     							word.seen_count = word.seen_count.to_i+1
-                  word.score = word.seen_count
+								word.score = word.seen_count
     							word.save
   							end # end check if word is on the system ignore list
   						end # End check if word is empty
@@ -142,7 +142,7 @@ for user in @users
 		end # end loop through ctweets
 		@dtweets.each do |p|
 	    #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
-  	  @words =  p.full_text.split(" ")
+		@words =  p.full_text.split(" ")
   		# begin looping through words in tweet
   		@words.each do |w|
   			unless w.include? %{http}
@@ -158,7 +158,7 @@ for user in @users
   							if word.sys_ignore_flag == "no"
     							# increment the number of times word has been seen counter by 1 and aggregate the score
     							word.seen_count = word.seen_count.to_i+1
-                  word.score = word.seen_count
+								word.score = word.seen_count
     							word.save
   							end # end check if word is on the system ignore list
   						end # End check if word is empty
@@ -169,24 +169,24 @@ for user in @users
 		end # end loop through dtweets
 		
 		# Clean out words once user gets to 3000
-    wordcount = Word.count(:conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
-    if wordcount > 3000
-      wordlimit = wordcount.to_i-3000
-      @killwords = Word.find(:all, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"], :order => "score ASC", :limit => wordlimit)
-      for killword in @killwords
-       killword.destroy
-      end
-    end
+		wordcount = Word.count(:conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
+		if wordcount > 3000
+		  wordlimit = wordcount.to_i-3000
+		  @killwords = Word.find(:all, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"], :order => "score ASC", :limit => wordlimit)
+		  for killword in @killwords
+		   killword.destroy
+		  end
+		end
     
 	else
 	  @tweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true, :since_id => user.latest_tweet_id.to_i)
 	end
 	
 	# declare tweet code variable
-  @tweetcode = ""
+	@tweetcode = ""
 	
 	# loop through Tweets pulled
-  @tweets.each do |p|
+	@tweets.each do |p|
 
     # Check if tweet was created by current user
   	unless p.user.id == user.uid
@@ -194,16 +194,16 @@ for user in @users
       if p.full_text.include? %{http}
       
   	    # set user latest tweet
-    	  if p.id.to_i > user.latest_tweet_id.to_i
-    	    user.latest_tweet_id = p.id.to_i
-    	  end
+    	if p.id.to_i > user.latest_tweet_id.to_i
+			user.latest_tweet_id = p.id.to_i
+    	end
 
-    		# Update user's and connection's count of tweets shown
-    	  user.num_tweets_shown = user.num_tweets_shown.to_i+1
-    		user.save		
+    	# Update user's and connection's count of tweets shown
+		user.num_tweets_shown = user.num_tweets_shown.to_i+1
+    	user.save		
 
-    		# Reset variables
-    		totaltweetscore = 0
+		# Reset variables
+    	totaltweetscore = 0
         followwords = ""
         cleantweet = ""
         wscore = "#CCCCCC"
@@ -223,23 +223,23 @@ for user in @users
     							# remove any non alphanumeric charactes from word
     							cleanword = w.gsub(/[^0-9a-z]/i, '')
     							# set all characters to lowercase
-    						  cleanword = cleanword.downcase
-    						  # look to see if word already exists, if not, create a new one using cleanword above
+								cleanword = cleanword.downcase
+								# look to see if word already exists, if not, create a new one using cleanword above
     							word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
     							if word.sys_ignore_flag == "no"
       							# increment the number of times word has been seen counter by 1 and aggregate the score
       							word.seen_count = word.seen_count.to_i+1
       							if word.follows > 0 
-                      word.score = word.seen_count*(word.follows.to_f+1)
-                    else
-                      word.score = word.seen_count
-                    end
-                    if word.thumb_status == "up"
-                      word.score = word.score.to_f*2
-                    end
-                    if word.thumb_status == "down"
-                      word.score = word.score.to_f/2
-                    end
+								  word.score = word.seen_count*(word.follows.to_f+1)
+								else
+								  word.score = word.seen_count
+								end
+								if word.thumb_status == "up"
+								  word.score = word.score.to_f*2
+								end
+								if word.thumb_status == "down"
+								  word.score = word.score.to_f/2
+								end
       							word.save
       							totaltweetscore = totaltweetscore+word.score
       							user.num_words_scored = user.num_words_scored+1
@@ -277,7 +277,7 @@ for user in @users
       	user.save
       
         # Check if tweets is in top tier and only create tweets that are
-        if totaltweetscore.to_f >= user.avg_word_score.to_f
+        if totaltweetscore.to_f >= ((user.avg_word_score.to_f+user.thirdq_word_score.to_f)/2)
           @words.each do |w|
         
             #set class based on word score
@@ -575,13 +575,13 @@ for user in @users
 
   
   
-  ###### SEND TOP WORDS EMAIL - DAILY ######
-  if user.last_wordemail <= (Time.now-(24*60*60))
+  ###### SEND TOP WORDS EMAIL - 2 DAILY ######
+  if user.last_wordemail <= (Time.now-(12*60*60))
     
     #reset email content
     wordcode = ""
     
-    @words = Word.find(:all, :conditions => ["user_id = ? and thumb_status = ? and sys_ignore_flag = ? and score > ?", user.id, "neutral", "no", 0], :order => "score DESC", :limit => 3)
+    @words = Word.find(:first, :conditions => ["user_id = ? and thumb_status = ? and sys_ignore_flag = ? and score > ?", user.id, "neutral", "no", 0], :order => "score DESC")
     for word in @words
       wordcode = wordcode.to_s+word.word.to_s+%{ | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/up" target="_blank">+</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/down" target="_blank">-</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/ignore" target="_blank">x</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/neutral" target="_blank">o</a><br /><br />}
     end # End loop through words to build email content
