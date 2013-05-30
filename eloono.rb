@@ -120,7 +120,7 @@ get '/words/:id/:action' do
 end
 
 get '/con_rec/:con/:user/:action' do
-  connection = Connection.find(:first, :conditions => ["user_id = ? and id = ?" params[:user], params[:con]])
+  connection = Connection.find(:first, :conditions => ["user_id = ? and id = ?", params[:user], params[:con]])
   if connection
     if params[:action] == "follow"
       connection.connection_type = "following"
