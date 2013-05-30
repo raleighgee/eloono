@@ -365,14 +365,8 @@ for user in @users
           end
           avgtoptweetwordscore = (avgtoptweetwordscore.to_f+tscore.to_f)/2
           thirdqtoptweetwordscore = (maxtoptweetwordscore.to_f+avgtoptweetwordscore.to_f)/2
-        
-          if tscore.to_f >= thirdqtoptweetwordscore.to_f
-            tclass = "tscore_one"
-          else
-            tclass = "tscore_two"
-          end
-                
-          cleantweet = %{<span class="}+tclass.to_s+%{">}+tscore.round(2).to_s+%{</span> | }+cleantweet.to_s
+            
+          cleantweet = %{<img src="}+p.user.profile_image_url.to_s+%{" height="24" width="24" style="float:left;" /> }+tscore.round(2).to_s+%{ | }+cleantweet.to_s
 
           @tweetcode = @tweetcode.to_s+cleantweet.to_s+%{<br /><br />}
         
