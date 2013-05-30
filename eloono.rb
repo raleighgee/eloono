@@ -133,7 +133,7 @@ get '/test_rec_email' do
 		body = ""
 		@connections = Connection.find(:all, :conditions => ["user_id = ? and connection_type = ?", user.id, "mentioned"], :limit => 5, :order => "average_stream_word_score DESC")
 		for connection in @connections
-			c = Twitter.user(connection.user_scree_name)
+			c = Twitter.user(connection.user_screen_name)
 			if c
 				connection.twitter_id = c.id
 				connection.profile_image_url = c.profile_image_url

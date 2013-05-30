@@ -275,7 +275,7 @@ for user in @users
     	user.save
       
       # Check if tweets is in top tier and only create tweets that are
-      if totaltweetscore.to_f >= user.thirdq_tweet_score.to_f
+      if totaltweetscore.to_f >= user.avg_word_score.to_f
         @words.each do |w|
         
           #set class based on word score
@@ -450,11 +450,11 @@ for user in @users
  
  
   ###### SEND TWEETS EMAIL - BI-DAILY ######## 
-  if user.last_tweetemail <= (Time.now-(12*60*60))
+  if user.last_tweetemail <= (Time.now-(6*60*60))
     body = %{<style>
      body{font-weight:200; color:#CCCCCC;}
      a{color:#CCCCCC; text-decoration:none;}
-     .wscore_one{font-size:1.4em; color:#5979CD; font-weight:bold;}
+     .wscore_one{color:#5979CD; font-weight:bold;}
      .wscore_hot{font-size:1.8em; color:#FF0000; font-weight:900;}
      .tscore_one{font-weight:bold; color:#600000;}
      </style>}+user.last_tweets.to_s
