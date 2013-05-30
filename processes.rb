@@ -185,260 +185,263 @@ for user in @users
 	# declare tweet code variable
   @tweetcode = ""
 	
-	 # loop through Tweets pulled
+	# loop through Tweets pulled
   @tweets.each do |p|
 
     # Check if tweet was created by current user
   	unless p.user.id == user.uid
-
-  	  # set user latest tweet
-  	  if p.id.to_i > user.latest_tweet_id.to_i
-  	    user.latest_tweet_id = p.id.to_i
-  	  end
-
-  		# Update user's and connection's count of tweets shown
-  	  user.num_tweets_shown = user.num_tweets_shown.to_i+1
-  		user.save		
-
-  		# Reset variables
-  		totaltweetscore = 0
-      followwords = ""
-      cleantweet = ""
-      wscore = "#CCCCCC"
-      tscore = 0
-      thirdqtoptweetwordscore = 0
-      maxtoptweetwordscore = 0
-      avgtoptweetwordscore = 0
-
-      #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
-  	  @words =  p.full_text.split(" ")
-  		# begin looping through words in tweet
-  		@words.each do |w|
-  			unless w.include? %{http}
-  				unless w.include? %{@}
-  					unless w.is_a? (Numeric)
-  						unless w == ""
-  							# remove any non alphanumeric charactes from word
-  							cleanword = w.gsub(/[^0-9a-z]/i, '')
-  							# set all characters to lowercase
-  						  cleanword = cleanword.downcase
-  						  # look to see if word already exists, if not, create a new one using cleanword above
-  							word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
-  							if word.sys_ignore_flag == "no"
-    							# increment the number of times word has been seen counter by 1 and aggregate the score
-    							word.seen_count = word.seen_count.to_i+1
-    							if word.follows > 0 
-                    word.score = word.seen_count*(word.follows.to_f+1)
-                  else
-                    word.score = word.seen_count
-                  end
-                  if word.thumb_status == "up"
-                    word.score = word.score.to_f*2
-                  end
-                  if word.thumb_status == "down"
-                    word.score = word.score.to_f/2
-                  end
-    							word.save
-    							totaltweetscore = totaltweetscore+word.score
-    							user.num_words_scored = user.num_words_scored+1
-  							end # end check if word is on the system ignore list
-  						end # End check if word is empty
-  					end # End check if word is just a number
-  				end # End check if word contains the @ symbol
-  			end # End check if word is a link
-
-  			#create wording for links
-  			cleanword = w.gsub(/[^0-9a-z]/i, '')
-      	cleanword = cleanword.downcase
-        followwords = followwords.to_s+"-"+cleanword.to_s
-                  
-  		end # end loop through words
-  		
-  		# Set tweet class based on aggregate Tweet score
-      if totaltweetscore.to_f > user.max_tweet_score.to_f
-        user.max_tweet_score = totaltweetscore.to_f
-      end
-      if totaltweetscore.to_f < user.min_tweet_score.to_f
-        user.min_tweet_score = totaltweetscore.to_f
-      end
-      user.avg_tweet_score = (user.avg_tweet_score.to_f+totaltweetscore.to_f)/2
-      user.firstq_tweet_score = (user.avg_tweet_score.to_f+user.min_tweet_score.to_f)/2
-      user.thirdq_tweet_score = (user.avg_tweet_score.to_f+user.max_tweet_score.to_f)/2
-      user.save
-	      
-      # Update user's tweet scoring ranges
-    	user.max_word_score = Word.maximum(:score, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
-    	user.min_word_score = Word.minimum(:score, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
-    	user.avg_word_score = Word.average(:score, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
-    	user.firstq_word_score = (user.min_word_score.to_f+user.avg_word_score.to_f)/2
-      user.thirdq_word_score = (user.max_word_score.to_f+user.avg_word_score.to_f)/2
-    	user.save
       
-      # Check if tweets is in top tier and only create tweets that are
-      if totaltweetscore.to_f >= user.avg_word_score.to_f
-        @words.each do |w|
+      if p.full_text.include? %{http}
+      
+  	    # set user latest tweet
+    	  if p.id.to_i > user.latest_tweet_id.to_i
+    	    user.latest_tweet_id = p.id.to_i
+    	  end
+
+    		# Update user's and connection's count of tweets shown
+    	  user.num_tweets_shown = user.num_tweets_shown.to_i+1
+    		user.save		
+
+    		# Reset variables
+    		totaltweetscore = 0
+        followwords = ""
+        cleantweet = ""
+        wscore = "#CCCCCC"
+        tscore = 0
+        thirdqtoptweetwordscore = 0
+        maxtoptweetwordscore = 0
+        avgtoptweetwordscore = 0
+
+        #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
+    	  @words =  p.full_text.split(" ")
+    		# begin looping through words in tweet
+    		@words.each do |w|
+    			unless w.include? %{http}
+    				unless w.include? %{@}
+    					unless w.is_a? (Numeric)
+    						unless w == ""
+    							# remove any non alphanumeric charactes from word
+    							cleanword = w.gsub(/[^0-9a-z]/i, '')
+    							# set all characters to lowercase
+    						  cleanword = cleanword.downcase
+    						  # look to see if word already exists, if not, create a new one using cleanword above
+    							word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
+    							if word.sys_ignore_flag == "no"
+      							# increment the number of times word has been seen counter by 1 and aggregate the score
+      							word.seen_count = word.seen_count.to_i+1
+      							if word.follows > 0 
+                      word.score = word.seen_count*(word.follows.to_f+1)
+                    else
+                      word.score = word.seen_count
+                    end
+                    if word.thumb_status == "up"
+                      word.score = word.score.to_f*2
+                    end
+                    if word.thumb_status == "down"
+                      word.score = word.score.to_f/2
+                    end
+      							word.save
+      							totaltweetscore = totaltweetscore+word.score
+      							user.num_words_scored = user.num_words_scored+1
+    							end # end check if word is on the system ignore list
+    						end # End check if word is empty
+    					end # End check if word is just a number
+    				end # End check if word contains the @ symbol
+    			end # End check if word is a link
+
+    			#create wording for links
+    			cleanword = w.gsub(/[^0-9a-z]/i, '')
+        	cleanword = cleanword.downcase
+          followwords = followwords.to_s+"-"+cleanword.to_s
+                  
+    		end # end loop through words
+  		
+    		# Set tweet class based on aggregate Tweet score
+        if totaltweetscore.to_f > user.max_tweet_score.to_f
+          user.max_tweet_score = totaltweetscore.to_f
+        end
+        if totaltweetscore.to_f < user.min_tweet_score.to_f
+          user.min_tweet_score = totaltweetscore.to_f
+        end
+        user.avg_tweet_score = (user.avg_tweet_score.to_f+totaltweetscore.to_f)/2
+        user.firstq_tweet_score = (user.avg_tweet_score.to_f+user.min_tweet_score.to_f)/2
+        user.thirdq_tweet_score = (user.avg_tweet_score.to_f+user.max_tweet_score.to_f)/2
+        user.save
+	      
+        # Update user's tweet scoring ranges
+      	user.max_word_score = Word.maximum(:score, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
+      	user.min_word_score = Word.minimum(:score, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
+      	user.avg_word_score = Word.average(:score, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
+      	user.firstq_word_score = (user.min_word_score.to_f+user.avg_word_score.to_f)/2
+        user.thirdq_word_score = (user.max_word_score.to_f+user.avg_word_score.to_f)/2
+      	user.save
+      
+        # Check if tweets is in top tier and only create tweets that are
+        if totaltweetscore.to_f >= user.avg_word_score.to_f
+          @words.each do |w|
         
-          #set class based on word score
-          cleanword = w.gsub(/[^0-9a-z]/i, '')
-          cleanword = cleanword.downcase
-          word = Word.find(:first, :conditions => ["word = ? and user_id = ? and sys_ignore_flag = ?", cleanword, user.id, "no"])
-          if word
-            if word.score.to_f >= user.thirdq_word_score
-              wscore = "wscore_hot"
-            elsif word.score.to_f >= user.avg_word_score
-              wscore = "wscore_one"
+            #set class based on word score
+            cleanword = w.gsub(/[^0-9a-z]/i, '')
+            cleanword = cleanword.downcase
+            word = Word.find(:first, :conditions => ["word = ? and user_id = ? and sys_ignore_flag = ?", cleanword, user.id, "no"])
+            if word
+              if word.score.to_f >= user.thirdq_word_score
+                wscore = "wscore_hot"
+              elsif word.score.to_f >= user.avg_word_score
+                wscore = "wscore_one"
+              else
+                wscore = "wscore_four"
+              end
+              tscore = (tscore.to_f+word.score.to_f)/2          
             else
               wscore = "wscore_four"
             end
-            tscore = (tscore.to_f+word.score.to_f)/2          
-          else
-            wscore = "wscore_four"
+        
+            # if the number of words in the tweet is less than 3, set the tweet content to exactly what the tweet says - no clean required
+          	if @words.size < 3
+          		cleantweet = p.full_text
+          	else
+          		# build clean version of tweet
+          		if w.include? %{http}
+          			cleantweet = cleantweet.to_s+%{<a href="http://eloono.com/follow?l=}+w.to_s+%{&w=}+followwords.to_s+%{&u=}+user.id.to_s+%{" target="_blank" title="}+w.to_s+%{">[...]</a> }
+          		elsif w.include? %{@}
+          			firstchar = w[0,1]
+          			secondchar = w[1,1]
+          			if firstchar == %{@} or secondchar == %{@}
+          				if w.length.to_i > 1
+          					nohandle = w.gsub('@', '')
+          					nohandle = nohandle.gsub(" ", '')
+          					nohandle = nohandle.gsub(":", '')
+          					nohandle = nohandle.gsub(";", '')
+          					nohandle = nohandle.gsub(",", '')
+          					nohandle = nohandle.gsub(".", '')
+          					nohandle = nohandle.gsub(")", '')
+          					nohandle = nohandle.gsub("(", '')
+          					nohandle = nohandle.gsub("*", '')
+          					nohandle = nohandle.gsub("^", '')
+          					nohandle = nohandle.gsub("$", '')
+          					nohandle = nohandle.gsub("#", '')
+          					nohandle = nohandle.gsub("!", '')
+          					nohandle = nohandle.gsub("~", '')
+          					nohandle = nohandle.gsub("`", '')
+          					nohandle = nohandle.gsub("+", '')
+          					nohandle = nohandle.gsub("=", '')
+          					nohandle = nohandle.gsub("[", '')
+          					nohandle = nohandle.gsub("]", '')
+          					nohandle = nohandle.gsub("{", '')
+          					nohandle = nohandle.gsub("}", '')
+          					nohandle = nohandle.gsub("/", '')
+          					nohandle = nohandle.gsub("<", '')
+          					nohandle = nohandle.gsub(">", '')
+          					nohandle = nohandle.gsub("?", '')
+          					nohandle = nohandle.gsub("&", '')
+          					nohandle = nohandle.gsub("|", '')
+          					nohandle = nohandle.gsub("-", '')
+          					cleantweet = cleantweet.to_s+%{<a href="http://twitter.com/}+nohandle.to_s+%{" target="_blank">}+w.to_s+%{</a> }
+          				else
+          					cleantweet = cleantweet.to_s+%{<span class="}+wscore.to_s+%{">}+w.to_s+%{</span> }
+          				end
+          			else
+          				cleantweet = cleantweet.to_s+%{<span class="}+wscore.to_s+%{">}+w.to_s+%{</span> }
+          			end
+          		elsif w.include? %{#}
+          			firstchar = w[0,1]
+          			secondchar = [1,1]
+          			if firstchar == %{#} or secondchar == %{#}
+          				nohandle = w.gsub('#', '')
+          				cleantweet = cleantweet.to_s+%{<a href="https://twitter.com/search/}+nohandle.to_s+%{" target="_blank">}+w.to_s+%{</a> }
+          			else
+          				cleantweet = cleantweet.to_s+%{<span class="}+wscore.to_s+%{">}+w.to_s+%{</span> }
+          			end
+          		else
+          			cleantweet = cleantweet.to_s+%{<span class="}+wscore.to_s+%{">}+w.to_s+%{</span> }
+          		end
+          	end # End check if tweet is smaller than 3 words
+
+          end # End loop through words to create clean tweet
+        
+          if tscore.to_f > maxtoptweetwordscore.to_f
+            maxtoptweetwordscore = tscore
           end
+          avgtoptweetwordscore = (avgtoptweetwordscore.to_f+tscore.to_f)/2
+          thirdqtoptweetwordscore = (maxtoptweetwordscore.to_f+avgtoptweetwordscore.to_f)/2
         
-          # if the number of words in the tweet is less than 3, set the tweet content to exactly what the tweet says - no clean required
-        	if @words.size < 3
-        		cleantweet = p.full_text
-        	else
-        		# build clean version of tweet
-        		if w.include? %{http}
-        			cleantweet = cleantweet.to_s+%{<a href="http://eloono.com/follow?l=}+w.to_s+%{&w=}+followwords.to_s+%{&u=}+user.id.to_s+%{" target="_blank" title="}+w.to_s+%{">[...]</a> }
-        		elsif w.include? %{@}
-        			firstchar = w[0,1]
-        			secondchar = w[1,1]
-        			if firstchar == %{@} or secondchar == %{@}
-        				if w.length.to_i > 1
-        					nohandle = w.gsub('@', '')
-        					nohandle = nohandle.gsub(" ", '')
-        					nohandle = nohandle.gsub(":", '')
-        					nohandle = nohandle.gsub(";", '')
-        					nohandle = nohandle.gsub(",", '')
-        					nohandle = nohandle.gsub(".", '')
-        					nohandle = nohandle.gsub(")", '')
-        					nohandle = nohandle.gsub("(", '')
-        					nohandle = nohandle.gsub("*", '')
-        					nohandle = nohandle.gsub("^", '')
-        					nohandle = nohandle.gsub("$", '')
-        					nohandle = nohandle.gsub("#", '')
-        					nohandle = nohandle.gsub("!", '')
-        					nohandle = nohandle.gsub("~", '')
-        					nohandle = nohandle.gsub("`", '')
-        					nohandle = nohandle.gsub("+", '')
-        					nohandle = nohandle.gsub("=", '')
-        					nohandle = nohandle.gsub("[", '')
-        					nohandle = nohandle.gsub("]", '')
-        					nohandle = nohandle.gsub("{", '')
-        					nohandle = nohandle.gsub("}", '')
-        					nohandle = nohandle.gsub("/", '')
-        					nohandle = nohandle.gsub("<", '')
-        					nohandle = nohandle.gsub(">", '')
-        					nohandle = nohandle.gsub("?", '')
-        					nohandle = nohandle.gsub("&", '')
-        					nohandle = nohandle.gsub("|", '')
-        					nohandle = nohandle.gsub("-", '')
-        					cleantweet = cleantweet.to_s+%{<a href="http://twitter.com/}+nohandle.to_s+%{" target="_blank">}+w.to_s+%{</a> }
-        				else
-        					cleantweet = cleantweet.to_s+%{<span class="}+wscore.to_s+%{">}+w.to_s+%{</span> }
-        				end
-        			else
-        				cleantweet = cleantweet.to_s+%{<span class="}+wscore.to_s+%{">}+w.to_s+%{</span> }
-        			end
-        		elsif w.include? %{#}
-        			firstchar = w[0,1]
-        			secondchar = [1,1]
-        			if firstchar == %{#} or secondchar == %{#}
-        				nohandle = w.gsub('#', '')
-        				cleantweet = cleantweet.to_s+%{<a href="https://twitter.com/search/}+nohandle.to_s+%{" target="_blank">}+w.to_s+%{</a> }
-        			else
-        				cleantweet = cleantweet.to_s+%{<span class="}+wscore.to_s+%{">}+w.to_s+%{</span> }
-        			end
-        		else
-        			cleantweet = cleantweet.to_s+%{<span class="}+wscore.to_s+%{">}+w.to_s+%{</span> }
-        		end
-        	end # End check if tweet is smaller than 3 words
-
-        end # End loop through words to create clean tweet
-        
-        if tscore.to_f > maxtoptweetwordscore.to_f
-          maxtoptweetwordscore = tscore
-        end
-        avgtoptweetwordscore = (avgtoptweetwordscore.to_f+tscore.to_f)/2
-        thirdqtoptweetwordscore = (maxtoptweetwordscore.to_f+avgtoptweetwordscore.to_f)/2
-        
-        if tscore.to_f >= thirdqtoptweetwordscore.to_f
-          tclass = "tscore_one"
-        else
-          tclass = "tscore_two"
-        end
+          if tscore.to_f >= thirdqtoptweetwordscore.to_f
+            tclass = "tscore_one"
+          else
+            tclass = "tscore_two"
+          end
                 
-        cleantweet = %{<span class="}+tclass.to_s+%{">}+tscore.round(2).to_s+%{</span> | }+cleantweet.to_s
+          cleantweet = %{<span class="}+tclass.to_s+%{">}+tscore.round(2).to_s+%{</span> | }+cleantweet.to_s
 
-        @tweetcode = @tweetcode.to_s+cleantweet.to_s+%{<br /><br />}
+          @tweetcode = @tweetcode.to_s+cleantweet.to_s+%{<br /><br />}
         
-      end # End check if tweet is in top tier of tweets so far
+        end # End check if tweet is in top tier of tweets so far
       
-      # Parse through mentions in tweet and create any connections
-      @connections = p.user_mentions
-      if @connections.size > 0
-      	for connection in @connections
-      		cfollow = Connection.find_by_twitter_id_and_user_id(connection.id, user.id)
-      		# if mention is not already a source, create a connection
-      		unless cfollow
-      			m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
-      			m.average_word_score = (m.average_word_score.to_f+tscore.to_f)/2
+        # Parse through mentions in tweet and create any connections
+        @connections = p.user_mentions
+        if @connections.size > 0
+        	for connection in @connections
+        		cfollow = Connection.find_by_twitter_id_and_user_id(connection.id, user.id)
+        		# if mention is not already a source, create a connection
+        		unless cfollow
+        			m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
+        			m.average_word_score = (m.average_word_score.to_f+tscore.to_f)/2
+        			m.appearances = m.appearances+1
+        			m.save
+        		end
+        	end # End loop through mentions in tweet
+        	# 
+        	# 
+        end # End check tweet has any mentions
+
+        # Check if tweet is a RT, if it is, convert source into a connection if user is not already following
+        if p.retweeted_status
+        	cfollow = Connection.find_by_twitter_id_and_user_id(p.retweeted_status.user.id, user.id)
+        	# if mention is not already a source, create a connection
+        	unless cfollow
+        		m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
+        		m.average_word_score = (m.average_word_score.to_f+tscore.to_f)/2
       			m.appearances = m.appearances+1
       			m.save
-      		end
-      	end # End loop through mentions in tweet
-      	# 
-      	# 
-      end # End check tweet has any mentions
+        	end
+        end
 
-      # Check if tweet is a RT, if it is, convert source into a connection if user is not already following
-      if p.retweeted_status
-      	cfollow = Connection.find_by_twitter_id_and_user_id(p.retweeted_status.user.id, user.id)
-      	# if mention is not already a source, create a connection
-      	unless cfollow
-      		m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
-      		m.average_word_score = (m.average_word_score.to_f+tscore.to_f)/2
-    			m.appearances = m.appearances+1
-    			m.save
-      	end
-      end
-
-      # Check if tweet is in reply to another tweet and check if user follows the soruce of the tweet that is being responded to
-      if p.in_reply_to_screen_name
-      	cfollow = Connection.find_by_twitter_id_and_user_id(p.in_reply_to_user_id, user.id)
-      	# if mention is not already a source, create a connection
-      	unless cfollow
-      		m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
-      		m.average_word_score = (m.average_word_score.to_f+tscore.to_f)/2
-    			m.appearances = m.appearances+1
-    			m.save
-      	end
-      end
+        # Check if tweet is in reply to another tweet and check if user follows the soruce of the tweet that is being responded to
+        if p.in_reply_to_screen_name
+        	cfollow = Connection.find_by_twitter_id_and_user_id(p.in_reply_to_user_id, user.id)
+        	# if mention is not already a source, create a connection
+        	unless cfollow
+        		m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
+        		m.average_word_score = (m.average_word_score.to_f+tscore.to_f)/2
+      			m.appearances = m.appearances+1
+      			m.save
+        	end
+        end
       
-      # find or create connection from tweet source
-      c = Connection.find_or_create_by_twitter_id_and_user_id(:twitter_id => p.user.id, :user_id => user.id)
-      c.profile_image_url = p.user.profile_image_url
-      c.user_name = p.user.name
-      c.following_flag = p.user.following
-      c.user_description = p.user.description
-      c.user_url = p.user.url
-      c.user_screen_name = p.user.screen_name
-      c.user_language = p.user.lang
-      c.twitter_created_at = p.user.created_at
-      c.statuses_count = p.user.statuses_count
-      c.followers_count = p.user.followers_count
-      c.friends_count = p.user.friends_count
-      c.location = p.user.location
-      c.connection_type = "following"
+        # find or create connection from tweet source
+        c = Connection.find_or_create_by_twitter_id_and_user_id(:twitter_id => p.user.id, :user_id => user.id)
+        c.profile_image_url = p.user.profile_image_url
+        c.user_name = p.user.name
+        c.following_flag = p.user.following
+        c.user_description = p.user.description
+        c.user_url = p.user.url
+        c.user_screen_name = p.user.screen_name
+        c.user_language = p.user.lang
+        c.twitter_created_at = p.user.created_at
+        c.statuses_count = p.user.statuses_count
+        c.followers_count = p.user.followers_count
+        c.friends_count = p.user.friends_count
+        c.location = p.user.location
+        c.connection_type = "following"
 
-      # calculate connection's tweets per hour
-      ageinhours = ((Time.now-p.user.created_at)/60)/60
-      c.tweets_per_hour = p.user.statuses_count.to_f/ageinhours.to_f
-      c.total_tweets_seen = c.total_tweets_seen.to_f+1
-      c.save
-      
+        # calculate connection's tweets per hour
+        ageinhours = ((Time.now-p.user.created_at)/60)/60
+        c.tweets_per_hour = p.user.statuses_count.to_f/ageinhours.to_f
+        c.total_tweets_seen = c.total_tweets_seen.to_f+1
+        c.save
+    
+      end # end check to see if tweet contained a link
   	end # end check if tweet was created by user  
   end # end loop through tweets
   
@@ -643,7 +646,7 @@ for user in @users
 			ageinyears = ((((Time.now-connection.twitter_created_at)/60)/60)/24)/365
   		ftofratio = connection.friends_count.to_f/connection.followers_count.to_f
 			if connection.location == ""
-			  local = "Unknwon"
+			  local = "Unknown"
 			else
 			  local = connection.location
 			end
