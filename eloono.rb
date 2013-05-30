@@ -157,7 +157,7 @@ get '/test_rec_email' do
 		ageinyears = ((((Time.now-connection.twitter_created_at)/60)/60)/24)/365
 		ftofratio = connection.friends_count.to_f/connection.followers_count.to_f
 		
-		body = body.to_s+%{<div><h3>}+connection.user_screen_name.to_s+%{</h3><a href="}+connection.user_url.to_s+%{" target="_blank"><img src="}+connection.profile_image_url.to_s+%{" width="48" hegith="48" /></a><p>This is }+connection.user_name.to_s+%{. They describe themselves like this: }+connection.user_description.to_s+%{. They speak }+connection.user_language.to_s+%{ and are located in }+connection.location.to_s+%{. They have been on Twitter for }+ageinyears.to_f.round(2).to_s+%{ years and has sent }+connection.statuses_count.to_s+%{ tweets at a rate of }+connection.tweets_per_hour.to_f.round(2).to_s+%{ tweets per hour. Thier friends to followers ratio is }+ftofratio.to_f.round(2).to_s+%{ (}+connection.friends_count.to_s+%{ friends, }+connection.followers_count.to_s+%{ followers).</p><h5><a href="http://twitter.com/}+connection.user_screen_name.to_s+%{" target="_blank">Follow?</a></h5></div><br />}
+		body = body.to_s+%{<div style="text-align:center;"><h3>}+connection.user_screen_name.to_s+%{</h3><a href="}+connection.user_url.to_s+%{" target="_blank"><img src="}+connection.profile_image_url.to_s+%{" width="48" hegith="48" /></a><p>This is <b>}+connection.user_name.to_s+%{</b>, describing themselves as: <i>}+connection.user_description.to_s+%{</i> They speak <b>}+connection.user_language.to_s+%{</b> and are located in <b>}+connection.location.to_s+%{</b>. They have been on Twitter for <b>}+ageinyears.to_f.round.to_s+%{</b> years and have sent <b>}+connection.statuses_count.to_f.round.to_s+%{</b> tweets at a rate of <b>}+connection.tweets_per_hour.to_f.round(2).to_s+%{</b> tweets per hour. They have <b>}+connection.friends_count.to_f.round.to_s+%{</b> friends and <b>}+connection.followers_count.to_f.round.to_s+%{</b> followers.</p><h5><a href="http://twitter.com/}+connection.user_screen_name.to_s+%{" target="_blank">Follow >>></a></h5></div><br />}
 		
 		Pony.mail(
 		  :headers => {'Content-Type' => 'text/html'},
@@ -181,4 +181,7 @@ get '/test_rec_email' do
 		#user.last_connectionsemail = Time.now
 		#user.save
 	end
+
+  %{Boom complete}
+	
 end
