@@ -181,6 +181,8 @@ for user in @users
     wordcode = ""
     @topwords = Word.find(:all, :conditions => ["user_id = ? and sys_ignore_flag <> ? and score > ?", user.id, "yes", 0], :order => "score DESC", :limit => 25)
     for topword in @topwords
+      topword = topword.gsub(/[^0-9a-z]/i, '')
+		  topword = topword.downcase
       wordcode = wordcode.to_s++topword.word.to_s+%{ | <a style="font-size:1.2em;" href="http://eloono.com/words/}+topword.id.to_s+%{/up" target="_blank">+</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+topword.id.to_s+%{/down" target="_blank">-</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+topword.id.to_s+%{/ignore" target="_blank">x</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+topword.id.to_s+%{/neutral" target="_blank">o</a><br /><br />}
     end
     
