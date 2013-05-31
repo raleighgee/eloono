@@ -187,6 +187,18 @@ for user in @users
 	
 	# loop through Tweets pulled
 	@tweets.each do |p|
+	  
+	  # Reset variables
+	  totaltweetscore = 0
+    followwords = ""
+    cleantweet = ""
+    wscore = "#CCCCCC"
+    tscore = 0
+    thirdqtoptweetwordscore = 0
+    maxtoptweetwordscore = 0
+    avgtoptweetwordscore = 0
+    maxtweetword = 0
+    maxtweetwordincrement = 1
 
     # Check if tweet was created by current user
   	unless p.user.id == user.uid
@@ -200,19 +212,7 @@ for user in @users
 
     	  # Update user's and connection's count of tweets shown
 		    user.num_tweets_shown = user.num_tweets_shown.to_i+1
-    	  user.save		
-
-		    # Reset variables
-    	  totaltweetscore = 0
-        followwords = ""
-        cleantweet = ""
-        wscore = "#CCCCCC"
-        tscore = 0
-        thirdqtoptweetwordscore = 0
-        maxtoptweetwordscore = 0
-        avgtoptweetwordscore = 0
-        maxtweetword = 0
-        maxtweetwordincrement = 1
+    	  user.save
 
         #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
     	  @words =  p.full_text.split(" ")
@@ -448,18 +448,9 @@ for user in @users
   user.last_wordscore = Time.now
   user.save
  
- 
- 
   ###### SEND TWEETS EMAIL - BI-DAILY ######## 
   if user.last_tweetemail <= (Time.now-(6*60*60))
-    
-    # Set maxtweetwordincrement if it doesn't exist
-    if maxtweetwordincrement
-      maxtweetwordincrement = maxtweetwordincrement
-    else
-      maxtweetwordincrement = 0
-    end
-    
+        
     body = %{<style>
      body{font-weight:200; color:#CCCCCC;}
      a{color:#CCCCCC; text-decoration:none;}
@@ -685,6 +676,5 @@ for user in @users
 
 	
   end # end check if last connections email was at least 7 days ago
-  
-  
+    
 end # End loop through users
