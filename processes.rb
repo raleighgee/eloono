@@ -194,16 +194,16 @@ for user in @users
       if p.full_text.include? %{http}
       
   	    # set user latest tweet
-    	if p.id.to_i > user.latest_tweet_id.to_i
-			user.latest_tweet_id = p.id.to_i
-    	end
+    	  if p.id.to_i > user.latest_tweet_id.to_i
+			    user.latest_tweet_id = p.id.to_i
+    	  end
 
-    	# Update user's and connection's count of tweets shown
-		user.num_tweets_shown = user.num_tweets_shown.to_i+1
-    	user.save		
+    	  # Update user's and connection's count of tweets shown
+		    user.num_tweets_shown = user.num_tweets_shown.to_i+1
+    	  user.save		
 
-		# Reset variables
-    	totaltweetscore = 0
+		    # Reset variables
+    	  totaltweetscore = 0
         followwords = ""
         cleantweet = ""
         wscore = "#CCCCCC"
@@ -211,6 +211,7 @@ for user in @users
         thirdqtoptweetwordscore = 0
         maxtoptweetwordscore = 0
         avgtoptweetwordscore = 0
+        maxtweetword = 0
 
         #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
     	  @words =  p.full_text.split(" ")
@@ -277,7 +278,7 @@ for user in @users
       	user.save
       
         # Check if tweets is in top tier and only create tweets that are
-        if totaltweetscore.to_f >= ((user.avg_word_score.to_f+user.thirdq_word_score.to_f)/2)
+        if totaltweetscore.to_f >= ((((user.avg_word_score.to_f+user.thirdq_word_score.to_f)/2)+user.thirdq_word_score.to_f)/2)
           @words.each do |w|
         
             #set class based on word score
@@ -285,10 +286,11 @@ for user in @users
             cleanword = cleanword.downcase
             word = Word.find(:first, :conditions => ["word = ? and user_id = ? and sys_ignore_flag = ?", cleanword, user.id, "no"])
             if word
-              if word.score.to_f >= user.thirdq_word_score
+              if word.score.to_f >= ((user.avg_word_score.to_f+user.thirdq_word_score.to_f)/2)
                 wscore = "wscore_hot"
-              elsif word.score.to_f >= user.avg_word_score
+              elsif word.score.to_f > maxtweetword.to_f
                 wscore = "wscore_one"
+                maxtweetword = word.score.to_f
               else
                 wscore = "wscore_four"
               end
