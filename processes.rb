@@ -212,6 +212,7 @@ for user in @users
         maxtoptweetwordscore = 0
         avgtoptweetwordscore = 0
         maxtweetword = 0
+        maxtweetwordincrement = 1
 
         #### CREATE WORDS AND BUILD OUT CLEAN TWEETS FOR DISPLAY ####
     	  @words =  p.full_text.split(" ")
@@ -289,8 +290,9 @@ for user in @users
               if word.score.to_f >= ((user.avg_word_score.to_f+user.thirdq_word_score.to_f)/2)
                 wscore = "wscore_hot"
               elsif word.score.to_f > maxtweetword.to_f
-                wscore = "wscore_one"
-                maxtweetword = word.score.to_f
+                maxtweetwordincrement = maxtweetwordincrement.to_i+1
+                wscore = "wscore_"maxtweetwordincrement.to_s
+                maxtweetword = word.score.to_fs
               else
                 wscore = "wscore_four"
               end
@@ -453,7 +455,7 @@ for user in @users
     body = %{<style>
      body{font-weight:200; color:#CCCCCC;}
      a{color:#CCCCCC; text-decoration:none;}
-     .wscore_one{color:#5979CD; font-weight:bold;}
+     .wscore_}+maxtweetwordincrement.to_s+%{{color:#5979CD; font-weight:bold;}
      .wscore_hot{font-size:1.8em; color:#FF0000; font-weight:900;}
      .tscore_one{font-weight:bold; color:#600000;}
      </style>}+user.last_tweets.to_s
