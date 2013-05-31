@@ -179,7 +179,7 @@ for user in @users
 		end
     
     wordcode = ""
-    @topwords = Word.find(:all, :conditions => ["user_id = ? and sys_ignore_flag <> ? and score > ?", user.id, "yes", 0], :order => "score DESC", :limit => 25)
+    @topwords = Word.find(:all, :conditions => ["user_id = ? and sys_ignore_flag <> ? and score > ?", user.id, "yes", 0], :order => "score DESC", :limit => 50)
     for topword in @topwords
       topword = topword.gsub(/[^0-9a-z]/i, '')
 		  topword = topword.downcase
