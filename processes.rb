@@ -182,8 +182,9 @@ for user in @users
 	  @tweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true, :since_id => user.latest_tweet_id.to_i)
 	end
 	
-	# declare tweet code variable
+	# Reset aggregate level variables
 	@tweetcode = ""
+	maxtweetwordincrement = 1
 	
 	# loop through Tweets pulled
 	@tweets.each do |p|
@@ -198,7 +199,6 @@ for user in @users
     maxtoptweetwordscore = 0
     avgtoptweetwordscore = 0
     maxtweetword = 0
-    maxtweetwordincrement = 1
 
     # Check if tweet was created by current user
   	unless p.user.id == user.uid
