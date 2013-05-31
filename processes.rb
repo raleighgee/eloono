@@ -211,7 +211,6 @@ for user in @users
 	
 	# Reset aggregate level variables
 	@tweetcode = ""
-	maxtweetwordincrement = 1
 	
 	# loop through Tweets pulled
 	@tweets.each do |p|
@@ -225,7 +224,6 @@ for user in @users
     thirdqtoptweetwordscore = 0
     maxtoptweetwordscore = 0
     avgtoptweetwordscore = 0
-    maxtweetword = 0
 
     # Check if tweet was created by current user
   	unless p.user.id == user.uid
@@ -316,10 +314,8 @@ for user in @users
             if word
               if word.score.to_f >= ((user.avg_word_score.to_f+user.thirdq_word_score.to_f)/2)
                 wscore = "wscore_hot"
-              elsif word.score.to_f > maxtweetword.to_f
-                maxtweetwordincrement = maxtweetwordincrement.to_i+1
-                wscore = "wscore_"+maxtweetwordincrement.to_s
-                maxtweetword = word.score.to_f
+              elsif word.score.to_f > user.avg_word_score.to_f
+                wscore = "wscore_two"
               else
                 wscore = "wscore_four"
               end
@@ -481,7 +477,7 @@ for user in @users
     body = %{<style>
      body{font-weight:200; color:#CCCCCC;}
      a{color:#CCCCCC; text-decoration:none;}
-     .wscore_}+maxtweetwordincrement.to_s+%{{color:#5979CD; font-weight:bold;}
+     .wscore_two{color:#5979CD; font-weight:bold;}
      .wscore_hot{font-size:1.8em; color:#FF0000; font-weight:900;}
      .tscore_one{font-weight:bold; color:#600000;}
      </style>}+user.last_tweets.to_s
