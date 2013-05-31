@@ -452,6 +452,12 @@ for user in @users
  
   ###### SEND TWEETS EMAIL - BI-DAILY ######## 
   if user.last_tweetemail <= (Time.now-(6*60*60))
+    
+    # Set maxtweetwordincrement if it doesn't exist
+    unless maxtweetwordincrement
+      maxtweetwordincrement = 0
+    end
+    
     body = %{<style>
      body{font-weight:200; color:#CCCCCC;}
      a{color:#CCCCCC; text-decoration:none;}
