@@ -178,6 +178,33 @@ for user in @users
 		  end
 		end
     
+    wordcode = ""
+    @topwords = Word.find(:all, :conditions => ["user_id = ? and sys_ignore_flag <> ? and score > ?", user.id, "yes", 0], :order => "score DESC", :limit => 25)
+    for topword in @topwords
+      wordcode = wordcode.to_s++topword.word.to_s+%{ | <a style="font-size:1.2em;" href="http://eloono.com/words/}+topword.id.to_s+%{/up" target="_blank">+</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+topword.id.to_s+%{/down" target="_blank">-</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+topword.id.to_s+%{/ignore" target="_blank">x</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+topword.id.to_s+%{/neutral" target="_blank">o</a><br /><br />}
+    end
+    
+    body = %{<h3>Hey there! I'm Ellono and I'm going to help you master your Twitter stream.</h3>First though, I need you to tell me a little about yourself. How do these words make you feel?<br /><br />}+wordcode.to_s
+  
+    Pony.mail(
+		  :headers => {'Content-Type' => 'text/html'},
+		  :from => 'welcome@eloono.com',
+		  :to => 'raleigh.gresham@gmail.com',
+		  :subject => 'Hola! Welcome to Eloono!',
+		  :body => body.to_s,
+		  :port => '587',
+		  :via => :smtp,
+		  :via_options => { 
+			:address => 'smtp.sendgrid.net', 
+			:port => '587', 
+			:enable_starttls_auto => true, 
+			:user_name => ENV['SENDGRID_USERNAME'], 
+			:password => ENV['SENDGRID_PASSWORD'], 
+			:authentication => :plain, 
+			:domain => ENV['SENDGRID_DOMAIN']
+		  }
+		)
+    
 	else
 	  @tweets = Twitter.home_timeline(:count => 200, :include_entities => true, :include_rts => true, :since_id => user.latest_tweet_id.to_i)
 	end
