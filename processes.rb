@@ -579,7 +579,7 @@ for user in @users
   
   
   ###### SEND TOP WORDS EMAIL - 2 DAILY ######
-  if user.last_wordemail <= (Time.now-(12*60*60))
+  if user.last_wordemail <= (Time.now-(6*60*60))
     
     #reset email content
     wordcode = ""
@@ -595,7 +595,7 @@ for user in @users
       :headers => {'Content-Type' => 'text/html'},
       :from => 'topwords@eloono.com',
       :to => 'raleigh.gresham@gmail.com',
-      :subject => 'How do these words make you feel?',
+      :subject => 'How does this word make you feel?',
       :body => body.to_s,
       :port => '587',
       :via => :smtp,
