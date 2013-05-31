@@ -292,7 +292,7 @@ for user in @users
               elsif word.score.to_f > maxtweetword.to_f
                 maxtweetwordincrement = maxtweetwordincrement.to_i+1
                 wscore = "wscore_"+maxtweetwordincrement.to_s
-                maxtweetword = word.score.to_fs
+                maxtweetword = word.score.to_f
               else
                 wscore = "wscore_four"
               end
