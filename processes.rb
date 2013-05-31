@@ -454,7 +454,9 @@ for user in @users
   if user.last_tweetemail <= (Time.now-(6*60*60))
     
     # Set maxtweetwordincrement if it doesn't exist
-    unless maxtweetwordincrement
+    if maxtweetwordincrement
+      maxtweetwordincrement = maxtweetwordincrement
+    else
       maxtweetwordincrement = 0
     end
     
