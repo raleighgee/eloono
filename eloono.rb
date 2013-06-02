@@ -157,3 +157,12 @@ get '/conrec/:con/:user/:action' do
     %{Hmmmmm. Can't seem to find that recommendation. Sorry about that!}
   end  
 end
+
+get '/reset_users' do
+  @users = User.find(:all)
+  for user in @users
+    user.active_scoring = "no"
+    user.save
+  end
+  %{DONE}
+end
