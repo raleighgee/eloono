@@ -85,12 +85,21 @@ get '/top_50_words' do
   user = User.find_by_id(session[:user_id])
   if user
     wordcode = ""
+    upcode = %{<div style="position:absolute; top:33px; right:33px;"><h4>Here are the words you have tumbed up:</h4>}
     @words = Word.find(:all, :conditions => ["user_id = ? and thumb_status = ? and sys_ignore_flag = ?", session[:user_id], "neutral", "no"], :order => "score DESC", :limit => 50)
     for word in @words
-      wordcode = wordcode.to_s+word.word.to_s+%{ | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/up?src=page" target="_blank">+</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/down?src=page" target="_blank">-</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/ignore?src=page" target="_blank">x</a><br /><br />}
+      wordcode = wordcode.to_s+word.word.to_s+%{ | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/up?src=page">+</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/down?src=page">-</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/ignore?src=page">x</a><br /><br />}
     end # end loop through words
-    
-    %{<h3>These are your top 50 words. What do you think?</h3>}+wordcode.to_s
+    @upwords = Word.find(:all, :conditions => ["user_id = ? and thumb_status = ? and sys_ignore_flag = ?", session[:user_id], "up", "no"], :order => "score DESC")
+    if @upwords.size > 0
+      i = 1
+      for upword in @upwords
+        upcode = upcode.to_s+i.to_s+%{. }+upword.word.to_s+%{<br />}
+        i = i+1
+      end # end loop through upwords
+      wordcode = upcode.to_s+%{</div>}+wordcode.to_s
+    end # end check if any words have been thumbed up
+    %{<h3>How do you feel about these words?</h3>}+wordcode.to_s
   else
     redirect %{http://eloono.com}
   end
