@@ -156,8 +156,8 @@ for user in @users
         @connections = p.user_mentions
         if @connections.size > 0
           for connection in @connections
-            user = Twitter.user(connection.id.to_i)
-            if user.protected != "true"
+            cuser = Twitter.user(connection.id.to_i)
+            if cuser.protected != "true"
               cfollow = Connection.find_by_twitter_id_and_user_id_and_connection_type(connection.id, user.id, "following")
               # if mention is not already a source, create a connection
               if cfollow
@@ -175,8 +175,8 @@ for user in @users
 
         # Check if tweet is a RT, if it is, convert source into a connection if user is not already following
         if p.retweeted_status
-          user = Twitter.user(p.retweeted_status.user.id)
-          if user.protected != "true"
+          cuser = Twitter.user(p.retweeted_status.user.id)
+          if cuser.protected != "true"
             cfollow = Connection.find_by_twitter_id_and_user_id_and_connection_type(p.retweeted_status.user.id, user.id, "following")
             # if mention is not already a source, create a connection
             if cfollow
@@ -193,8 +193,8 @@ for user in @users
 
         # Check if tweet is in reply to another tweet and check if user follows the soruce of the tweet that is being responded to
         if p.in_reply_to_screen_name
-          user = Twitter.user(p.in_reply_to_user_id)
-          if user.protected != "true"
+          cuser = Twitter.user(p.in_reply_to_user_id)
+          if cuser.protected != "true"
             cfollow = Connection.find_by_twitter_id_and_user_id_and_connection_type(p.in_reply_to_user_id, user.id, "following")
             # if mention is not already a source, create a connection
             if cfollow
@@ -246,10 +246,11 @@ for user in @users
         
         # Update user's and connection's count of tweets shown
         user.num_tweets_shown = user.num_tweets_shown.to_i+1
-		    user.last_wordscore = Time.now
-    	  user.save
     	  
     	end # end loop through 800 tweets
+    	
+    	user.last_wordscore = Time.now
+  	  user.save
     	
     	@mentions = Connection.find(:all, :conditions => ["user_id = ? and connection_type = ?", user.id, "mentioned"], :order => "last_stream_score DESC")
     	i = 0
