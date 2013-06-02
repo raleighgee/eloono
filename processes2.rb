@@ -9,7 +9,6 @@ require 'twitter'
 require 'pony'
 
 require_relative "./models/connection"
-require_relative "./models/source"
 require_relative "./models/sysigword"
 require_relative "./models/user"
 require_relative "./models/word"
@@ -30,11 +29,8 @@ ActiveRecord::Base.establish_connection(
 
 
 #### CODE #####
-
 @users = User.find(:all)
-
 for user in @users
-  
   # Authenticate user for pulling of Tweets
 	Twitter.configure do |config|
 		config.consumer_key = "DHBxwGvab2sJGw3XhsEmA"
@@ -42,15 +38,8 @@ for user in @users
 		config.oauth_token = user.token
 		config.oauth_token_secret = user.secret
 	end
-	
 	# Pull initial information about the user and load all of the people they follow into the sources table if this is the first time we've hit this user
-	if user.num_tweets_shown == 0
-    u = Twitter.user(user.uid)
-		user.handle = u.screen_name
-		user.profile_image_url = u.profile_image_url
-		user.language = u.lang.to_s
-		user.save
-	  
+	if user.intial_learning_complete_flag == "no"	  
     #### SCORE WORDS FOR INTIAL LEARNING ####
     i = 1
     maxid = 0
@@ -89,6 +78,19 @@ for user in @users
   		  end # end loop through words
   		end # end loop through tweets
       i = i+1
-    end # End iterate through intial 8000 tweets		
-	end # end check if this is uers's initial pass  
+    end # End iterate through intial 4000 tweets
+    user.intial_learning_complete_flag = "pulled"
+    user.save
+  else # if user intial_learning_complete_flag <> 0 then do this
+    twords = Word.count(:conditions => ["user_id = ? and thumb_status <> ?", user.id, "neutral"])
+    if twords >= 50
+      if user.num_tweets_shown == 0
+        u = Twitter.user(user.uid)
+    		user.handle = u.screen_name
+    		user.profile_image_url = u.profile_image_url
+    		user.language = u.lang.to_s
+    		user.save
+    	end # end check if this is the first time a user has had tweets scored      
+    end # end check to make sure user has scored at least 50 words before continuning to grab tweets
+  end# end check user's intial_learning_complete_flag status
 end # End loop through users

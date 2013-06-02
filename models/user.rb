@@ -3,7 +3,6 @@ class User < ActiveRecord::Base
   
   has_many :words
   has_many :connections
-  has_many :sources
   
   def self.create_with_omniauth(auth)
     create! do |user|
