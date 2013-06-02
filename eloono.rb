@@ -81,6 +81,18 @@ get '/follow' do
 	
 end
 
+get '/top_50_words/:user'
+  user = User.find_by_id(session[:user_id])
+  if user
+    wordcode = ""
+    @words = Word.find(:all, :conditions => ["user_id = ? and thumb_status = ? and sys_ignore_flag = ?", session[:user_id], "neutral", "no"], :oder => "score DESC", :limit => 50)
+    for word in @words
+      wordcode = wordcode.to_s+word.word.to_s+%{ | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/up?src=page" target="_blank">+</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/down?src=page" target="_blank">-</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/ignore?src=page" target="_blank">x</a><br /><br />}
+    end # end loop through words
+    
+    %{<h3>These are your top 50 words. What do you think?</h3>}+wordcode.to_s
+end
+
 get '/words/:id/:action' do
   
   message = ""
@@ -114,7 +126,11 @@ get '/words/:id/:action' do
     message = %{take care of that. Thanks for making me smarter!}
   end
   
-  %{Got it. I'll }+message.to_s
+  if params[:src] != "page"
+    %{Got it. I'll }+message.to_s
+  else
+    redirect %{http://eloono.com/top_50_words/}+session[:user_id].to_s
+  end
     
 end
 

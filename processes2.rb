@@ -43,7 +43,7 @@ for user in @users
     #### SCORE WORDS FOR INTIAL LEARNING ####
     i = 1
     maxid = 0
-    5.times do
+    10.times do
       if i == 1 
         @tweets = Twitter.home_timeline(:count => 800, :include_entities => true, :include_rts => true)
       else
@@ -78,7 +78,7 @@ for user in @users
   		  end # end loop through words
   		end # end loop through tweets
       i = i+1
-    end # End iterate through intial 4000 tweets
+    end # End iterate through intial 8000 tweets
     user.intial_learning_complete_flag = "pulled"
     user.save
   else # if user intial_learning_complete_flag <> 0 then do this
