@@ -246,7 +246,7 @@ for user in @users
     	i = 0
     	for mention in @mentions
     	  dups = Connection.count(:conditions => ["user_id = ? and connection_type = ? and user_screen_name = ?", user.id, "following", mention.user_screen_name])
-    	  if dups > 1
+    	  if dups > 0
     	    mention.destroy
     	  else
     	    if i < 26
