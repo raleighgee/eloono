@@ -81,7 +81,7 @@ get '/follow' do
 	
 end
 
-get '/top_50_words/:user'
+get '/top_50_words' do
   user = User.find_by_id(session[:user_id])
   if user
     wordcode = ""
