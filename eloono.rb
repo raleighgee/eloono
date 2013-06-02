@@ -85,7 +85,7 @@ get '/word_review' do
   user = User.find_by_id(session[:user_id])
   if user
     wordcode = ""
-    upcode = %{<div style="position:fixed; top:13px; left:233px;"><h4>Here are the words you have tumbed up:</h4>}
+    upcode = %{<div style="position:fixed; top:33px; left:233px;"><h4>Here are the words you have tumbed up:</h4>}
     @words = Word.find(:all, :conditions => ["user_id = ? and thumb_status = ? and sys_ignore_flag = ?", session[:user_id], "neutral", "no"], :order => "score DESC", :limit => 50)
     for word in @words
       wordcode = wordcode.to_s+word.word.to_s+%{ | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/up?src=page">+</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/down?src=page">-</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/ignore?src=page">x</a><br /><br />}
