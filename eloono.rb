@@ -161,7 +161,7 @@ end
 get '/reset_users' do
   @users = User.find(:all)
   for user in @users
-    user.active_scoring = "no"
+    user.active_scoring_flag = "no"
     user.save
   end
   %{DONE}
