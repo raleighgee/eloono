@@ -278,6 +278,7 @@ for user in @users
       			    mention.save
           	  end
           	  mention.total_tweets_seen = mention.total_tweets_seen.to_f+1
+          	  mention.save
         	  end # end loop through tweets for scoring connection against user's words
             mention.last_stream_score = Time.now
             mention.overall_index = mention.average_stream_word_score.to_f/mention.total_tweets_seen.to_f
