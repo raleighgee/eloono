@@ -156,57 +156,48 @@ for user in @users
         @connections = p.user_mentions
         if @connections.size > 0
           for connection in @connections
-            cuser = Twitter.user(connection.id.to_i)
-            if cuser.protected != "true"
-              cfollow = Connection.find_by_twitter_id_and_user_id_and_connection_type(connection.id, user.id, "following")
-              # if mention is not already a source, create a connection
-              if cfollow
-                cfollow.appearances = cfollow.appearances.to_i+1
-                cfollow.save
-              else
-                m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
-                m.average_word_score = (m.average_word_score.to_f+totaltweetscore.to_f)/2
-                m.appearances = m.appearances+1
-                m.save
-              end
-            end # end check if mention is protected
+            cfollow = Connection.find_by_twitter_id_and_user_id_and_connection_type(connection.id, user.id, "following")
+            # if mention is not already a source, create a connection
+            if cfollow
+              cfollow.appearances = cfollow.appearances.to_i+1
+              cfollow.save
+            else
+              m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
+              m.average_word_score = (m.average_word_score.to_f+totaltweetscore.to_f)/2
+              m.appearances = m.appearances+1
+              m.save
+            end
           end # End loop through mentions in tweet
         end # End check tweet has any mentions
 
         # Check if tweet is a RT, if it is, convert source into a connection if user is not already following
         if p.retweeted_status
-          cuser = Twitter.user(p.retweeted_status.user.id)
-          if cuser.protected != "true"
-            cfollow = Connection.find_by_twitter_id_and_user_id_and_connection_type(p.retweeted_status.user.id, user.id, "following")
-            # if mention is not already a source, create a connection
-            if cfollow
-              cfollow.appearances = cfollow.appearances.to_i+1
-              cfollow.save
-            else
-              m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
-              m.average_word_score = (m.average_word_score.to_f+totaltweetscore.to_f)/2
-              m.appearances = m.appearances+1
-              m.save
-            end
-          end # end check it mention is ptorected
+          cfollow = Connection.find_by_twitter_id_and_user_id_and_connection_type(p.retweeted_status.user.id, user.id, "following")
+          # if mention is not already a source, create a connection
+          if cfollow
+            cfollow.appearances = cfollow.appearances.to_i+1
+            cfollow.save
+          else
+            m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
+            m.average_word_score = (m.average_word_score.to_f+totaltweetscore.to_f)/2
+            m.appearances = m.appearances+1
+            m.save
+          end
         end
 
         # Check if tweet is in reply to another tweet and check if user follows the soruce of the tweet that is being responded to
         if p.in_reply_to_screen_name
-          cuser = Twitter.user(p.in_reply_to_user_id)
-          if cuser.protected != "true"
-            cfollow = Connection.find_by_twitter_id_and_user_id_and_connection_type(p.in_reply_to_user_id, user.id, "following")
-            # if mention is not already a source, create a connection
-            if cfollow
-              cfollow.appearances = cfollow.appearances.to_i+1
-              cfollow.save
-            else
-              m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
-              m.average_word_score = (m.average_word_score.to_f+totaltweetscore.to_f)/2
-              m.appearances = m.appearances+1
-              m.save
-            end
-          end # end check if mention is protected
+          cfollow = Connection.find_by_twitter_id_and_user_id_and_connection_type(p.in_reply_to_user_id, user.id, "following")
+          # if mention is not already a source, create a connection
+          if cfollow
+            cfollow.appearances = cfollow.appearances.to_i+1
+            cfollow.save
+          else
+            m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
+            m.average_word_score = (m.average_word_score.to_f+totaltweetscore.to_f)/2
+            m.appearances = m.appearances+1
+            m.save
+          end
         end
 
         # find or create connection from tweet source
@@ -259,41 +250,44 @@ for user in @users
     	  if dups > 0
     	    mention.destroy
     	  else
-    	    if i < 25
-      	    ctotaltweetscore = 0
-      	    if mention.since_tweet_id == 0
-      	      @tweets = Twitter.user_timeline(mention.user_screen_name.to_s, :count => 1000)
-      	    else
-      	      @tweets = Twitter.user_timeline(mention.user_screen_name.to_s, :count => 1000, :since_id => mention.since_tweet_id)
-      	    end
-        	  @tweets.each do |p|
+    	    cuser = Twitter.user(mention.user_screen_name.to_s)
+    	    if cuser.protected != "true"
+      	    if i < 25
         	    ctotaltweetscore = 0
-        	    @words =  p.full_text.split(" ")
-          		# begin looping through words in tweet
-          		@words.each do |w|
-                # normalize word and look to see if word already exists, if not, create a new one using cleanword above
-          			cleanword = w.gsub(/[^0-9a-z]/i, '')
-          			cleanword = cleanword.downcase
-          			word = Word.find(:first, :conditions => ["word = ? and user_id = ?", cleanword, user.id])
-          			if word
-          			  if word.sys_ignore_flag == "no"
-                    ctotaltweetscore = ctotaltweetscore.to_f+word.score.to_f
-          				end # end check if word is on the system ignore list
-          			end # end check if user has seen word
-          		end # end loop through words
-          		mention.average_stream_word_score = (mention.average_stream_word_score.to_f+ctotaltweetscore.to_f)/2
-          	  mention.save
-          	  if p.id.to_i > mention.since_tweet_id.to_i
-      			    mention.since_tweet_id = p.id.to_i
-      			    mention.save
-          	  end
-        	  end # end loop through tweets for scoring connection against user's words
-            mention.last_stream_score = Time.now
-            mention.save
-            i = i + 1
-          end
-    	  end
-    	end
+        	    if mention.since_tweet_id == 0
+        	      @tweets = Twitter.user_timeline(mention.user_screen_name.to_s, :count => 1000)
+        	    else
+        	      @tweets = Twitter.user_timeline(mention.user_screen_name.to_s, :count => 1000, :since_id => mention.since_tweet_id)
+        	    end
+          	  @tweets.each do |p|
+          	    ctotaltweetscore = 0
+          	    @words =  p.full_text.split(" ")
+            		# begin looping through words in tweet
+            		@words.each do |w|
+                  # normalize word and look to see if word already exists, if not, create a new one using cleanword above
+            			cleanword = w.gsub(/[^0-9a-z]/i, '')
+            			cleanword = cleanword.downcase
+            			word = Word.find(:first, :conditions => ["word = ? and user_id = ?", cleanword, user.id])
+            			if word
+            			  if word.sys_ignore_flag == "no"
+                      ctotaltweetscore = ctotaltweetscore.to_f+word.score.to_f
+            				end # end check if word is on the system ignore list
+            			end # end check if user has seen word
+            		end # end loop through words
+            		mention.average_stream_word_score = (mention.average_stream_word_score.to_f+ctotaltweetscore.to_f)/2
+            	  mention.save
+            	  if p.id.to_i > mention.since_tweet_id.to_i
+        			    mention.since_tweet_id = p.id.to_i
+        			    mention.save
+            	  end
+          	  end # end loop through tweets for scoring connection against user's words
+              mention.last_stream_score = Time.now
+              mention.save
+              i = i + 1
+            end # end check if mentions loop has been performed 25 times
+          end # end check if mention has a protected timeline
+    	  end # end check if mention is actually someone user follows
+    	end # end loop through mentions
     	user.last_connectionsscore = Time.now
     	
     end # end check to make sure user has upped at least 5 words before continuning to grab tweets
