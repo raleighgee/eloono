@@ -277,16 +277,39 @@ for user in @users
       			    mention.since_tweet_id = p.id.to_i
       			    mention.save
           	  end
+          	  mention.total_tweets_seen = mention.total_tweets_seen.to_f+1
         	  end # end loop through tweets for scoring connection against user's words
             mention.last_stream_score = Time.now
+            mention.overall_index = mention.average_stream_word_score.to_f/mention.total_tweets_seen.to_f
             mention.save
             i = i + 1
           end
     	  end
     	end
+    	user.last_connectionsscore = Time.now
     	
     end # end check to make sure user has upped at least 5 words before continuning to grab tweets
   end # end check user's intial_learning_complete_flag status
+  
+  # Clean out words once user gets to 3000
+  wordcount = Word.count(:conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
+  if wordcount > 5000
+    wordlimit = wordcount.to_i-5000
+    @killwords = Word.find(:all, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"], :order => "score ASC", :limit => wordlimit)
+    for killword in @killwords
+     killword.destroy
+    end
+  end
+
+  # Clean out connections once user gets to 3000
+  concount = Connection.count(:conditions => ["user_id = ? and connection_type <> ?", user.id, "following"])
+  if concount > 3000
+    conlimit = concount.to_i-3000
+    @killcons = Connection.find(:all, :conditions => ["user_id = ? and connection_type <> ?", user.id, "following"], :order => "times_in_top ASC, appearances ASC, average_stream_word_score ASC, average_word_score ASC", :limit => conlimit)
+    for killcon in @killcons
+     killcon.destroy
+    end
+  end
   
   user.active_scoring_flag = "no"
   user.save
