@@ -52,7 +52,7 @@ for user in @users
 		user.save
 	  
     #### SCORE WORDS FOR INTIAL LEARNING ####
-    1 = 0
+    i = 1
     maxid = 0
     2.times do
       if i == 1 
