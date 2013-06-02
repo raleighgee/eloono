@@ -132,7 +132,7 @@ get '/words/:id/:action' do
   if params[:src] != "page"
     %{Got it. I'll }+message.to_s
   else
-    redirect %{http://eloono.com/top_50_words/}+session[:user_id].to_s
+    redirect %{http://eloono.com/top_50_words}
   end
     
 end
