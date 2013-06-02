@@ -155,8 +155,29 @@ for user in @users
         # Parse through mentions in tweet and create any connections
         @connections = p.user_mentions
         if @connections.size > 0
-          for connection in @connections
-            cfollow = Connection.find_by_twitter_id_and_user_id_and_connection_type(connection.id, user.id, "following")
+          user = Twitter.user(connection.id.to_i)
+          if user.protected != "true"
+            for connection in @connections
+              cfollow = Connection.find_by_twitter_id_and_user_id_and_connection_type(connection.id, user.id, "following")
+              # if mention is not already a source, create a connection
+              if cfollow
+                cfollow.appearances = cfollow.appearances.to_i+1
+                cfollow.save
+              else
+                m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
+                m.average_word_score = (m.average_word_score.to_f+totaltweetscore.to_f)/2
+                m.appearances = m.appearances+1
+                m.save
+              end
+            end # End loop through mentions in tweet
+          end # end check if mention is protected
+        end # End check tweet has any mentions
+
+        # Check if tweet is a RT, if it is, convert source into a connection if user is not already following
+        if p.retweeted_status
+          user = Twitter.user(p.retweeted_status.user.id)
+          if user.protected != "true"
+            cfollow = Connection.find_by_twitter_id_and_user_id_and_connection_type(p.retweeted_status.user.id, user.id, "following")
             # if mention is not already a source, create a connection
             if cfollow
               cfollow.appearances = cfollow.appearances.to_i+1
@@ -167,37 +188,25 @@ for user in @users
               m.appearances = m.appearances+1
               m.save
             end
-          end # End loop through mentions in tweet
-        end # End check tweet has any mentions
-
-        # Check if tweet is a RT, if it is, convert source into a connection if user is not already following
-        if p.retweeted_status
-          cfollow = Connection.find_by_twitter_id_and_user_id_and_connection_type(p.retweeted_status.user.id, user.id, "following")
-          # if mention is not already a source, create a connection
-          if cfollow
-            cfollow.appearances = cfollow.appearances.to_i+1
-            cfollow.save
-          else
-            m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
-            m.average_word_score = (m.average_word_score.to_f+totaltweetscore.to_f)/2
-            m.appearances = m.appearances+1
-            m.save
-          end
+          end # end check it mention is ptorected
         end
 
         # Check if tweet is in reply to another tweet and check if user follows the soruce of the tweet that is being responded to
         if p.in_reply_to_screen_name
-          cfollow = Connection.find_by_twitter_id_and_user_id_and_connection_type(p.in_reply_to_user_id, user.id, "following")
-          # if mention is not already a source, create a connection
-          if cfollow
-            cfollow.appearances = cfollow.appearances.to_i+1
-            cfollow.save
-          else
-            m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
-            m.average_word_score = (m.average_word_score.to_f+totaltweetscore.to_f)/2
-            m.appearances = m.appearances+1
-            m.save
-          end
+          user = Twitter.user(p.in_reply_to_user_id)
+          if user.protected != "true"
+            cfollow = Connection.find_by_twitter_id_and_user_id_and_connection_type(p.in_reply_to_user_id, user.id, "following")
+            # if mention is not already a source, create a connection
+            if cfollow
+              cfollow.appearances = cfollow.appearances.to_i+1
+              cfollow.save
+            else
+              m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
+              m.average_word_score = (m.average_word_score.to_f+totaltweetscore.to_f)/2
+              m.appearances = m.appearances+1
+              m.save
+            end
+          end # end check if mention is protected
         end
 
         # find or create connection from tweet source
