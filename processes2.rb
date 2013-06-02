@@ -52,10 +52,10 @@ for user in @users
 		user.save
 	  
     #### SCORE WORDS FOR INTIAL LEARNING ####
-    i = 0
+    1 = 0
     maxid = 0
-    begin
-      if i == 0 
+    2.times do
+      if i == 1 
         @tweets = Twitter.home_timeline(:count => 800, :include_entities => true, :include_rts => true)
       else
         @tweets = Twitter.home_timeline(:count => 800, :include_entities => true, :include_rts => true, :max_id => maxid.to_i)
@@ -89,6 +89,6 @@ for user in @users
   		  end # end loop through words
   		end # end loop through tweets
       i = i+1
-    end while i < 2 # End iterate through intial 8000 tweets		
+    end # End iterate through intial 8000 tweets		
 	end # end check if this is uers's initial pass  
 end # End loop through users
