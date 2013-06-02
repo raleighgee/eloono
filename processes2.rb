@@ -245,7 +245,6 @@ for user in @users
         c.save
         
         # Update user's and connection's count of tweets shown
-		    user.num_tweets_shown = user.num_tweets_shown.to_i+1
 		    user.last_wordscore = Time.now
     	  user.save
     	  
