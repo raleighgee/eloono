@@ -9,7 +9,6 @@ require 'twitter'
 require 'pony'
 
 require_relative "./models/connection"
-require_relative "./models/source"
 require_relative "./models/sysigword"
 require_relative "./models/user"
 require_relative "./models/word"
