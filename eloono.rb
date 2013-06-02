@@ -91,6 +91,9 @@ get '/top_50_words' do
     end # end loop through words
     
     %{<h3>These are your top 50 words. What do you think?</h3>}+wordcode.to_s
+  else
+    redirect %{http://eloono.com}
+  end
 end
 
 get '/words/:id/:action' do
