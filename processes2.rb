@@ -54,7 +54,7 @@ for user in @users
     #### SCORE WORDS FOR INTIAL LEARNING ####
     i = 1
     maxid = 0
-    2.times do
+    5.times do
       if i == 1 
         @tweets = Twitter.home_timeline(:count => 800, :include_entities => true, :include_rts => true)
       else
