@@ -250,7 +250,7 @@ for user in @users
     	    mention.destroy
     	  else
     	    if i < 26
-      	    avgconwordscore = 0
+      	    ctotaltweetscore = 0
       	    if mention.since_tweet_id == 0
       	      @tweets = Twitter.user_timeline(mention.user_screen_name.to_s, :count => 1000)
       	    else
@@ -271,7 +271,7 @@ for user in @users
           				end # end check if word is on the system ignore list
           			end # end check if user has seen word
           		end # end loop through words
-          		mention.average_stream_word_score = (connection.average_stream_word_score.to_f+ctotaltweetscore.to_f)/2
+          		mention.average_stream_word_score = (mention.average_stream_word_score.to_f+ctotaltweetscore.to_f)/2
           	  mention.save
           	  if p.id.to_i > mention.since_tweet_id.to_i
       			    mention.since_tweet_id = p.id.to_i
