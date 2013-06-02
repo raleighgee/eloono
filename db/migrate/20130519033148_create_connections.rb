@@ -28,6 +28,8 @@ class CreateConnections < ActiveRecord::Migration
 			t.integer :tone_tweet_id, :default => 0, :limit => 8
 			t.integer :ttwo_tweet_id, :default => 0, :limit => 8
 			t.integer :tthree_tweet_id, :default => 0, :limit => 8
+			t.datetime :last_stream_score
+			t.integer :since_tweet_id, :default => 0, :limit => 8
 			t.timestamps
 		end
 	end
