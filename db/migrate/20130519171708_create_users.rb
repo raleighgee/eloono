@@ -29,6 +29,7 @@ class CreateUsers < ActiveRecord::Migration
 			t.datetime :last_tweetemail, :default => Time.now
 			t.datetime :last_wordemail, :default => Time.now
 			t.datetime :last_connectionsemail, :default => Time.now
+			t.string :active_scoring_flag, :default => "no"
 			t.timestamps
 		end
 	end
