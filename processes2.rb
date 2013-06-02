@@ -240,8 +240,52 @@ for user in @users
 		    user.last_wordscore = Time.now
     	  user.save
     	  
-    	end # end loop through 800 tweets 
-    end # end check to make sure user has upprd at least 5 words before continuning to grab tweets
+    	end # end loop through 800 tweets
+    	
+    	@mentions = Connection.find(:all, :conditions => ["user_id = ? and connection_type = ?", user.id, "mentioned"], :order => "last_stream_score ASC")
+    	i = 0
+    	for mention in @mentions
+    	  dups = Connection.count(:conditions => ["user_id = ? and connection_type = ? and user_screen_name = ?", user.id, "following", mention.user_screen_name])
+    	  if dups > 1
+    	    mention.destroy
+    	  else
+    	    if i < 26
+      	    avgconwordscore = 0
+      	    if mention.since_tweet_id == 0
+      	      @tweets = Twitter.user_timeline(mention.user_screen_name.to_s, :count => 1000)
+      	    else
+      	      @tweets = Twitter.user_timeline(mention.user_screen_name.to_s, :count => 1000, :since_id => mention.since_tweet_id)
+      	    end
+        	  @tweets.each do |p|
+        	    ctotaltweetscore = 0
+        	    @words =  p.full_text.split(" ")
+          		# begin looping through words in tweet
+          		@words.each do |w|
+                # normalize word and look to see if word already exists, if not, create a new one using cleanword above
+          			cleanword = w.gsub(/[^0-9a-z]/i, '')
+          			cleanword = cleanword.downcase
+          			word = Word.find(:first, :conditions => ["word = ? and user_id = ?", cleanword, user.id])
+          			if word
+          			  if word.sys_ignore_flag == "no"
+                    ctotaltweetscore = ctotaltweetscore.to_f+word.score.to_f
+          				end # end check if word is on the system ignore list
+          			end # end check if user has seen word
+          		end # end loop through words
+          		mention.average_stream_word_score = (connection.average_stream_word_score.to_f+ctotaltweetscore.to_f)/2
+          	  mention.save
+          	  if p.id.to_i > mention.since_tweet_id.to_i
+      			    mention.since_tweet_id = p.id.to_i
+      			    mention.save
+          	  end
+        	  end # end loop through tweets for scoring connection against user's words
+            mention.last_stream_score = Time.now
+            mention.save
+            i = i + 1
+          end
+    	  end
+    	end
+    	
+    end # end check to make sure user has upped at least 5 words before continuning to grab tweets
   end # end check user's intial_learning_complete_flag status
   
   user.active_scoring_flag = "no"

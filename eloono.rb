@@ -81,7 +81,7 @@ get '/follow' do
 	
 end
 
-get '/top_50_words' do
+get '/word_review' do
   user = User.find_by_id(session[:user_id])
   if user
     wordcode = ""
@@ -113,12 +113,11 @@ get '/words/:id/:action' do
     if word.thumb_status == "neutral" && word.sys_ignore_flag == "no"
       if params[:action].to_s == "up"
         word.thumb_status = "up"
-        word.score = word.score.to_f*5
+        word.score = word.score.to_f*100
         word.save
         message = %{INCREASE the weight I use for <b>"}+word.word.to_s+%{"</b> when scoring your tweets. Thanks for making me smarter!}
       elsif params[:action].to_s == "down"
         word.thumb_status = "down"
-        word.score = word.score.to_f/5
         word.save
         message = %{DECREASE the weight I use for <b>"}+word.word.to_s+%{"</b> when scoring your tweets. Thanks for making me smarter!}
       elsif params[:action].to_s == "ignore"
@@ -126,10 +125,6 @@ get '/words/:id/:action' do
         word.score = 0
         word.save
         message = %{NEVER use the word <b>"}+word.word.to_s+%{"</b> when scoring your tweets. Thanks for making me smarter!}
-      elsif params[:action].to_s == "neutral"
-        word.thumb_status = "neutral_final"
-        word.save
-        message = %{leave the weight I use for <b>"}+word.word.to_s+%{"</b> when scoring your tweets the SAME. Thanks for making me smarter!}
       end
     else
       message = %{take care of that. Thanks for making me smarter!}
@@ -141,7 +136,7 @@ get '/words/:id/:action' do
   if params[:src] != "page"
     %{Got it. I'll }+message.to_s
   else
-    redirect %{http://eloono.com/top_50_words}
+    redirect %{http://eloono.com/word_review}
   end
     
 end

@@ -213,64 +213,7 @@ for user in @users
   
   
   
-  ###### SCORE CONNECTIONS - DAILY ########
-  if user.last_connectionsscore <= (Time.now-(24*60*60))
-    # calculate average_stream_word_score for top connections
-  	@connections = Connection.find(:all, :conditions => ["user_id = ? and average_stream_word_score = ?", user.id, 0], :order => "average_word_score DESC", :limit => 10)
-  	for connection in @connections
-  	  avgconwordscore = 0
-  	  @tweets = Twitter.user_timeline(connection.user_screen_name.to_s, :count => 200)
-  	  @tweets.each do |p|
-  	    avgtweetwscore = 0
-  	    @words =  p.full_text.split(" ")
-    		# begin looping through words in tweet
-    		@words.each do |w|
-          # normalize word and look to see if word already exists, if not, create a new one using cleanword above
-    			cleanword = w.gsub(/[^0-9a-z]/i, '')
-    			cleanword = cleanword.downcase
-    			word = Word.find(:first, :conditions => ["word = ? and user_id = ?", cleanword, user.id])
-    			if word
-    			  if word.sys_ignore_flag == "no"
-              avgtweetwscore = (avgtweetwscore.to_f+word.score.to_f)/2
-              avgconwordscore = (avgconwordscore.to_f+avgtweetwscore.to_f)/2
-    				end # end check if word is on the system ignore list
-    			end # end check if user has seen word
-    		end # end loop through words
-  	  end # end loop through tweets for scoring connection against user's words
-  	  connection.average_stream_word_score = avgconwordscore.to_f
-  	  connection.save
-  	end # end loop through top connections
-  	
-  	@connections = Connection.find(:all, :conditions => ["user_id = ? and times_in_top > ?", user.id, 0], :order => "average_stream_word_score DESC, average_word_score DESC", :limit => 5)
-  	for connection in @connections
-  	  avgconwordscore = 0
-  	  @tweets = Twitter.user_timeline(connection.user_screen_name.to_s, :count => 200)
-  	  @tweets.each do |p|
-  	    avgtweetwscore = 0
-  	    @words =  p.full_text.split(" ")
-    		# begin looping through words in tweet
-    		@words.each do |w|
-          # normalize word and look to see if word already exists, if not, create a new one using cleanword above
-    			cleanword = w.gsub(/[^0-9a-z]/i, '')
-    			cleanword = cleanword.downcase
-    			word = Word.find(:first, :conditions => ["word = ? and user_id = ?", cleanword, user.id])
-    			if word
-    			  if word.sys_ignore_flag == "no"
-              avgtweetwscore = (avgtweetwscore.to_f+word.score.to_f)/2
-              avgconwordscore = (avgconwordscore.to_f+avgtweetwscore.to_f)/2
-    				end # end check if word is on the system ignore list
-    			end # end check if user has seen word
-    		end # end loop through words
-  	  end # end loop through tweets for scoring connection against user's words
-  	  connection.average_stream_word_score = avgconwordscore.to_f
-  	  connection.times_in_top = connection.times_in_top.to_f+1
-  	  connection.save
-  	end # end loop through top connections
-  	
-  	user.last_connectionsscore = Time.now
-    user.save
-  	
-  end # end check if last word email sent was at least 24 hours ago
+
 
   
   
