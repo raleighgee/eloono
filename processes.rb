@@ -38,32 +38,6 @@ for user in @users
       
       if p.full_text.include? %{http}
       
-
-
-
-
-
-  		
-    		# Set tweet class based on aggregate Tweet score
-        if totaltweetscore.to_f > user.max_tweet_score.to_f
-          user.max_tweet_score = totaltweetscore.to_f
-        end
-        if totaltweetscore.to_f < user.min_tweet_score.to_f
-          user.min_tweet_score = totaltweetscore.to_f
-        end
-        user.avg_tweet_score = (user.avg_tweet_score.to_f+totaltweetscore.to_f)/2
-        user.firstq_tweet_score = (user.avg_tweet_score.to_f+user.min_tweet_score.to_f)/2
-        user.thirdq_tweet_score = (user.avg_tweet_score.to_f+user.max_tweet_score.to_f)/2
-        user.save
-	      
-        # Update user's tweet scoring ranges
-      	user.max_word_score = Word.maximum(:score, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
-      	user.min_word_score = Word.minimum(:score, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
-      	user.avg_word_score = Word.average(:score, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
-      	user.firstq_word_score = (user.min_word_score.to_f+user.avg_word_score.to_f)/2
-        user.thirdq_word_score = (user.max_word_score.to_f+user.avg_word_score.to_f)/2
-      	user.save
-      
         # Check if tweets is in top tier and only create tweets that are
         if totaltweetscore.to_f >= ((((user.avg_word_score.to_f+user.thirdq_word_score.to_f)/2)+user.thirdq_word_score.to_f)/2)
           @words.each do |w|
@@ -168,7 +142,6 @@ for user in @users
   
   # Update user's last interaction time
   user.last_tweets = @tweetcode.to_s+user.last_tweets.to_s
-  user.last_wordscore = Time.now
   user.save
  
   ###### SEND TWEETS EMAIL - BI-DAILY ######## 

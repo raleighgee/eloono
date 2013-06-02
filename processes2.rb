@@ -239,9 +239,10 @@ for user in @users
 		    user.num_tweets_shown = user.num_tweets_shown.to_i+1
 		    user.last_wordscore = Time.now
     	  user.save
-    	 
+    	  
+    	end # end loop through 800 tweets 
     end # end check to make sure user has upprd at least 5 words before continuning to grab tweets
-  end# end check user's intial_learning_complete_flag status
+  end # end check user's intial_learning_complete_flag status
   
   user.active_scoring_flag = "no"
   user.save
