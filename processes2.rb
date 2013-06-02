@@ -242,14 +242,14 @@ for user in @users
     	  
     	end # end loop through 800 tweets
     	
-    	@mentions = Connection.find(:all, :conditions => ["user_id = ? and connection_type = ?", user.id, "mentioned"], :order => "last_stream_score ASC")
+    	@mentions = Connection.find(:all, :conditions => ["user_id = ? and connection_type = ?", user.id, "mentioned"], :order => "last_stream_score DESC")
     	i = 0
     	for mention in @mentions
     	  dups = Connection.count(:conditions => ["user_id = ? and connection_type = ? and user_screen_name = ?", user.id, "following", mention.user_screen_name])
     	  if dups > 0
     	    mention.destroy
     	  else
-    	    if i < 26
+    	    if i < 25
       	    ctotaltweetscore = 0
       	    if mention.since_tweet_id == 0
       	      @tweets = Twitter.user_timeline(mention.user_screen_name.to_s, :count => 1000)
