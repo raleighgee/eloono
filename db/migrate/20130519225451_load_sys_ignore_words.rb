@@ -156,6 +156,8 @@ class LoadSysIgnoreWords < ActiveRecord::Migration
     Word.create(:word=>"open", :user_id => 1, :sys_ignore_flag => "yes")
     Word.create(:word=>"using", :user_id => 1, :sys_ignore_flag => "yes")
     Word.create(:word=>"some", :user_id => 1, :sys_ignore_flag => "yes")
+    Word.create(:word=>"usmnt", :user_id => 1, :sys_ignore_flag => "yes")
+    Word.create(:word=>"20", :user_id => 1, :sys_ignore_flag => "yes")
     Word.create(:word=>"he", :user_id => 1, :sys_ignore_flag => "yes")
     Word.create(:word=>"two", :user_id => 1, :sys_ignore_flag => "yes")
     Word.create(:word=>"should", :user_id => 1, :sys_ignore_flag => "yes")
