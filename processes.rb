@@ -131,7 +131,7 @@ for user in @users
                     if word.follows > 0 
                       word.score = (word.seen_count.to_f*(word.follows.to_f+1))+word.score.to_f
                     else
-                      word.score = word.seen_count.to_f+word.score_to.f
+                      word.score = word.seen_count.to_f+word.score.to_f
                     end
                     if word.thumb_status == "up"
                       word.score = word.score.to_f*1.2
