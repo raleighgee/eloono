@@ -61,22 +61,24 @@ for user in @users
     		@words.each do |w|
     			unless w.include? %{http}
     				unless w.include? %{@}
-    					unless w.is_a? (Numeric)
-    						unless w == ""
-    							# remove any non alphanumeric charactes from word
-    							cleanword = w.gsub(/[^0-9a-z]/i, '')
-    							# set all characters to lowercase
-    						  cleanword = cleanword.downcase
-    						  # look to see if word already exists, if not, create a new one using cleanword above
-    							word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
-    							if word.sys_ignore_flag == "no"
-      							# increment the number of times word has been seen counter by 1 and aggregate the score
-      							word.seen_count = word.seen_count.to_i+1
-  								  word.score = word.seen_count
-      							word.save
-    							end # end check if word is on the system ignore list
-    						end # End check if word is empty
-    					end # End check if word is just a number
+    				  unless w.include? %{#}
+    					  unless w.is_a? (Numeric)
+      						unless w == ""
+      							# remove any non alphanumeric charactes from word
+      							cleanword = w.gsub(/[^0-9a-z]/i, '')
+      							# set all characters to lowercase
+      						  cleanword = cleanword.downcase
+      						  # look to see if word already exists, if not, create a new one using cleanword above
+      							word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
+      							if word.sys_ignore_flag == "no"
+        							# increment the number of times word has been seen counter by 1 and aggregate the score
+        							word.seen_count = word.seen_count.to_i+1
+    								  word.score = word.seen_count
+        							word.save
+      							end # end check if word is on the system ignore list
+      						end # End check if word is empty
+      					end # End check if word is just a number
+      				end # end check if word includes a hashtag
     				end # End check if word contains the @ symbol
     			end # End check if word is a link       
   		  end # end loop through words
@@ -118,35 +120,37 @@ for user in @users
         @words.each do |w|
           unless w.include? %{http}
             unless w.include? %{@}
-              unless w.is_a? (Numeric)
-                unless w == ""
-                  # remove any non alphanumeric charactes from word and set all characters to lowercase
-                  cleanword = w.gsub(/[^0-9a-z]/i, '')
-                  cleanword = cleanword.downcase
-                  # look to see if word already exists, if not, create a new one using cleanword above
-                  word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
-                  if word.sys_ignore_flag == "no"
-                    # increment the number of times word has been seen counter by 1 and aggregate the score
-                    word.seen_count = word.seen_count.to_i+1
-                    if word.follows > 0 
-                      word.score = (word.seen_count.to_f*(word.follows.to_f+1))+word.score.to_f
-                    else
-                      word.score = word.seen_count.to_f+word.score.to_f
-                    end
-                    if word.thumb_status == "up"
-                      word.score = word.score.to_f*1.5
-                    end
-                    word.save
-                    totaltweetscore = totaltweetscore+word.score
-                    user.num_words_scored = user.num_words_scored+1
-                    if p.user.id == user.uid
-                      word.score = word.score.to_f*2.5
-                    end
-                    word.save
-                  end # end check if word is on the system ignore list
-                end # End check if word is empty
-              end # End check if word is just a number
-            end # End check if word contains the @ symbol
+              unless w.include? %{#}
+                unless w.is_a? (Numeric)
+                  unless w == ""
+                    # remove any non alphanumeric charactes from word and set all characters to lowercase
+                    cleanword = w.gsub(/[^0-9a-z]/i, '')
+                    cleanword = cleanword.downcase
+                    # look to see if word already exists, if not, create a new one using cleanword above
+                    word = Word.find_or_create_by_word_and_user_id(:word => cleanword, :user_id => user.id)
+                    if word.sys_ignore_flag == "no"
+                      # increment the number of times word has been seen counter by 1 and aggregate the score
+                      word.seen_count = word.seen_count.to_i+1
+                      if word.follows > 0 
+                        word.score = (word.seen_count.to_f*(word.follows.to_f+1))+word.score.to_f
+                      else
+                        word.score = word.seen_count.to_f+word.score.to_f
+                      end
+                      if word.thumb_status == "up"
+                        word.score = word.score.to_f*1.5
+                      end
+                      word.save
+                      totaltweetscore = totaltweetscore+word.score
+                      user.num_words_scored = user.num_words_scored+1
+                      if p.user.id == user.uid
+                        word.score = word.score.to_f*2.5
+                      end
+                      word.save
+                    end # end check if word is on the system ignore list
+                  end # End check if word is empty
+                end # End check if word is just a number
+              end # End check if word contains the @ symbol
+            end # end check if word contains a hashtag
           end # End check if word is a link              
     		end # end loop through words
         
