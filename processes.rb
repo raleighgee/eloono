@@ -137,7 +137,10 @@ for user in @users
                         word.score = word.seen_count.to_f+word.score.to_f
                       end
                       if word.thumb_status == "up"
-                        word.score = word.score.to_f*1.5
+                        word.score = word.score.to_f*1.1
+                      end
+                      if word.thumb_status == "down"
+                        word.score = word.score.to_f*0.9
                       end
                       word.save
                       totaltweetscore = totaltweetscore+word.score
