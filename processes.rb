@@ -134,13 +134,13 @@ for user in @users
                       word.score = word.seen_count.to_f+word.score.to_f
                     end
                     if word.thumb_status == "up"
-                      word.score = word.score.to_f*1.2
+                      word.score = word.score.to_f*1.5
                     end
                     word.save
                     totaltweetscore = totaltweetscore+word.score
                     user.num_words_scored = user.num_words_scored+1
                     if p.user.id == user.uid
-                      word.score = word.score.to_f*1.5
+                      word.score = word.score.to_f*2.5
                     end
                     word.save
                   end # end check if word is on the system ignore list
@@ -307,7 +307,7 @@ for user in @users
   concount = Connection.count(:conditions => ["user_id = ? and connection_type <> ?", user.id, "following"])
   if concount > 3000
     conlimit = concount.to_i-3000
-    @killcons = Connection.find(:all, :conditions => ["user_id = ? and connection_type <> ?", user.id, "following"], :order => "times_in_top ASC, appearances ASC, average_stream_word_score ASC, average_word_score ASC", :limit => conlimit)
+    @killcons = Connection.find(:all, :conditions => ["user_id = ? and connection_type <> ?", user.id, "following"], :order => "appearances ASC, average_stream_word_score ASC, average_word_score ASC", :limit => conlimit)
     for killcon in @killcons
      killcon.destroy
     end

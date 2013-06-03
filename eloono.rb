@@ -109,7 +109,6 @@ get '/words/:id/:action' do
     if word.thumb_status == "neutral" && word.sys_ignore_flag == "no"
       if params[:action].to_s == "up"
         word.thumb_status = "up"
-        word.score = word.score.to_f*100
         word.save
         message = %{INCREASE the weight I use for <b>"}+word.word.to_s+%{"</b> when scoring your tweets. Thanks for making me smarter!}
       elsif params[:action].to_s == "down"
