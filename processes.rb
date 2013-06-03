@@ -249,9 +249,8 @@ for user in @users
     	    mention.destroy
     	  else
     	    if i < 25
-      	    cuser = Twitter.user(mention.user_screen_name.to_s)
-        	  if cuser.protected != "true"
-        	    ctotaltweetscore = 0
+      	    ctotaltweetscore = 0
+      	    begin
         	    if mention.since_tweet_id == 0
         	      @tweets = Twitter.user_timeline(mention.user_screen_name.to_s, :count => 1000)
         	    else
@@ -282,13 +281,13 @@ for user in @users
               mention.last_stream_score = Time.now
               mention.save
               i = i + 1
-            end # end check if mention has a protected timeline
+            rescue
+              mention.destroy
+            end
           end # end check if mentions loop has been performed 25 times
     	  end # end check if mention is actually someone user follows
     	end # end loop through mentions
     	user.last_connectionsscore = Time.now
-    	
-    	
     	
     end # end check to make sure user has upped at least 5 words before continuning to grab tweets
   end # end check user's intial_learning_complete_flag status
