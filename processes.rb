@@ -248,9 +248,9 @@ for user in @users
     	  if dups > 0
     	    mention.destroy
     	  else
-    	    cuser = Twitter.user(mention.user_screen_name.to_s)
-    	    if cuser.protected != "true"
-      	    if i < 25
+    	    if i < 25
+      	    cuser = Twitter.user(mention.user_screen_name.to_s)
+        	  if cuser.protected != "true"
         	    ctotaltweetscore = 0
         	    if mention.since_tweet_id == 0
         	      @tweets = Twitter.user_timeline(mention.user_screen_name.to_s, :count => 1000)
@@ -282,8 +282,8 @@ for user in @users
               mention.last_stream_score = Time.now
               mention.save
               i = i + 1
-            end # end check if mentions loop has been performed 25 times
-          end # end check if mention has a protected timeline
+            end # end check if mention has a protected timeline
+          end # end check if mentions loop has been performed 25 times
     	  end # end check if mention is actually someone user follows
     	end # end loop through mentions
     	user.last_connectionsscore = Time.now
