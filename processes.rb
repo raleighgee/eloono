@@ -99,8 +99,6 @@ for user in @users
     	else
     	  @tweets = Twitter.home_timeline(:count => 800, :include_entities => true, :include_rts => true, :since_id => user.latest_tweet_id.to_i)
     	end # end check if this is the first time a user has had tweets scored
-    	#pull user's last 800 tweets 
-    	@tweets = Twitter.home_timeline(:count => 800, :include_entities => true, :include_rts => true)
     	# Reset aggregate level variables
     	@tweetcode = ""
       # loop through Tweets pulled
