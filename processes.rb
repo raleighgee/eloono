@@ -129,9 +129,9 @@ for user in @users
                     # increment the number of times word has been seen counter by 1 and aggregate the score
                     word.seen_count = word.seen_count.to_i+1
                     if word.follows > 0 
-                      word.score = word.seen_count*(word.follows.to_f+1)
+                      word.score = (word.seen_count.to_f*(word.follows.to_f+1))+word.score.to_f
                     else
-                      word.score = word.seen_count
+                      word.score = word.seen_count.to_f+word.score_to.f
                     end
                     if word.thumb_status == "up"
                       word.score = word.score.to_f*1.2
@@ -287,6 +287,8 @@ for user in @users
     	  end # end check if mention is actually someone user follows
     	end # end loop through mentions
     	user.last_connectionsscore = Time.now
+    	
+    	
     	
     end # end check to make sure user has upped at least 5 words before continuning to grab tweets
   end # end check user's intial_learning_complete_flag status
