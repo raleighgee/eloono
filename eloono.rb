@@ -157,3 +157,12 @@ get '/reset_users' do
   end
   %{DONE}
 end
+
+get '/onetime' do
+  @connections = Connection.find(:all, :conditions => ["connection_type = ? and appearances > ?", "following", 0])
+  for connection in @connections
+    connection.appearances = 0
+    connection.save
+  end
+  %{DONE}
+end

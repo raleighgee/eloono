@@ -242,6 +242,13 @@ for user in @users
     	  
     	end # end loop through 800 tweets
     	
+    	# Increment top ten followed connections
+    	@connections = Connection.find(:all, :conditions => ["connection_type = ? and user_id = ?", "following", user.id], :order => "overall_index DESC", :limit => 10)
+    	for connection in @connections
+    	  connection.appearances = connection.appearances+1
+    	  connection.save
+    	end 
+    	
     	user.last_wordscore = Time.now
     	
     	@mentions = Connection.find(:all, :conditions => ["user_id = ? and connection_type = ?", user.id, "mentioned"], :order => "last_stream_score DESC")
