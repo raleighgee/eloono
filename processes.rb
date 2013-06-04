@@ -161,8 +161,8 @@ for user in @users
             cfollow = Connection.find_by_twitter_id_and_user_id_and_connection_type(connection.id, user.id, "following")
             # if mention is not already a source, create a connection
             if cfollow
-              cfollow.appearances = cfollow.appearances.to_i+1
-              cfollow.save
+              #cfollow.overall_index = cfollow.overall_index.to_f*1.001
+              #cfollow.save
             else
               m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
               m.average_word_score = (m.average_word_score.to_f+totaltweetscore.to_f)/2
@@ -177,8 +177,8 @@ for user in @users
           cfollow = Connection.find_by_twitter_id_and_user_id_and_connection_type(p.retweeted_status.user.id, user.id, "following")
           # if mention is not already a source, create a connection
           if cfollow
-            cfollow.appearances = cfollow.appearances.to_i+1
-            cfollow.save
+            #cfollow.appearances = cfollow.appearances.to_i+1
+            #cfollow.save
           else
             m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
             m.average_word_score = (m.average_word_score.to_f+totaltweetscore.to_f)/2
@@ -192,8 +192,8 @@ for user in @users
           cfollow = Connection.find_by_twitter_id_and_user_id_and_connection_type(p.in_reply_to_user_id, user.id, "following")
           # if mention is not already a source, create a connection
           if cfollow
-            cfollow.appearances = cfollow.appearances.to_i+1
-            cfollow.save
+            #cfollow.appearances = cfollow.appearances.to_i+1
+            #cfollow.save
           else
             m = Connection.find_or_create_by_user_screen_name_and_user_id(:user_screen_name => connection.screen_name, :user_id => user.id, :connection_type => "mentioned")
             m.average_word_score = (m.average_word_score.to_f+totaltweetscore.to_f)/2

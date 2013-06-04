@@ -20,7 +20,7 @@ class CreateConnections < ActiveRecord::Migration
 			t.float :tweets_per_hour
 			t.float :average_word_score, :default => 0
 			t.float :average_stream_word_score, :default => 0
-			t.float :appearances, :default => 0
+			t.float :appearances, :default => 0 # used for number of times appeared in top ten once a source is followed
 			t.float :overall_index, :default => 0
 			t.float :tone_score, :default => 0
 			t.float :ttwo_score, :default => 0
