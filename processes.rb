@@ -145,9 +145,6 @@ for user in @users
                       word.save
                       totaltweetscore = totaltweetscore+word.score
                       user.num_words_scored = user.num_words_scored+1
-                      if p.user.id == user.uid
-                        word.score = word.score.to_f*2.5
-                      end
                       word.save
                     end # end check if word is on the system ignore list
                   end # End check if word is empty
