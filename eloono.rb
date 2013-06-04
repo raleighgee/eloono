@@ -57,7 +57,23 @@ end
 
 ########## MVC CODE ########## 
 get '/' do
-  %{<a href="http://eloono.com/signin">Click Here to Sign In<a/>}
+  user = User.find_by_id(session[:user_id])
+  if user
+    wordcode = ""
+    upcode = %{<div style="position:fixed; top:53px; left:233px;"><h4>Here are the words you have tumbed up:</h4>}
+    word = Word.find(:first, :conditions => ["user_id = ? and thumb_status = ? and sys_ignore_flag = ?", session[:user_id], "neutral", "no"], :order => "score DESC")
+    wordcode = wordcode.to_s+%{<span style="font-size:2.5em; font-family:Helvetica;">}+word.word.to_s+%{</span><br /><a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/up?src=page">+</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/down?src=page">-</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/ignore?src=page">x</a><br /><br />}
+    @upwords = Word.find(:all, :conditions => ["user_id = ? and thumb_status = ? and sys_ignore_flag = ?", session[:user_id], "up", "no"], :order => "word ASC")
+    if @upwords.size > 0
+      for upword in @upwords
+        upcode = upcode.to_s+%{* }+upword.word.to_s+%{<br />}
+      end # end loop through upwords
+      wordcode = upcode.to_s+%{</div>}+wordcode.to_s
+    end # end check if any words have been thumbed up
+    %{<h3>How do you feel about these words?</h3>}+wordcode.to_s
+  else
+      %{<a href="http://eloono.com/signin">Click Here to Sign In<a/>}
+  end
 end
 
 get '/tweets' do
@@ -79,26 +95,6 @@ get '/follow' do
 	
 	redirect link
 	
-end
-
-get '/word_review' do
-  user = User.find_by_id(session[:user_id])
-  if user
-    wordcode = ""
-    upcode = %{<div style="position:fixed; top:53px; left:233px;"><h4>Here are the words you have tumbed up:</h4>}
-    word = Word.find(:first, :conditions => ["user_id = ? and thumb_status = ? and sys_ignore_flag = ?", session[:user_id], "neutral", "no"], :order => "score DESC")
-    wordcode = wordcode.to_s+%{<span style="font-size:2.5em; font-family:Helvetica;">}+word.word.to_s+%{</span><br /><a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/up?src=page">+</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/down?src=page">-</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/ignore?src=page">x</a><br /><br />}
-    @upwords = Word.find(:all, :conditions => ["user_id = ? and thumb_status = ? and sys_ignore_flag = ?", session[:user_id], "up", "no"], :order => "word ASC")
-    if @upwords.size > 0
-      for upword in @upwords
-        upcode = upcode.to_s+%{* }+upword.word.to_s+%{<br />}
-      end # end loop through upwords
-      wordcode = upcode.to_s+%{</div>}+wordcode.to_s
-    end # end check if any words have been thumbed up
-    %{<h3>How do you feel about these words?</h3>}+wordcode.to_s
-  else
-    redirect %{http://eloono.com}
-  end
 end
 
 get '/words/:id/:action' do
@@ -131,7 +127,7 @@ get '/words/:id/:action' do
   if params[:src] != "page"
     %{Got it. I'll }+message.to_s
   else
-    redirect %{http://eloono.com/word_review}
+    redirect %{http://eloono.com}
   end
     
 end

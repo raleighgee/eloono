@@ -243,7 +243,6 @@ for user in @users
     	end # end loop through 800 tweets
     	
     	user.last_wordscore = Time.now
-  	  user.save
     	
     	@mentions = Connection.find(:all, :conditions => ["user_id = ? and connection_type = ?", user.id, "mentioned"], :order => "last_stream_score DESC")
     	i = 0
@@ -315,6 +314,39 @@ for user in @users
      killcon.destroy
     end
   end
+  
+  if user.last_wordemail <= (Time.now-(24*60*60))
+    wordcode = ""
+    @words = Word.find(:all, :conditions => ["user_id = ? and thumb_status = ? and sys_ignore_flag = ?", user.id, "neutral", "no"], :order => "score DESC", :limit => 3)
+    
+    for word in @words
+      wordcode = wordcode.to_s+%{<span style="font-size:1.65em; font-family:Helvetica;">}+word.word.to_s+%{</span><br /><a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/up?src=page">+</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/down?src=page">-</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/ignore?src=page">x</a><br /><br />}
+    end
+    
+    body = %{<h2>How do you feel about these words?</h2>}+wordcode.to_s
+    
+    Pony.mail(
+      :headers => {'Content-Type' => 'text/html'},
+      :from => 'topwords@eloono.com',
+      :to => 'raleigh.gresham@gmail.com',
+      :subject => 'Some words for you to think about.',
+      :body => body.to_s,
+      :port => '587',
+      :via => :smtp,
+      :via_options => { 
+        :address => 'smtp.sendgrid.net', 
+        :port => '587', 
+        :enable_starttls_auto => true, 
+        :user_name => ENV['SENDGRID_USERNAME'], 
+        :password => ENV['SENDGRID_PASSWORD'], 
+        :authentication => :plain, 
+        :domain => ENV['SENDGRID_DOMAIN']
+      }
+    )
+    
+    user.last_wordemail = Time.now
+    
+  end # end check if word email has been sent in the last 24 hours
   
   user.active_scoring_flag = "no"
   user.save
