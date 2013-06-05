@@ -160,10 +160,10 @@ end
 
 get '/onetime' do
   word = Word.find_by_word("night")
-  word.thumbs_status = "down"
+  word.thumb_status = "down"
   word.save
   wordt = ord.find_by_word("patent")
-  wordt.thumbs_status = "down"
+  wordt.thumb_status = "down"
   wordt.save
   %{DONE}
 end
