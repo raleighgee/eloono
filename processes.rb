@@ -327,7 +327,7 @@ for user in @users
     @words = Word.find(:all, :conditions => ["user_id = ? and thumb_status = ? and sys_ignore_flag = ?", user.id, "neutral", "no"], :order => "score DESC", :limit => 3)
     
     for word in @words
-      wordcode = wordcode.to_s+%{<span style="font-size:1.65em; font-family:Helvetica;">}+word.word.to_s+%{</span><br /><a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/up?src=page">+</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/down?src=page">-</a> | <a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/ignore?src=page">x</a><br /><br />}
+      wordcode = wordcode.to_s+%{<span style="font-size:1.65em; font-family:Helvetica;">}+word.word.to_s+%{</span><br /><a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/up">+</a><br /><br /><a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/down">-</a><br /><br /><a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/ignore">x</a><br /><br />}
     end
     
     body = %{<h2>How do you feel about these words?</h2>}+wordcode.to_s
