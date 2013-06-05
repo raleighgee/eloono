@@ -251,7 +251,7 @@ for user in @users
     	
     	user.last_wordscore = Time.now
     	
-    	if user.last_connectionsscore <= (Time.now-(60*60*12))
+    	if user.last_connectionsscore <= (Time.now-(60*60*24))
     	  @mentions = Connection.find(:all, :conditions => ["user_id = ? and connection_type = ?", user.id, "mentioned"], :order => "last_stream_score DESC")
       	i = 0
       	for mention in @mentions
