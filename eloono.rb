@@ -159,10 +159,11 @@ get '/reset_users' do
 end
 
 get '/onetime' do
-  @connections = Connection.find(:all, :conditions => ["connection_type = ? and appearances > ?", "following", 0])
-  for connection in @connections
-    connection.appearances = 0
-    connection.save
-  end
+  word = Word.find_by_word("night")
+  word.thumbs_status = "down"
+  word.save
+  wordt = ord.find_by_word("patent")
+  wordt.thumbs_status = "down"
+  wordt.save
   %{DONE}
 end
