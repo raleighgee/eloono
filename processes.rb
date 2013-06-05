@@ -251,7 +251,7 @@ for user in @users
     	
     	user.last_wordscore = Time.now
     	
-    	if user.last_connectionsscore <= (Time.now-(60*60*24))
+    	if user.last_connectionsscore <= (Time.now-(60*60*10))
     	  @mentions = Connection.find(:all, :conditions => ["user_id = ? and connection_type = ?", user.id, "mentioned"], :order => "last_stream_score DESC")
       	i = 0
       	for mention in @mentions
@@ -263,9 +263,9 @@ for user in @users
         	    ctotaltweetscore = 0
         	    begin
           	    if mention.since_tweet_id == 0
-          	      @tweets = Twitter.user_timeline(mention.user_screen_name.to_s, :count => 1000)
+          	      @tweets = Twitter.user_timeline(mention.user_screen_name.to_s, :count => 250)
           	    else
-          	      @tweets = Twitter.user_timeline(mention.user_screen_name.to_s, :count => 1000, :since_id => mention.since_tweet_id)
+          	      @tweets = Twitter.user_timeline(mention.user_screen_name.to_s, :count => 250, :since_id => mention.since_tweet_id)
           	    end
             	  @tweets.each do |p|
             	    ctotaltweetscore = 0
