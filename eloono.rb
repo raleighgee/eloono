@@ -162,7 +162,7 @@ get '/onetime' do
   word = Word.find_by_word("night")
   word.thumb_status = "down"
   word.save
-  wordt = ord.find_by_word("patent")
+  wordt = Word.find_by_word("patent")
   wordt.thumb_status = "down"
   wordt.save
   %{DONE}
