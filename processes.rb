@@ -302,7 +302,129 @@ for user in @users
       end # end check if user's last connection score was at least 10 hours ago
       
       if user.last_tweetemail <= (Time.now-(60*60*10))
+        toptweets = ""
+        atleastfive = Connection.count(:conditions => ["user_id = ? and connection_type = ? and appearances > ? and tone_score > ?", user.id, "following", 4, 0])
+        if atleastfive > 1
+          @topcons = Connection.find(:all, :conditions => ["user_id = ? and connection_type = ? and tone_score > ?", user.id, "following", 0], :order => "appearances DESC, overall_index DESC", :limit => 15)
+          for topcon in @topcons
+            toptweets = toptweets.to_s+%{<img src="}+topcon.profile_image_url.to_s+%{" height="24" width="24" style="float:left;" /> <span style="font-size:1.3em;">}+topcon.user_screen_name.to_s+%{</span><br />}
+            tweet = Twitter.status(topcon.tone_tweet_id)
+            if tweet
+              @words =  tweet.full_text.split(" ")
+              followwords = ""
+              @words.each do |w|
+                fword = w.gsub(/[^0-9a-z]/i, '')
+      					fword = fword.downcase
+      					followwords = followwords.to_s+"-"+fword.to_s
+              end # end loop through words to build followwords text
+              cleantweet = %{<div style="display:block; padding:13px 0;">}
+              if @words.size < 3
+            		cleantweet = cleantweet.to_s+tweet.full_text.to_s
+            	else
+                @words.each do |w|
+              	  if w.include? %{http}
+              			cleantweet = cleantweet.to_s+%{<a href="http://eloono.com/follow?l=}+w.to_s+%{&w=}+followwords.to_s+%{&u=}+user.id.to_s+%{" target="_blank" title="}+w.to_s+%{">[...]</a> }
+              		else
+              		  cleantweet = cleantweet.to_s+w.to_s+%{ }
+              		end
+              	end # end loop through words to build clean tweet
+              end 
+              cleantweet = cleantweet.to_s+%{</div>}
+              toptweets = toptweets.to_s+cleantweet.to_s
+              topcon.tone_tweet_id = 0
+              topcon.tone_score = 0
+              topcon.save
+            end # end check if tweet exists
+            if topcon.ttwo_score > 0
+              tweet = Twitter.status(topcon.ttwo_tweet_id)
+              if tweet
+                @words =  tweet.full_text.split(" ")
+                followwords = ""
+                @words.each do |w|
+                  fword = w.gsub(/[^0-9a-z]/i, '')
+                  fword = fword.downcase
+                  followwords = followwords.to_s+"-"+fword.to_s
+                end # end loop through words to build followwords text
+                cleantweet = %{<div style="display:block; padding:13px 0;">}
+                if @words.size < 3
+                  cleantweet = cleantweet.to_s+tweet.full_text.to_s
+                else
+                  @words.each do |w|
+                    if w.include? %{http}
+                      cleantweet = cleantweet.to_s+%{<a href="http://eloono.com/follow?l=}+w.to_s+%{&w=}+followwords.to_s+%{&u=}+user.id.to_s+%{" target="_blank" title="}+w.to_s+%{">[...]</a> }
+                    else
+                      cleantweet = cleantweet.to_s+w.to_s+%{ }
+                    end
+                  end # end loop through words to build clean tweet
+                end # end check if there are more than 3 words
+                cleantweet = cleantweet.to_s+%{</div>}
+                toptweets = toptweets.to_s+cleantweet.to_s
+                topcon.ttwo_tweet_id = 0
+                topcon.ttwo_score = 0
+                topcon.save                
+              end # end check if second tweet exists
+            end # end check if topcon has a second tweet to show
+            if topcon.tthree_score > 0
+              tweet = Twitter.status(topcon.tthree_tweet_id)
+              if tweet
+                @words =  tweet.full_text.split(" ")
+                followwords = ""
+                @words.each do |w|
+                  fword = w.gsub(/[^0-9a-z]/i, '')
+                  fword = fword.downcase
+                  followwords = followwords.to_s+"-"+fword.to_s
+                end # end loop through words to build followwords text
+                cleantweet = %{<div style="display:block; padding:13px 0;">}
+                if @words.size < 3
+                  cleantweet = cleantweet.to_s+tweet.full_text.to_s
+                else
+                  @words.each do |w|
+                    if w.include? %{http}
+                      cleantweet = cleantweet.to_s+%{<a href="http://eloono.com/follow?l=}+w.to_s+%{&w=}+followwords.to_s+%{&u=}+user.id.to_s+%{" target="_blank" title="}+w.to_s+%{">[...]</a> }
+                    else
+                      cleantweet = cleantweet.to_s+w.to_s+%{ }
+                    end
+                  end # end loop through words to build clean tweet
+                end # end check if there are more than 3 words
+                cleantweet = cleantweet.to_s+%{</div>}
+                toptweets = toptweets.to_s+cleantweet.to_s  
+                topcon.tthree_tweet_id = 0
+                topcon.tthree_score = 0
+                topcon.save              
+              end # end check if third tweet exists
+            end # end check if topcon has a third tweet to show
+            toptweets = toptweets.to_s+%{<br /><br />}
+          end # end loop through top ten connections
 
+          body = %{<h2>Here are the Tweets I found for you from the last few hours.</h2>}+toptweets.to_s
+
+          Pony.mail(
+            :headers => {'Content-Type' => 'text/html'},
+            :from => 'goodtweets@eloono.com',
+            :to => 'raleigh.gresham@gmail.com',
+            :subject => 'Top Tweets from your top connections.',
+            :body => body.to_s,
+            :port => '587',
+            :via => :smtp,
+            :via_options => { 
+              :address => 'smtp.sendgrid.net', 
+              :port => '587', 
+              :enable_starttls_auto => true, 
+              :user_name => ENV['SENDGRID_USERNAME'], 
+              :password => ENV['SENDGRID_PASSWORD'], 
+              :authentication => :plain, 
+              :domain => ENV['SENDGRID_DOMAIN']
+            }
+          )         
+
+          @aconnections = Connection.find(:all, :conditions => ["user_id = ? and connection_type = ?", user.id, "following"])
+          for aconnection in @aconnections
+            aconnection.appearances = 0
+            aconnection.save
+          end
+
+          user.last_tweetemail = Time.now 
+        end # end check if there is at least two people with 5 appearences or more
       end # end check if user's last tweet email was at least 10 hours ago
       
     end # end check to make sure user has upped at least 5 words before continuning to grab tweets
