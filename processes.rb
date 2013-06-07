@@ -299,7 +299,11 @@ for user in @users
       	  end # end check if mention is actually someone user follows
       	end # end loop through mentions
       	user.last_connectionsscore = Time.now
-      end # end check if user's last connection score was at least 12 hours ago
+      end # end check if user's last connection score was at least 10 hours ago
+      
+      if user.last_tweetemail <= (Time.now-(60*60*10))
+
+      end # end check if user's last tweet email was at least 10 hours ago
       
     end # end check to make sure user has upped at least 5 words before continuning to grab tweets
   end # end check user's intial_learning_complete_flag status
