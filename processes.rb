@@ -430,10 +430,10 @@ for user in @users
     end # end check to make sure user has upped at least 5 words before continuning to grab tweets
   end # end check user's intial_learning_complete_flag status
   
-  # Clean out words once user gets to 3000
+  # Clean out words once user gets to 3500
   wordcount = Word.count(:conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"])
-  if wordcount > 5000
-    wordlimit = wordcount.to_i-5000
+  if wordcount > 3500
+    wordlimit = wordcount.to_i-3500
     @killwords = Word.find(:all, :conditions => ["user_id = ? and sys_ignore_flag = ?", user.id, "no"], :order => "score ASC", :limit => wordlimit)
     for killword in @killwords
      killword.destroy
