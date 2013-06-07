@@ -285,7 +285,7 @@ get '/onetime' do
     )         
     
     @aconnections = Connection.find(:all, :conditions => ["user_id = ? and connection_type = ?", user_id, "following"])
-    for aconnection = @aconnections
+    for aconnection in @aconnections
       aconnection.appearances = 0
       aconnection.save
     end
