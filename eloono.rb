@@ -175,7 +175,7 @@ get '/onetime' do
     @topcons = Connection.find(:all, :conditions => ["user_id = ? and connection_type = ? and tone_score > ?", user.id, "following", 0], :order => "appearances DESC, overall_index DESC", :limit => 10)
     for topcon in @topcons
       toptweets = %{<img src="}+topcon.profile_image_url.to_s+%{" height="24" width="24" style="float:left;" /> <span style="font-size:1.3em;">}+topcon.user_screen_name.to_s+%{</span><br />}
-      tweet = Tweet.status(topcon.tone_tweet_id)
+      tweet = Twitter.status(topcon.tone_tweet_id)
       if tweet
         @words =  tweet.full_text.split(" ")
         followwords = ""
@@ -203,7 +203,7 @@ get '/onetime' do
         #topcon.save
       end # end check if tweet exists
       if topcon.ttwo_score > 0
-        tweet = Tweet.status(topcon.ttwo_tweet_id)
+        tweet = Twitter.status(topcon.ttwo_tweet_id)
         if tweet
           @words =  tweet.full_text.split(" ")
           followwords = ""
@@ -232,7 +232,7 @@ get '/onetime' do
         end # end check if second tweet exists
       end # end check if topcon has a second tweet to show
       if topcon.tthree_score > 0
-        tweet = Tweet.status(topcon.tthree_tweet_id)
+        tweet = Twitter.status(topcon.tthree_tweet_id)
         if tweet
           @words =  tweet.full_text.split(" ")
           followwords = ""
