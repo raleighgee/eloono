@@ -172,7 +172,7 @@ get '/onetime' do
   toptweets = ""
   atleastfive = Connection.count(:conditions => ["user_id = ? and connection_type = ? and appearances > ? and tone_score > ?", user.id, "following", 4, 0])
   if atleastfive > 1
-    @topcons = Connection.find(:all, :conditions => ["user_id = ? and connection_type = ? and tone_score > ?", user.id, "following", 0], :order => "appearances DESC, overall_index DESC", :limit => 5)
+    @topcons = Connection.find(:all, :conditions => ["user_id = ? and connection_type = ? and tone_score > ?", user.id, "following", 0], :order => "appearances DESC, overall_index DESC", :limit => 15)
     for topcon in @topcons
       toptweets = toptweets.to_s+%{<img src="}+topcon.profile_image_url.to_s+%{" height="24" width="24" style="float:left;" /> <span style="font-size:1.3em;">}+topcon.user_screen_name.to_s+%{</span><br />}
       tweet = Twitter.status(topcon.tone_tweet_id)
@@ -184,7 +184,7 @@ get '/onetime' do
 					fword = fword.downcase
 					followwords = followwords.to_s+"-"+fword.to_s
         end # end loop through words to build followwords text
-        cleantweet = %{<div style="display:block; padding:6px 0;">}
+        cleantweet = %{<div style="display:block; padding:13px 0;">}
         if @words.size < 3
       		cleantweet = cleantweet.to_s+tweet.full_text.to_s
       	else
@@ -198,9 +198,9 @@ get '/onetime' do
         end 
         cleantweet = cleantweet.to_s+%{</div>}
         toptweets = toptweets.to_s+cleantweet.to_s
-        #topcon.tone_tweet_id = 0
-        #topcon.tone_score = 0
-        #topcon.save
+        topcon.tone_tweet_id = 0
+        topcon.tone_score = 0
+        topcon.save
       end # end check if tweet exists
       if topcon.ttwo_score > 0
         tweet = Twitter.status(topcon.ttwo_tweet_id)
@@ -212,7 +212,7 @@ get '/onetime' do
             fword = fword.downcase
             followwords = followwords.to_s+"-"+fword.to_s
           end # end loop through words to build followwords text
-          cleantweet = %{<div style="display:block; padding:6px 0;">}
+          cleantweet = %{<div style="display:block; padding:13px 0;">}
           if @words.size < 3
             cleantweet = cleantweet.to_s+tweet.full_text.to_s
           else
@@ -226,9 +226,9 @@ get '/onetime' do
           end # end check if there are more than 3 words
           cleantweet = cleantweet.to_s+%{</div>}
           toptweets = toptweets.to_s+cleantweet.to_s
-          #topcon.ttwo_tweet_id = 0
-          #topcon.ttwo_score = 0
-          #topcon.save                
+          topcon.ttwo_tweet_id = 0
+          topcon.ttwo_score = 0
+          topcon.save                
         end # end check if second tweet exists
       end # end check if topcon has a second tweet to show
       if topcon.tthree_score > 0
@@ -241,7 +241,7 @@ get '/onetime' do
             fword = fword.downcase
             followwords = followwords.to_s+"-"+fword.to_s
           end # end loop through words to build followwords text
-          cleantweet = %{<div style="display:block; padding:6px 0;">}
+          cleantweet = %{<div style="display:block; padding:13px 0;">}
           if @words.size < 3
             cleantweet = cleantweet.to_s+tweet.full_text.to_s
           else
@@ -255,9 +255,9 @@ get '/onetime' do
           end # end check if there are more than 3 words
           cleantweet = cleantweet.to_s+%{</div>}
           toptweets = toptweets.to_s+cleantweet.to_s  
-          #topcon.tthree_tweet_id = 0
-          #topcon.tthree_score = 0
-          #topcon.save              
+          topcon.tthree_tweet_id = 0
+          topcon.tthree_score = 0
+          topcon.save              
         end # end check if third tweet exists
       end # end check if topcon has a third tweet to show
       toptweets = toptweets.to_s+%{<br /><br />}
@@ -284,13 +284,13 @@ get '/onetime' do
       }
     )         
     
-    #@aconnections = Connection.find(:all, :conditions => ["user_id = ? and connection_type = ?", user_id, "following"])
-    #for aconnection = @aconnections
-      #aconnection.appearances = 0
-      #aconnection.save
-    #end
+    @aconnections = Connection.find(:all, :conditions => ["user_id = ? and connection_type = ?", user_id, "following"])
+    for aconnection = @aconnections
+      aconnection.appearances = 0
+      aconnection.save
+    end
     
-    #user.last_tweetemail = Time.now 
+    user.last_tweetemail = Time.now 
   end # end check if there is at least two people with 5 appearences or more
   %{DONE}
 end
