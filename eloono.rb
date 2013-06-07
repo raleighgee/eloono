@@ -174,7 +174,7 @@ get '/onetime' do
   if atleastfive > 1
     @topcons = Connection.find(:all, :conditions => ["user_id = ? and connection_type = ? and tone_score > ?", user.id, "following", 0], :order => "appearances DESC, overall_index DESC", :limit => 10)
     for topcon in @topcons
-      toptweets = %{<img src="}+topcon.profile_image_url.to_s+%{" height="24" width="24" style="float:left;" /> <span style="font-size:1.3em;">}+topcon.user_screen_name.to_s+%{</span><br />}
+      toptweets = toptweets.to_s+%{<img src="}+topcon.profile_image_url.to_s+%{" height="24" width="24" style="float:left;" /> <span style="font-size:1.3em;">}+topcon.user_screen_name.to_s+%{</span><br />}
       tweet = Twitter.status(topcon.tone_tweet_id)
       if tweet
         @words =  tweet.full_text.split(" ")
