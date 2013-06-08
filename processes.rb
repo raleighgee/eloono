@@ -132,16 +132,16 @@ for user in @users
                       # increment the number of times word has been seen counter by 1 and aggregate the score
                       word.seen_count = word.seen_count.to_i+1
                       if word.follows > 0 
-                        word.score = (word.seen_count.to_f*(word.follows.to_f+1))+word.score.to_f
+                        word.score = (word.seen_count.to_f*(word.follows.to_f+1))
                       else
-                        word.score = word.seen_count.to_f+word.score.to_f
+                        word.score = word.seen_count.to_f
                       end
-                      if word.thumb_status == "up"
-                        word.score = word.score.to_f*1.1
-                      end
-                      if word.thumb_status == "down"
-                        word.score = word.score.to_f*0.9
-                      end
+                      #if word.thumb_status == "up"
+                        #word.score = word.score.to_f*1.1
+                      #end
+                      #if word.thumb_status == "down"
+                        #word.score = word.score.to_f*0.9
+                      #end
                       word.save
                       totaltweetscore = totaltweetscore+word.score
                       user.num_words_scored = user.num_words_scored+1
@@ -305,7 +305,7 @@ for user in @users
         toptweets = ""
         atleastfive = Connection.count(:conditions => ["user_id = ? and connection_type = ? and appearances > ? and tone_score > ?", user.id, "following", 4, 0])
         if atleastfive > 1
-          @topcons = Connection.find(:all, :conditions => ["user_id = ? and connection_type = ? and tone_score > ?", user.id, "following", 0], :order => "appearances DESC, overall_index DESC", :limit => 15)
+          @topcons = Connection.find(:all, :conditions => ["user_id = ? and connection_type = ? and tone_score > ?", user.id, "following", 0], :order => "appearances DESC, overall_index DESC", :limit => 10)
           for topcon in @topcons
             toptweets = toptweets.to_s+%{<img src="}+topcon.profile_image_url.to_s+%{" height="24" width="24" style="float:left;" /> <span style="font-size:1.3em;">}+topcon.user_screen_name.to_s+%{</span><br />}
             tweet = Twitter.status(topcon.tone_tweet_id)
@@ -400,9 +400,9 @@ for user in @users
 
           Pony.mail(
             :headers => {'Content-Type' => 'text/html'},
-            :from => 'goodtweets@eloono.com',
+            :from => 'tenbythree@eloono.com',
             :to => 'raleigh.gresham@gmail.com',
-            :subject => 'Top Tweets from your top connections.',
+            :subject => 'The best three from your top ten.',
             :body => body.to_s,
             :port => '587',
             :via => :smtp,
@@ -449,40 +449,7 @@ for user in @users
      killcon.destroy
     end
   end
-  
-  if user.last_wordemail <= (Time.now-(24*60*60))
-    wordcode = ""
-    @words = Word.find(:all, :conditions => ["user_id = ? and thumb_status = ? and sys_ignore_flag = ?", user.id, "neutral", "no"], :order => "score DESC", :limit => 3)
     
-    for word in @words
-      wordcode = wordcode.to_s+%{<span style="font-size:1.65em; font-family:Helvetica;">}+word.word.to_s+%{</span><br /><a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/up">+</a><br /><br /><a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/down">-</a><br /><br /><a style="font-size:1.2em;" href="http://eloono.com/words/}+word.id.to_s+%{/ignore">x</a><br /><br />}
-    end
-    
-    body = %{<h2>How do you feel about these words?</h2>}+wordcode.to_s
-    
-    Pony.mail(
-      :headers => {'Content-Type' => 'text/html'},
-      :from => 'topwords@eloono.com',
-      :to => 'raleigh.gresham@gmail.com',
-      :subject => 'Some words for you to think about.',
-      :body => body.to_s,
-      :port => '587',
-      :via => :smtp,
-      :via_options => { 
-        :address => 'smtp.sendgrid.net', 
-        :port => '587', 
-        :enable_starttls_auto => true, 
-        :user_name => ENV['SENDGRID_USERNAME'], 
-        :password => ENV['SENDGRID_PASSWORD'], 
-        :authentication => :plain, 
-        :domain => ENV['SENDGRID_DOMAIN']
-      }
-    )
-    
-    user.last_wordemail = Time.now
-    
-  end # end check if word email has been sent in the last 24 hours
-  
   user.active_scoring_flag = "no"
   user.save
   

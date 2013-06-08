@@ -162,12 +162,34 @@ get '/onetime' do
   
   user = User.find_by_id(1)
   
-  Twitter.configure do |config|
-		config.consumer_key = "DHBxwGvab2sJGw3XhsEmA"
-		config.consumer_secret = "530TCO6YMRuB23R7wse91rTcIKFPKQaxFQNVhfnk"
-		config.oauth_token = user.token
-		config.oauth_token_secret = user.secret
-	end
+  @words = Word.find(:all)
+  for word in @words
+    word.score = 0
+    if word.follows > 0 
+      word.score = (word.seen_count.to_f*(word.follows.to_f+1))
+    else
+      word.score = word.seen_count.to_f
+    end
+    word.thumb_status = "neutral"
+    word.save
+  end
+  
+  @connections = Connection.find(:all)
+  for connection in @connections
+    connection.average_word_score = 0
+    connection.average_stream_word_score = 0
+    if connection.connection_type == "following"
+      connection.appearances = 0
+      connection.tone_score = 0
+			connection.ttwo_score = 0
+			connection.tthree_score = 0
+			connection.tone_tweet_id = 0
+			connection.ttwo_tweet_id = 0
+			connection.tthree_tweet_id = 0
+			connection.overall_index = 0
+    end
+    connection.save
+  end
   
   %{DONE}
 end
