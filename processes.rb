@@ -89,7 +89,7 @@ for user in @users
     user.save
   else # if user intial_learning_complete_flag <> 0 then do this
     twords = Word.count(:conditions => ["user_id = ? and thumb_status = ?", user.id, "up"])
-    if twords >= 5
+    if twords == 0
       user.intial_learning_complete_flag = "yes"
       if user.num_tweets_shown == 0
         u = Twitter.user(user.uid)
