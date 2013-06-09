@@ -162,18 +162,6 @@ get '/onetime' do
   
   user = User.find_by_id(1)
   
-  @words = Word.find(:all)
-  for word in @words
-    word.score = 0
-    if word.follows > 0 
-      word.score = (word.seen_count.to_f*(word.follows.to_f+1))
-    else
-      word.score = word.seen_count.to_f
-    end
-    word.thumb_status = "neutral"
-    word.save
-  end
-  
   @connections = Connection.find(:all)
   for connection in @connections
     connection.average_word_score = 0
@@ -187,6 +175,7 @@ get '/onetime' do
 			connection.ttwo_tweet_id = 0
 			connection.tthree_tweet_id = 0
 			connection.overall_index = 0
+			connection.total_tweets_seen = 0
     end
     connection.save
   end
