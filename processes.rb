@@ -396,11 +396,11 @@ for user in @users
             toptweets = toptweets.to_s+%{<br /><br />}
           end # end loop through top ten connections
 
-          body = %{<h2>Here are the Tweets I found for you from the last few hours.</h2>}+toptweets.to_s
+          body = toptweets.to_s
 
           Pony.mail(
             :headers => {'Content-Type' => 'text/html'},
-            :from => 'tenbythree@eloono.com',
+            :from => 'toptweets@eloono.com',
             :to => 'raleigh.gresham@gmail.com',
             :subject => 'The best three from your top ten.',
             :body => body.to_s,
