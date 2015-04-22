@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title><% if @title %><%= @title.to_s %><% else %>Eloono<% end %></title>
+
+
+		<!-- Bootstrap -->
+		<link href="http://netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+		
+		<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	    	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	    	<!--[if lt IE 9]>
+	      		<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+	      		<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+	    	<![endif]-->
+		
+		<!-- Fontawesome -->
+		<link href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+		
+		<!-- My Styles
+		<link href="style.css" rel="stylesheet"> -->
+		
+	</head>
+	<body>
+		
+		<div class="container">
+			<br />
+			<%= yield %>
+			<br />
+		</div>
+
+		<!-- JavaScript plugins (requires jQuery) -->
+		<script src="http://code.jquery.com/jquery.min.js"></script>
+		<script src="http://netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+		<script src="../vendor/taphold.js"></script>
+		<script src="../vendor/jquery.touchSwipe.min.js"></script>
+		<script>
+			$( document ).ready(function() {
+
+				window.setInterval(function(){
+					$.ajax({
+						url: 'http://eloono.raleighgresham.com/refresh_rec',
+						//data: {
+						//	format: 'json'
+						//},
+						//error: function() {
+						//	$('#info').html('<p>An error has occurred</p>');
+						//},
+						//dataType: 'jsonp',
+						success: function(data) {
+							$('.rec_refresh_container').html(data);
+						},
+						type: 'GET'
+					});
+				}, 5000);
+
+				$(".rec_container").swipe({
+					swipe:function(event, direction, distance, duration, fingerCount){
+
+						//$(this).text("You swiped " + direction + " with " + fingerCount + " fingers" );
+						//$.ajax({
+						//	url: "../create_dot",
+						//	context: $(this)
+						//}).done(function(response) {
+						//	//$( this ).html( response );
+						//	//$( ".dot[dotNumber='""']" ).append( response );
+						//	$('.dot-container .dot:first').before(response);
+						
+						var recId = $(this).attr('id');
+
+						if (direction == "right"){
+							window.location.href = "http://eloono.raleighgresham.com/rec_action/none/follow/"+recId+"/direct";
+						} else if (direction == "left") {
+							$('.rec_refresh_container').html("");
+							window.location.href = "http://eloono.raleighgresham.com/rec_action/none/ignore/"+recId+"/na";
+						};
+
+					}//,
+					//fingers: 1
+				});
+				
+			});
+		</script>
+	</body>
+</html>

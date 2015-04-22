@@ -1,0 +1,26 @@
+<div class="row">
+	<div class="col-xs-12">
+		<% for category in @categories %>
+			<a href="../tweets/<%= category.id %>" role="button" class="btn <% if category.current_release_status == "open" %>btn-success<% elsif ((category.next_release - Time.now)/60) < 10 %>btn-info<% else %>btn-default<% end %> btn-lg btn-block" <% if category.current_release_status == "closed" %>disabled="disabled"<% end %>><%= category.name.to_s %>
+				<% if category.current_release_status == "closed" %>
+					<br />
+					<span style="font-size:0.85em;">Opens in 
+					 <% if (((category.next_release - Time.now)/60)/60) > 1 %>
+					 	<%= sprintf("%.0f", (((category.next_release - Time.now)/60)/60)) %>
+					 	<% if (((category.next_release - Time.now)/60)/60) <= 1 %> Hour<% else %> Hours<% end %>
+					 <% else %>
+					 	<% if ((category.next_release - Time.now)/60) < 1 %>
+					 		 Less than a Minute
+					 	<% else %>
+					 		<%= sprintf("%.0f", ((category.next_release - Time.now)/60)) %><% if ((category.next_release - Time.now)/60) <= 1 %> Minute<% else %> Minutes<% end %>
+					 	<% end %>
+					 <% end %>
+					 </span>
+				<% end %>
+			</a>
+		<% end %>
+		<div class="well well-large" style="margin-top:13px;">
+			<a href="../friends" role="button" class="btn btn-primary btn-lg btn-block"><i class="fa fa-user"></i> Mange People</a>
+		</div>
+	</div>
+</div>

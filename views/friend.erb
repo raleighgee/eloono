@@ -1,0 +1,31 @@
+<div class="modal-header">
+	<a class="hidden-lg hidden-md" href="twitter://user?screen_name=<%= @user.screen_name.to_s %>" target="_blank"><img src="<%= @user.profile_image_url.to_s %>" height="33px" width="51px" style="padding:0 9px;" /><%= @user.name.to_s %></a>
+	<a class="hidden-xs hidden-sm" href="http://tiwtter.com/<%= @user.screen_name.to_s %>" target="_blank"><img src="<%= @user.profile_image_url.to_s %>" height="33px" width="51px" style="padding:0 9px;" /><%= @user.name.to_s %></a>
+	<% if Follower.exists?(:user_id => @user.user_id) %> | <i class="fa fa-chain"></i><% end %>
+	<% if @user.url != "" %> | <a href="<%= @user.url.to_s %>" target="_blank"><i class="fa fa-external-link-square"></i></a><% end %>
+	<button type="button" class="close pull-right" data-dismiss="modal" aria-hidden="true">&times;</button>
+	<p style="text-align:center; padding-top:13px;"><em><%= @user.description.to_s %><% if @user.location != "" %></br><%= @user.location.to_s %><% end %></em></p>
+</div>
+
+<div class="modal-body">
+	<%= @code %>
+</div>
+
+<div class="modal-footer">
+	<p style="text-align:left;">
+		<% if @user.category_name != "Uncategorized" %>
+			<a href="../friend_category?type=remove&friend=<%= @user.user_id %>"><i class="fa fa-minus-square"></i></a> | 
+		<% end %>					
+		<% for category in @categories %>
+			<% unless category.name == @user.category_name %>
+				<a href="../friend_category?type=change&friend=<%= @user.user_id.to_s %>&newcategory=<%= category.id.to_s %>"><%= category.name.to_s %></a> | 
+			<% end %>
+		<% end %>
+		<a href="../friend_category?type=new&friend=<%= @user.user_id.to_s %>"><i class="fa fa-plus-square"></i></a>
+	</p>
+	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+</div>					
+	
+
+	
+					

@@ -1,0 +1,27 @@
+collect_new_leader_timeline - three times an hour
+	collects new tweets from all leaders
+
+collect_new_engagement_timeline - once an hour
+	collects new tweets sent by me
+
+collect_engagement_friends - once an hour
+	refreshes the list of people I am following
+
+collect_engagement_followers - once an hour
+	refreshes the list of people who follow me
+
+update_all_account_profiles - once an hour
+	updates 15000 profiles for accounts of any kind
+
+collect_engagement_friends_profiles - once an hour
+	collects profile info on the people i am following
+
+collect_leader_account_profiles  - twice a day
+	collects profile for new leader accounts
+
+collect_new_leader_search  - once an hour
+	collects new search results for all leaders
+	searches for 
+
+collect_new_engagement_search - once an hour
+	collects new search results for my account
