@@ -1,1 +1,0 @@
-web: bundle exec ruby eloono.rb -p $PORT
